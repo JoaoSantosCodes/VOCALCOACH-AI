@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles';
-import { Theme as MuiTheme } from '@mui/material/styles';
+import type { Theme as MuiTheme } from '@mui/material';
 
 // Extend the Theme type to include our custom properties
 declare module '@mui/material/styles' {
@@ -71,34 +71,33 @@ const shadows = {
   error: '0 4px 12px rgba(255, 77, 77, 0.25)'
 };
 
-// Escala de sombras do Material-UI (25 níveis)
 const shadowScale = [
-  'none',                // 0
-  shadows.card,          // 1
-  shadows.card,          // 2
-  shadows.card,          // 3
-  shadows.primary,       // 4
-  shadows.primary,       // 5
-  shadows.primary,       // 6
-  shadows.primary,       // 7
-  shadows.primary,       // 8
-  shadows.primary,       // 9
-  shadows.primary,       // 10
-  shadows.primary,       // 11
-  shadows.primary,       // 12
-  shadows.primary,       // 13
-  shadows.primary,       // 14
-  shadows.primary,       // 15
-  shadows.primary,       // 16
-  shadows.primary,       // 17
-  shadows.primary,       // 18
-  shadows.primary,       // 19
-  shadows.primary,       // 20
-  shadows.primary,       // 21
-  shadows.primary,       // 22
-  shadows.primary,       // 23
-  shadows.primary        // 24
-];
+  'none',
+  '0px 2px 4px rgba(0,0,0,0.1)',
+  '0px 4px 8px rgba(0,0,0,0.12)',
+  '0px 8px 16px rgba(0,0,0,0.14)',
+  '0px 12px 24px rgba(0,0,0,0.16)',
+  '0px 16px 32px rgba(0,0,0,0.18)',
+  '0px 20px 40px rgba(0,0,0,0.20)',
+  '0px 24px 48px rgba(0,0,0,0.22)',
+  '0px 28px 56px rgba(0,0,0,0.24)',
+  '0px 32px 64px rgba(0,0,0,0.26)',
+  '0px 36px 72px rgba(0,0,0,0.28)',
+  '0px 40px 80px rgba(0,0,0,0.30)',
+  '0px 44px 88px rgba(0,0,0,0.32)',
+  '0px 48px 96px rgba(0,0,0,0.34)',
+  '0px 52px 104px rgba(0,0,0,0.36)',
+  '0px 56px 112px rgba(0,0,0,0.38)',
+  '0px 60px 120px rgba(0,0,0,0.40)',
+  '0px 64px 128px rgba(0,0,0,0.42)',
+  '0px 68px 136px rgba(0,0,0,0.44)',
+  '0px 72px 144px rgba(0,0,0,0.46)',
+  '0px 76px 152px rgba(0,0,0,0.48)',
+  '0px 80px 160px rgba(0,0,0,0.50)',
+  '0px 84px 168px rgba(0,0,0,0.52)',
+  '0px 88px 176px rgba(0,0,0,0.54)',
+  '0px 92px 184px rgba(0,0,0,0.56)',
+] as const;
 
 const gradients = {
   primary: 'linear-gradient(135deg, #1E1E2E 0%, #2D2D44 100%)',
@@ -138,9 +137,9 @@ const theme = createTheme({
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#4ECDC4',
-      light: '#7FFFE4',
-      dark: '#2ECC71',
+      main: '#FF4081',
+      light: '#FF80AB',
+      dark: '#F50057',
       contrastText: '#FFFFFF',
     },
     error: {
@@ -156,8 +155,8 @@ const theme = createTheme({
       main: colors.success,
     },
     background: {
-      default: '#1E1E2E',
-      paper: '#2D2D44',
+      default: '#121212',
+      paper: '#1E1E1E',
     },
     text: {
       primary: '#FFFFFF',
@@ -169,35 +168,36 @@ const theme = createTheme({
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontSize: '3.5rem',
+      fontSize: '2.5rem',
       fontWeight: 700,
-      lineHeight: 1.2,
-      letterSpacing: '-0.02em',
     },
     h2: {
-      fontSize: '2.5rem',
-      fontWeight: 600,
-      lineHeight: 1.3,
-    },
-    h3: {
       fontSize: '2rem',
       fontWeight: 600,
-      lineHeight: 1.4,
     },
-    h4: {
+    h3: {
       fontSize: '1.75rem',
       fontWeight: 600,
-      lineHeight: 1.4,
     },
-    h5: {
+    h4: {
       fontSize: '1.5rem',
       fontWeight: 600,
-      lineHeight: 1.4,
     },
-    h6: {
+    h5: {
       fontSize: '1.25rem',
       fontWeight: 600,
-      lineHeight: 1.4,
+    },
+    h6: {
+      fontSize: '1rem',
+      fontWeight: 600,
+    },
+    body1: {
+      fontSize: '1rem',
+      lineHeight: 1.5,
+    },
+    body2: {
+      fontSize: '0.875rem',
+      lineHeight: 1.43,
     },
     subtitle1: {
       fontSize: '1.125rem',
@@ -210,16 +210,6 @@ const theme = createTheme({
       fontWeight: 500,
       lineHeight: 1.57,
       letterSpacing: '0.00714em',
-    },
-    body1: {
-      fontSize: '1rem',
-      lineHeight: 1.5,
-      letterSpacing: '0.00938em',
-    },
-    body2: {
-      fontSize: '0.875rem',
-      lineHeight: 1.43,
-      letterSpacing: '0.01071em',
     },
     button: {
       fontSize: '0.875rem',
@@ -348,5 +338,5 @@ const theme = createTheme({
   shadows: shadowScale,
 });
 
-export type Theme = MuiTheme;
-export default theme; 
+export { theme };
+export type Theme = MuiTheme; 

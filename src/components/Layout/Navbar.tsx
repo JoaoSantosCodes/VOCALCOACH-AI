@@ -1,205 +1,218 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Box,
-  Button,
-  Container,
+  Toolbar,
   IconButton,
-  Stack,
+  Typography,
+  Menu,
+  Container,
+  Avatar,
+  Button,
   Tooltip,
+  MenuItem,
   useTheme,
   useMediaQuery,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  MusicNote as MusicNoteIcon,
-  Dashboard as DashboardIcon,
-  Mic as MicIcon,
   GraphicEq as GraphicEqIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import Logo from './Logo';
+import LoginModal from '../Auth/LoginModal';
 
 const Navbar: React.FC = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navigationItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-    { path: '/practice', label: 'Praticar', icon: <MicIcon /> },
-    { path: '/karaoke', label: 'Karaokê', icon: <MusicNoteIcon /> },
-    { path: '/stats', label: 'Estatísticas', icon: <GraphicEqIcon /> },
-  ];
-
-  const handleNavigate = (path: string) => {
-    navigate(path);
-    setMobileOpen(false);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
   };
 
-  const handleMobileMenuToggle = () => {
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLoginClick = () => {
+    setLoginModalOpen(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+    handleCloseUserMenu();
+  };
+
+  const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.1,
-      },
-    },
-  };
+  const isAuthenticated = localStorage.getItem('token') !== null;
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-  };
+  const menuItems = [
+    { text: 'Dashboard', path: '/dashboard', icon: <GraphicEqIcon /> },
+    { text: 'Practice', path: '/practice', icon: <GraphicEqIcon /> },
+    { text: 'Karaoke', path: '/karaoke', icon: <GraphicEqIcon /> },
+  ];
 
   return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      sx={{
-        background: theme.gradients.glass,
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-      }}
-    >
-      <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            py: 2,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+    <>
+      <AppBar position="static" color="transparent" elevation={0}>
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
             <Logo size="small" />
-          </motion.div>
-
-          {isMobile ? (
-            <>
+            
+            {isMobile ? (
               <IconButton
-                onClick={handleMobileMenuToggle}
-                sx={{
-                  color: 'white',
-                  '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.1)',
-                  },
-                }}
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ ml: 'auto' }}
               >
-                {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+                <MenuIcon />
               </IconButton>
-
-              <AnimatePresence>
-                {mobileOpen && (
-                  <Box
-                    component={motion.div}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    sx={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      background: theme.gradients.glass,
-                      backdropFilter: 'blur(20px)',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                      zIndex: 1000,
-                    }}
-                  >
-                    <Container maxWidth="lg">
-                      <Stack spacing={2} sx={{ py: 3 }}>
-                        {navigationItems.map((item) => (
-                          <Button
-                            key={item.path}
-                            component={motion.button}
-                            whileHover={{ scale: 1.05, x: 10 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => handleNavigate(item.path)}
-                            startIcon={item.icon}
-                            variant={location.pathname === item.path ? 'contained' : 'text'}
-                            fullWidth
-                            sx={{
-                              justifyContent: 'flex-start',
-                              px: 2,
-                              py: 1.5,
-                              color: 'white',
-                              background: location.pathname === item.path
-                                ? theme.gradients.button
-                                : 'transparent',
-                              '&:hover': {
-                                background: location.pathname === item.path
-                                  ? theme.gradients.buttonHover
-                                  : 'rgba(255, 255, 255, 0.1)',
-                              },
-                            }}
-                          >
-                            {item.label}
-                          </Button>
-                        ))}
-                      </Stack>
-                    </Container>
-                  </Box>
-                )}
-              </AnimatePresence>
-            </>
-          ) : (
-            <Stack
-              component={motion.div}
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              direction="row"
-              spacing={1}
-            >
-              {navigationItems.map((item) => (
-                <motion.div key={item.path} variants={itemVariants}>
-                  <Tooltip title={item.label}>
+            ) : (
+              <>
+                <Box sx={{ flexGrow: 1, display: 'flex', ml: 4 }}>
+                  {isAuthenticated && menuItems.map((item) => (
                     <Button
-                      component={motion.button}
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleNavigate(item.path)}
-                      startIcon={item.icon}
-                      variant={location.pathname === item.path ? 'contained' : 'text'}
+                      key={item.text}
+                      component={Link}
+                      to={item.path}
+                      sx={{ 
+                        my: 2, 
+                        color: 'text.primary', 
+                        display: 'flex', 
+                        alignItems: 'center',
+                        mr: 2 
+                      }}
+                    >
+                      {item.icon}
+                      <Typography sx={{ ml: 1 }}>{item.text}</Typography>
+                    </Button>
+                  ))}
+                </Box>
+
+                <Box sx={{ flexGrow: 0 }}>
+                  {isAuthenticated ? (
+                    <>
+                      <Tooltip title="Open settings">
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                          <Avatar alt="User Avatar" />
+                        </IconButton>
+                      </Tooltip>
+                      <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                      >
+                        <MenuItem onClick={handleLogout}>
+                          <Typography textAlign="center">Logout</Typography>
+                        </MenuItem>
+                      </Menu>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={handleLoginClick}
                       sx={{
-                        px: 2,
-                        py: 1,
-                        color: 'white',
-                        background: location.pathname === item.path
-                          ? theme.gradients.button
-                          : 'transparent',
+                        color: 'text.primary',
+                        borderRadius: '20px',
+                        px: 3,
+                        border: '2px solid',
+                        borderColor: 'primary.main',
                         '&:hover': {
-                          background: location.pathname === item.path
-                            ? theme.gradients.buttonHover
-                            : 'rgba(255, 255, 255, 0.1)',
+                          backgroundColor: 'primary.main',
+                          color: 'white',
                         },
                       }}
                     >
-                      {item.label}
+                      Login
                     </Button>
-                  </Tooltip>
-                </motion.div>
-              ))}
-            </Stack>
-          )}
+                  )}
+                </Box>
+              </>
+            )}
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      <Drawer
+        variant="temporary"
+        anchor="right"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: 240,
+            backgroundColor: theme.palette.background.default,
+          },
+        }}
+      >
+        <Box sx={{ textAlign: 'right', p: 1 }}>
+          <IconButton onClick={handleDrawerToggle}>
+            <CloseIcon />
+          </IconButton>
         </Box>
-      </Container>
-    </AppBar>
+        <List>
+          {isAuthenticated ? (
+            <>
+              {menuItems.map((item) => (
+                <ListItem 
+                  button 
+                  key={item.text}
+                  component={Link}
+                  to={item.path}
+                  onClick={handleDrawerToggle}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItem>
+              ))}
+              <ListItem button onClick={handleLogout}>
+                <ListItemText primary="Logout" />
+              </ListItem>
+            </>
+          ) : (
+            <ListItem button onClick={handleLoginClick}>
+              <ListItemText primary="Login" />
+            </ListItem>
+          )}
+        </List>
+      </Drawer>
+
+      <LoginModal
+        open={isLoginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
+    </>
   );
 };
 

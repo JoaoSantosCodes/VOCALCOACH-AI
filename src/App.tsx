@@ -1,6 +1,10 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { CssBaseline } from '@mui/material';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+// Theme
+import { theme } from './utils/theme';
 
 // Pages
 import Home from './pages/Home';
@@ -10,39 +14,49 @@ import Karaoke from './pages/Karaoke';
 
 // Components
 import Layout from './components/Layout';
-import PrivateRoute from './components/Auth/PrivateRoute';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      { 
-        path: "/", 
-        element: <Home /> 
-      },
-      { 
-        path: "/dashboard", 
-        element: <PrivateRoute><Dashboard /></PrivateRoute> 
-      },
-      { 
-        path: "/practice", 
-        element: <PrivateRoute><Practice /></PrivateRoute> 
-      },
-      { 
-        path: "/karaoke", 
-        element: <PrivateRoute><Karaoke /></PrivateRoute> 
-      }
-    ]
-  }
-]);
+const isAuthenticated = () => localStorage.getItem('token') !== null;
+
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return isAuthenticated() ? <>{children}</> : <Navigate to="/" replace />;
+};
 
 const App: React.FC = () => {
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <RouterProvider router={router} />
-    </>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route
+              path="dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="practice"
+              element={
+                <PrivateRoute>
+                  <Practice />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="karaoke"
+              element={
+                <PrivateRoute>
+                  <Karaoke />
+                </PrivateRoute>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
