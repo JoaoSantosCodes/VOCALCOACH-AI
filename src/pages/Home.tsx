@@ -43,7 +43,7 @@ const Home: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const [activeFeature, setActiveFeature] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
 
@@ -176,6 +176,10 @@ const Home: React.FC = () => {
     navigate('/dashboard');
   };
 
+  const handleDemoClick = () => {
+    navigate('/demo');
+  };
+
   return (
     <Box
       sx={{
@@ -260,44 +264,66 @@ const Home: React.FC = () => {
               variant="h1"
               component={motion.h1}
               sx={{
-                fontSize: { xs: '2.5rem', md: '4rem' },
-                fontWeight: 700,
+                fontSize: {
+                  xs: '2.5rem',
+                  sm: '3.5rem',
+                  md: '4.5rem'
+                },
                 background: theme.gradients.text,
-                backgroundClip: 'text',
-                textFillColor: 'transparent',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
                 maxWidth: '800px',
                 lineHeight: 1.2,
-                mb: 2,
+                mb: 2
               }}
             >
-              Desenvolva Seu
+              Desenvolva Seu{' '}
               <Box
-                component={motion.span}
-                variants={waveVariants}
-                animate="animate"
-                display="inline-block"
-                mx={2}
+                component="span"
+                sx={{
+                  display: 'inline-block',
+                  position: 'relative'
+                }}
               >
-                🎵
+                Potencial Vocal
+                <Box
+                  component="span"
+                  sx={{
+                    position: 'absolute',
+                    right: '-1.5rem',
+                    top: '-0.5rem',
+                    fontSize: {
+                      xs: '2rem',
+                      sm: '3rem',
+                      md: '4rem'
+                    }
+                  }}
+                >
+                  🎵
+                </Box>
               </Box>
-              <br />
-              Potencial Vocal
             </Typography>
 
             <Typography
               variant="h2"
               component={motion.h2}
               sx={{
-                fontSize: { xs: '1.25rem', md: '1.5rem' },
-                fontWeight: 400,
-                color: 'rgba(255, 255, 255, 0.9)',
-                maxWidth: '600px',
+                fontSize: {
+                  xs: '1.25rem',
+                  sm: '1.5rem',
+                  md: '1.75rem'
+                },
+                color: 'text.secondary',
+                maxWidth: '800px',
                 mx: 'auto',
+                px: 2,
                 lineHeight: 1.5,
-                mb: 4,
+                mb: 4
               }}
             >
-              Treine sua voz com feedback em tempo real usando inteligência artificial avançada
+              Treine sua voz com feedback em tempo real usando
+              <br />
+              inteligência artificial avançada
             </Typography>
           </Box>
 
@@ -367,6 +393,7 @@ const Home: React.FC = () => {
               variant="outlined"
               size="large"
               startIcon={<MusicNoteIcon />}
+              onClick={handleDemoClick}
               sx={{
                 px: 6,
                 py: 2,

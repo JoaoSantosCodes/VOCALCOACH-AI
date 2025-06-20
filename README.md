@@ -1,146 +1,105 @@
-# VocalCoach AI 🎵
+# VocalCoach AI 🎤
 
-Uma aplicação moderna para treinamento vocal com feedback em tempo real usando inteligência artificial.
+Uma aplicação web moderna para treinamento vocal usando inteligência artificial.
 
-## 🌟 Funcionalidades
+## Funcionalidades 🌟
 
-- **Análise Vocal em Tempo Real**: Feedback instantâneo sobre afinação e técnica vocal
-- **Interface Moderna e Responsiva**: Design fluido com animações e transições suaves
-- **Dashboard Interativo**: Acompanhe seu progresso com visualizações dinâmicas
-- **Modo Karaokê**: Pratique com suas músicas favoritas
-- **Sistema de Conquistas**: Ganhe recompensas conforme evolui
-- **Exercícios Personalizados**: Treinos adaptados ao seu nível
+- Análise de voz em tempo real
+- Feedback instantâneo de afinação
+- Visualização de forma de onda
+- Interface responsiva e moderna
+- Processamento de áudio otimizado com Web Workers
 
-## 🎨 Design System
+## Tecnologias 💻
 
-### Cores e Gradientes
-```css
-/* Gradientes Principais */
-primary: 'linear-gradient(135deg, #1E1E2E 0%, #2D2D44 100%)'
-secondary: 'linear-gradient(135deg, #7C4DFF 0%, #651FFF 100%)'
-text: 'linear-gradient(135deg, #B388FF 0%, #7C4DFF 100%)'
+- React 18
+- TypeScript
+- Material-UI
+- Web Audio API
+- Web Workers
+- Jest & Testing Library
 
-/* Efeitos de Vidro */
-glass: 'rgba(255, 255, 255, 0.1)'
-darkGlass: 'rgba(0, 0, 0, 0.2)'
-blur: 'blur(10px)'
-```
+## Começando 🚀
 
-### Tipografia
-- **Principal**: Inter, Roboto, Helvetica, Arial, sans-serif
-- **Hierarquia**:
-  - H1: 4rem (Desktop) / 2.5rem (Mobile)
-  - H2: 1.5rem
-  - Body: 1rem
-  - Small: 0.875rem
+### Pré-requisitos
 
-### Animações
-- Transições suaves: 0.3s ease
-- Hover effects: scale(1.02-1.05)
-- Page transitions: fade + slide
-- Loading states: pulse animation
+- Node.js 16+ 
+- npm ou yarn
 
-### Componentes
-- **Cards**: Efeito de vidro com bordas suaves
-- **Botões**: Gradientes animados com hover effect
-- **Gráficos**: Gradientes semi-transparentes
-- **Ícones**: Animações de hover e click
+### Instalação
 
-## 🚀 Instalação
-
-1. Clone o repositório:
+1. Clone o repositório
 ```bash
 git clone https://github.com/seu-usuario/vocalcoach-ai.git
 cd vocalcoach-ai
 ```
 
-2. Instale as dependências:
+2. Instale as dependências
 ```bash
 npm install
 ```
 
-3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env
-```
-Edite o arquivo `.env` com suas configurações
-
-4. Inicie o servidor de desenvolvimento:
+3. Inicie o servidor de desenvolvimento
 ```bash
 npm start
 ```
 
-## 🛠️ Tecnologias
+### Testes 🧪
 
-- **Frontend**:
-  - React 18
-  - TypeScript
-  - Material-UI v5
-  - Framer Motion
-  - Chart.js
-  - Axios
+O projeto usa Jest e Testing Library para testes. Para executar os testes:
 
-- **Backend**:
-  - Node.js
-  - Express
-  - MongoDB
-  - WebSocket
-  - TensorFlow.js
-
-## 📱 Compatibilidade
-
-- **Desktop**: Chrome 90+, Firefox 88+, Safari 14+
-- **Mobile**: iOS 14+, Android 8+
-- **Tablets**: iPad OS 14+, Android 8+
-
-## 🔧 Configuração do Ambiente de Desenvolvimento
-
-### Requisitos
-- Node.js 16+
-- npm 7+ ou yarn 1.22+
-- MongoDB 4.4+
-
-### VSCode Extensions Recomendadas
-- ESLint
-- Prettier
-- Material Icon Theme
-- Auto Import
-- GitLens
-
-### Scripts Disponíveis
 ```bash
-npm start        # Inicia o servidor de desenvolvimento
-npm test        # Executa os testes
-npm run build   # Cria a build de produção
-npm run lint    # Executa o linter
-npm run format  # Formata o código
+# Executar todos os testes
+npm test
+
+# Executar testes em modo watch
+npm run test:watch
+
+# Verificar cobertura de testes
+npm run test:coverage
 ```
 
-## 🤝 Contribuição
+## Estrutura do Projeto 📁
 
-1. Fork o projeto
-2. Crie sua Feature Branch (`git checkout -b feature/AmazingFeature`)
+```
+src/
+├── components/         # Componentes React reutilizáveis
+├── pages/             # Páginas da aplicação
+├── services/          # Serviços e APIs
+├── utils/             # Utilitários e helpers
+├── workers/           # Web Workers para processamento
+└── __tests__/         # Testes
+```
+
+## Contribuindo 🤝
+
+1. Faça um Fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
 3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a Branch (`git push origin feature/AmazingFeature`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-### Padrões de Código
-- Utilize TypeScript
-- Siga o ESLint config
-- Mantenha 100% de cobertura de testes
-- Documente novas funcionalidades
-- Siga o padrão de commits convencional
+### Guia de Contribuição
 
-## 📝 Licença
+- Escreva testes para novas funcionalidades
+- Siga o padrão de código existente
+- Atualize a documentação quando necessário
+- Mantenha os commits organizados e descritivos
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+## Roadmap 🗺️
 
-## 📞 Suporte
+- [ ] Expandir cobertura de testes
+- [ ] Implementar análise de timbre
+- [ ] Adicionar exercícios vocais guiados
+- [ ] Melhorar feedback visual
+- [ ] Implementar sistema de progresso
 
-- Email: support@vocalcoach-ai.com
-- Discord: [VocalCoach AI Community](https://discord.gg/vocalcoach-ai)
-- Twitter: [@VocalCoachAI](https://twitter.com/vocalcoach-ai)
+## Licença 📝
 
----
+Este projeto está sob a licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
 
-Desenvolvido com ❤️ pela equipe VocalCoach AI 
+## Contato 📧
+
+Seu Nome - [@seu-twitter](https://twitter.com/seu-twitter)
+
+Link do Projeto: [https://github.com/seu-usuario/vocalcoach-ai](https://github.com/seu-usuario/vocalcoach-ai) 

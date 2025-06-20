@@ -92,3 +92,84 @@
 2. Corrigir sistema de tipos (Theme, Axios)
 3. Limpar warnings do ESLint
 4. Testar todas as rotas e componentes 
+
+## 🎤 Análise de Voz
+
+### Biblioteca Pitchy ✅
+- **Status**: Resolvido
+- **Problema**: Erro na importação da função detectPitch
+- **Solução Aplicada**:
+  ```typescript
+  // Antes
+  import { detectPitch } from 'pitchy';
+  
+  // Depois
+  import { PitchDetector } from 'pitchy';
+  const detector = PitchDetector.forFloat32Array(bufferSize);
+  const [pitch, clarity] = detector.findPitch(buffer, sampleRate);
+  ```
+- **Arquivos Afetados**:
+  - src/components/VoiceAnalysis/VoiceCapture.tsx
+
+### Web Audio API 🔄
+- **Status**: Em Monitoramento
+- **Considerações**:
+  - Gerenciamento de recursos de áudio
+  - Limpeza de contexto ao desmontar
+  - Compatibilidade cross-browser
+- **Melhorias Planejadas**:
+  ```typescript
+  // Implementar cleanup mais robusto
+  useEffect(() => {
+    return () => {
+      // Limpar recursos
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+  ```
+
+### Performance ⚠️
+- **Status**: Pendente
+- **Problemas Identificados**:
+  - Alto uso de CPU em análise contínua
+  - Possível memory leak em longos períodos
+  - Latência em dispositivos mais lentos
+- **Soluções Propostas**:
+  1. Implementar throttling na análise
+  2. Usar Web Workers para processamento
+  3. Otimizar tamanho do buffer
+  4. Implementar pooling de recursos
+
+### Permissões de Áudio 🔄
+- **Status**: Em Desenvolvimento
+- **Problemas**:
+  - Tratamento de negação de permissão
+  - Feedback ao usuário sobre status
+  - Reconexão após perda de permissão
+- **Próximos Passos**:
+  1. Melhorar mensagens de erro
+  2. Adicionar retry automático
+  3. Implementar fallback para navegadores não suportados 
+
+## ESLint e Melhorias de Código (Data: Atual)
+
+1. Correções de ESLint:
+   - Adicionada regra para permitir uso de 'self' no Web Worker
+   - Removidas variáveis não utilizadas no Home.tsx
+   - Implementado corretamente o theme e reportWebVitals
+
+2. Melhorias de Código:
+   - Adicionado ThemeProvider no index.tsx
+   - Implementado reportWebVitals.ts
+   - Melhorada responsividade na página Home
+   - Otimizado uso de breakpoints para diferentes tamanhos de tela
+
+3. Próximos Passos:
+   - Continuar monitorando warnings do ESLint
+   - Implementar testes unitários para os componentes
+   - Otimizar performance do Web Worker 
