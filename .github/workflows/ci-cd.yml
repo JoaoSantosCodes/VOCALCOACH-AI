@@ -1,0 +1,209 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          
+      - name: Run linting
+        run: |
+          npm run lint
+          cd backend && npm run lint
+          
+      - name: Run type checking
+        run: |
+          npm run type-check
+          cd backend && npm run type-check
+          
+      - name: Run unit tests
+        run: |
+          npm run test
+          cd backend && npm run test
+        
+      - name: Run E2E tests
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm run dev
+          wait-on: 'http://localhost:3000'
+          
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run SAST scan
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript, typescript
+          
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        
+      - name: Run dependency audit
+        run: |
+          npm audit
+          cd backend && npm audit
+          
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          
+      - name: Build frontend
+        run: npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          
+      - name: Build backend
+        run: cd backend && npm run build
+        
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: build/
+          
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build
+          path: backend/dist/
+          
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: build
+          
+      - name: Download backend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-build
+          path: backend/dist
+          
+      - name: Deploy to staging
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_STAGING }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
+          package: .
+          
+      - name: Run smoke tests
+        run: |
+          npm install -g newman
+          newman run tests/api/smoke-tests.json --environment staging
+          
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, deploy-staging]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: build
+          
+      - name: Download backend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-build
+          path: backend/dist
+          
+      - name: Deploy to production
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME_PROD }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PROD }}
+          package: .
+          
+      - name: Run health check
+        run: |
+          curl -f ${{ secrets.PROD_HEALTH_CHECK_URL }}
+          
+  monitoring:
+    name: Post-deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    
+    steps:
+      - name: Configure monitoring alerts
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az monitor alert create \
+              --name "High CPU Usage" \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --condition "CPU percentage > 80%" \
+              --window-size 5m \
+              --evaluation-frequency 1m
+            
+      - name: Setup logging
+        run: |
+          az webapp log config \
+            --name ${{ secrets.AZURE_WEBAPP_NAME_PROD }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --web-server-logging filesystem
+            
+      - name: Configure metrics collection
+        run: |
+          az monitor metrics alert create \
+            --name "Response Time Alert" \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --condition "avg responseTime > 1000ms" \
+            --window-size 5m \
+            --evaluation-frequency 1m 

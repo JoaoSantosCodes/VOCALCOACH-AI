@@ -1,0 +1,78 @@
+name: Lighthouse CI
+on: 
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g @lhci/cli@0.13.x
+          
+      - name: Build project
+        run: npm run build
+        env:
+          CI: true
+          
+      - name: Run Lighthouse CI
+        run: |
+          lhci autorun \
+            --upload.target=temporary-public-storage \
+            --collect.staticDistDir=./build \
+            --collect.numberOfRuns=3 \
+            --collect.settings.throttling.cpuSlowdownMultiplier=4 \
+            --assert.preset=lighthouse:recommended \
+            --assert.assertions.interactive-dom-size.error=1000 \
+            --assert.assertions.render-blocking-resources.warning=0 \
+            --assert.assertions.uses-responsive-images.warning=0 \
+            --assert.assertions.uses-rel-preconnect.warning=0 \
+            --assert.assertions.total-byte-weight.warning=1000000
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Save Lighthouse report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-results
+          path: .lighthouseci
+
+      - name: Notify on Performance Issues
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const run_id = context.runId;
+            
+            const summary = `🚨 Performance issues detected in Lighthouse CI run
+            
+            - Check the [Lighthouse report](https://github.com/${owner}/${repo}/actions/runs/${run_id}) for details
+            - Common issues to check:
+              - Bundle size
+              - Render-blocking resources
+              - Image optimization
+              - Resource preloading
+              - JavaScript execution time
+            
+            Please review and optimize the affected areas.`;
+            
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title: '🔍 Performance Issues Detected',
+              body: summary,
+              labels: ['performance', 'needs-review']
+            }); 

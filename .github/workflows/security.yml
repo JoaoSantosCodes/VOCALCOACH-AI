@@ -1,0 +1,119 @@
+name: Security Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * *' # Executa diariamente à meia-noite
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          cd ../
+
+      # Análise de dependências com Snyk
+      - name: Snyk Security Scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      # SAST com SonarCloud
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Verificação de secrets com GitGuardian
+      - name: GitGuardian scan
+        uses: GitGuardian/ggshield-action@master
+        env:
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
+      # Análise de vulnerabilidades com OWASP ZAP
+      - name: OWASP ZAP Scan
+        uses: zaproxy/action-full-scan@v0.7.0
+        with:
+          target: 'https://api.vocalcoach.ai'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
+
+      # Verificação de licenças
+      - name: License Compliance Check
+        run: |
+          npx license-checker --production --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause" --summary
+
+      # Auditoria de npm
+      - name: NPM Audit
+        run: |
+          npm audit
+          cd backend && npm audit
+          cd ../
+
+      # Análise estática com ESLint
+      - name: ESLint Security Rules Check
+        run: |
+          npx eslint . --config .eslintrc.security.js
+
+      # Testes de segurança
+      - name: Security Tests
+        run: |
+          npm run test:security
+
+      # Relatório de cobertura de segurança
+      - name: Security Coverage Report
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: security
+          name: security-coverage
+
+  security-gates:
+    needs: security-checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Security Gates
+        run: |
+          # Verifica se todos os checks passaram
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "All security checks passed!"
+            exit 0
+          else
+            echo "Security checks failed!"
+            exit 1
+          fi
+
+  notify:
+    needs: [security-checks, security-gates]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Notify Security Team
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always() 

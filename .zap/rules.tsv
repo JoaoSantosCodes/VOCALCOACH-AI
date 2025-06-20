@@ -1,0 +1,62 @@
+10010	IGNORE	Cookie No HttpOnly Flag
+10011	WARN	Cookie Without Secure Flag
+10015	ERROR	Incomplete or No Cache-control and Pragma HTTP Header Set
+10016	ERROR	Web Browser XSS Protection Not Enabled
+10017	ERROR	Cross-Domain JavaScript Source File Inclusion
+10019	ERROR	Content-Type Header Missing
+10020	ERROR	X-Frame-Options Header Not Set
+10021	ERROR	X-Content-Type-Options Header Missing
+10023	ERROR	Information Disclosure - Debug Error Messages
+10024	ERROR	Information Disclosure - Sensitive Information in URL
+10025	ERROR	Information Disclosure - Sensitive Information in HTTP Referrer Header
+10026	ERROR	HTTP Parameter Override
+10027	ERROR	Information Disclosure - Suspicious Comments
+10032	ERROR	Viewstate without MAC Signature
+10040	ERROR	Secure Pages Include Mixed Content
+10054	ERROR	Cookie Without SameSite Attribute
+10055	ERROR	CSP Scanner
+10095	ERROR	Backup File Disclosure
+10202	ERROR	Absence of Anti-CSRF Tokens
+20012	ERROR	Anti-CSRF Tokens Scanner
+20014	ERROR	HTTP Parameter Pollution
+20015	ERROR	Heartbleed OpenSSL Vulnerability
+20016	ERROR	Cross-Domain Misconfiguration
+20017	ERROR	Source Code Disclosure - CVE-2012-1823
+20018	ERROR	Remote Code Execution - CVE-2012-1823
+20019	ERROR	External Redirect
+40003	ERROR	CRLF Injection
+40008	ERROR	Parameter Tampering
+40009	ERROR	Server Side Include
+40012	ERROR	Cross Site Scripting (Reflected)
+40013	ERROR	Session Fixation
+40014	ERROR	Cross Site Scripting (Persistent)
+40016	ERROR	Cross Site Scripting (Persistent) - Prime
+40017	ERROR	Cross Site Scripting (Persistent) - Spider
+40018	ERROR	SQL Injection
+40019	ERROR	SQL Injection - MySQL
+40020	ERROR	SQL Injection - Hypersonic SQL
+40021	ERROR	SQL Injection - Oracle
+40022	ERROR	SQL Injection - PostgreSQL
+40023	ERROR	Username Enumeration
+40024	ERROR	SQL Injection - SQLite
+40025	ERROR	Proxy Disclosure
+40026	ERROR	Cross Site Scripting (DOM Based)
+40027	ERROR	SQL Injection - MsSQL
+40028	ERROR	ELMAH Information Leak
+40029	ERROR	Trace.axd Information Leak
+90001	ERROR	Insecure JSF ViewState
+90011	ERROR	Charset Mismatch
+90019	ERROR	Server Side Code Injection
+90020	ERROR	Remote OS Command Injection
+90021	ERROR	XPath Injection
+90022	ERROR	Application Error Disclosure
+90023	ERROR	XML External Entity Attack
+90024	ERROR	Generic Padding Oracle
+90025	ERROR	Expression Language Injection
+90026	ERROR	SOAP Action Spoofing
+90027	ERROR	Cookie Slack Detector
+90028	ERROR	Insecure HTTP Method
+90029	ERROR	SOAP XML Injection
+90030	ERROR	WSDL File Detection
+90033	ERROR	Loosely Scoped Cookie
+90034	ERROR	Cloud Metadata Attack 
