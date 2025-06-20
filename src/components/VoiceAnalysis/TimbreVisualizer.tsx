@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Paper, Typography, LinearProgress, useTheme } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
+import { useSpring, animated } from '@react-spring/web';
 
-interface TimbreFeatures {
+export interface VisualizerFeatures {
   spectralCentroid: number;
   spectralFlatness: number;
   spectralRolloff: number;
@@ -9,98 +10,152 @@ interface TimbreFeatures {
 }
 
 interface TimbreVisualizerProps {
-  features: TimbreFeatures;
+  features?: VisualizerFeatures;
 }
 
-const TimbreVisualizer: React.FC<TimbreVisualizerProps> = ({ features }) => {
-  const theme = useTheme();
+const TimbreVisualizer: React.FC<TimbreVisualizerProps> = ({ features = { 
+  spectralCentroid: 0, 
+  spectralFlatness: 0, 
+  spectralRolloff: 0, 
+  harmonicRatio: 0 
+} }) => {
+  const visualizerAnimation = useSpring({
+    from: { scale: 0.8, opacity: 0 },
+    to: { scale: 1, opacity: 1 },
+    config: { tension: 300, friction: 20 }
+  });
 
-  // Normaliza os valores para exibição
-  const normalizeValue = (value: number, min: number, max: number): number => {
-    return ((value - min) / (max - min)) * 100;
+  // Normaliza os valores para uso na visualização
+  const amplitude = features.spectralFlatness;
+  const frequency = features.spectralCentroid / 1000;
+  const timbre = features.harmonicRatio;
+  const rolloff = features.spectralRolloff;
+
+  // Calcula cores baseadas nas características
+  const getVibrancyColor = (t: number) => {
+    const hue = Math.min(200 + (t * 160), 360); // Varia de azul a vermelho
+    return `hsl(${hue}, 70%, 50%)`;
   };
 
-  // Configuração dos limites para cada característica
-  const limits = {
-    spectralCentroid: { min: 0, max: 5000, label: 'Brilho' },
-    spectralFlatness: { min: 0, max: 1, label: 'Riqueza Harmônica' },
-    spectralRolloff: { min: 0, max: 10000, label: 'Decaimento Espectral' },
-    harmonicRatio: { min: 0, max: 1, label: 'Razão Harmônica' }
+  // Gera descrições para tooltips
+  const getTimbreDescription = (t: number) => {
+    if (t < 0.3) return "Som mais opaco/fechado";
+    if (t < 0.6) return "Som equilibrado";
+    return "Som mais brilhante/aberto";
+  };
+
+  const getAmplitudeDescription = (a: number) => {
+    if (a < 0.3) return "Volume baixo";
+    if (a < 0.7) return "Volume moderado";
+    return "Volume alto";
   };
 
   return (
-    <Paper
-      elevation={3}
+    <Box
       sx={{
-        p: 3,
+        width: '100%',
+        height: '200px',
+        bgcolor: 'background.paper',
         borderRadius: 2,
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(10px)'
+        overflow: 'hidden',
+        position: 'relative',
+        padding: 2,
+        boxShadow: 3
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Análise de Timbre
+      <Typography
+        variant="caption"
+        sx={{
+          position: 'absolute',
+          top: 8,
+          left: 8,
+          color: 'text.secondary'
+        }}
+      >
+        Visualizador de Timbre
       </Typography>
 
-      {Object.entries(features).map(([key, value]) => {
-        const { min, max, label } = limits[key as keyof TimbreFeatures];
-        const normalizedValue = normalizeValue(value, min, max);
+      <animated.div
+        style={{
+          ...visualizerAnimation,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <svg width="100%" height="100%" viewBox="0 0 100 100">
+          {/* Grade de fundo */}
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.1" />
+          </pattern>
+          <rect width="100" height="100" fill="url(#grid)" opacity="0.1" />
 
-        return (
-          <Box key={key} sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {label}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {Math.round(normalizedValue)}%
-              </Typography>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={normalizedValue}
-              sx={{
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 4,
-                  background: theme.gradients.primary
-                }
-              }}
+          {/* Círculo principal com tooltip */}
+          <Tooltip title={getTimbreDescription(timbre)} placement="top">
+            <animated.circle
+              cx="50"
+              cy="50"
+              r={20 + amplitude * 15}
+              fill="none"
+              stroke={getVibrancyColor(timbre)}
+              strokeWidth="2"
+              opacity={0.5 + timbre * 0.5}
             />
-          </Box>
-        );
-      })}
+          </Tooltip>
 
-      <Box sx={{ mt: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Interpretação:
-        </Typography>
-        <Box component="ul" sx={{ mt: 1, pl: 2 }}>
-          <li>
-            <Typography variant="body2">
-              Brilho: Indica a presença de frequências altas
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2">
-              Riqueza Harmônica: Mostra a complexidade do som
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2">
-              Decaimento Espectral: Indica como a energia se distribui
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2">
-              Razão Harmônica: Mede a presença de harmônicos
-            </Typography>
-          </li>
-        </Box>
-      </Box>
-    </Paper>
+          {/* Onda de frequência com tooltip */}
+          <Tooltip title={getAmplitudeDescription(amplitude)} placement="bottom">
+            <animated.path
+              d={`
+                M 20,50 
+                Q 35,${50 - frequency * 15} 50,50 
+                T 80,50
+              `}
+              fill="none"
+              stroke={getVibrancyColor(rolloff)}
+              strokeWidth="2"
+            />
+          </Tooltip>
+
+          {/* Indicadores de intensidade */}
+          <circle
+            cx="90"
+            cy={100 - (amplitude * 80)}
+            r="2"
+            fill={getVibrancyColor(amplitude)}
+          />
+          <line
+            x1="88"
+            y1="20"
+            x2="92"
+            y2="20"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            opacity="0.3"
+          />
+          <line
+            x1="88"
+            y1="50"
+            x2="92"
+            y2="50"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            opacity="0.3"
+          />
+          <line
+            x1="88"
+            y1="80"
+            x2="92"
+            y2="80"
+            stroke="currentColor"
+            strokeWidth="0.5"
+            opacity="0.3"
+          />
+        </svg>
+      </animated.div>
+    </Box>
   );
 };
 
