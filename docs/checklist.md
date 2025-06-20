@@ -35,14 +35,14 @@
   - [x] Adicionar feedback de intensidade
 
 ### Prioridade Alta - Acessibilidade 🟡
-- [ ] Implementar ARIA labels
-  - [ ] Adicionar roles apropriados
-  - [ ] Implementar descrições para leitores de tela
-  - [ ] Adicionar estados ARIA
-- [ ] Suporte a navegação por teclado
-  - [ ] Implementar focus management
-  - [ ] Adicionar atalhos de teclado
-  - [ ] Melhorar ordem de tabulação
+- [x] Implementar ARIA labels
+  - [x] Adicionar roles apropriados
+  - [x] Implementar descrições para leitores de tela
+  - [x] Adicionar estados ARIA
+- [x] Suporte a navegação por teclado
+  - [x] Implementar focus management
+  - [x] Adicionar atalhos de teclado
+  - [x] Melhorar ordem de tabulação
 - [ ] Modo de alto contraste
   - [ ] Implementar temas acessíveis
   - [ ] Adicionar opções de contraste

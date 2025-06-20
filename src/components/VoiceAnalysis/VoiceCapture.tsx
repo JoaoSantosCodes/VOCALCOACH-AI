@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, IconButton, Typography, Alert, Snackbar, LinearProgress } from '@mui/material';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Box, IconButton, Typography, Alert, Snackbar, LinearProgress, useTheme } from '@mui/material';
 import { Mic, Stop, GraphicEq, VolumeUp } from '@mui/icons-material';
 import TimbreVisualizer from './TimbreVisualizer';
 
@@ -51,6 +51,21 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
   const waveformDataRef = useRef<Uint8Array | null>(null);
   const audioWorkerRef = useRef<Worker | null>(null);
   const timbreWorkerRef = useRef<Worker | null>(null);
+
+  const theme = useTheme();
+  const [focusVisible, setFocusVisible] = useState(false);
+
+  // Handlers para navegação por teclado
+  const handleKeyPress = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+  }, [isRecording]);
 
   // Inicializa os Web Workers
   useEffect(() => {
@@ -302,8 +317,16 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
   };
 
   return (
-    <Box sx={{ width: '100%', p: 2 }}>
-      <Box data-testid="audio-status" sx={{ display: 'none' }}>
+    <Box 
+      sx={{ width: '100%', p: 2 }}
+      role="region"
+      aria-label="Análise de Voz"
+    >
+      <Box 
+        data-testid="audio-status" 
+        sx={{ display: 'none' }}
+        aria-hidden="true"
+      >
         {isRecording ? 'recording' : 'stopped'}
       </Box>
 
@@ -312,6 +335,8 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
           severity="error" 
           data-testid="permission-error"
           sx={{ mb: 2 }}
+          role="alert"
+          aria-live="assertive"
         >
           {error}
         </Alert>
@@ -322,21 +347,42 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
           severity="warning" 
           data-testid="quality-warning"
           sx={{ mb: 2 }}
+          role="alert"
+          aria-live="polite"
         >
           Qualidade do áudio está baixa. Tente reduzir o ruído ambiente.
         </Alert>
       )}
 
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+      <Box 
+        sx={{ display: 'flex', gap: 2, mb: 2 }}
+        role="toolbar"
+        aria-label="Controles de gravação"
+      >
         <IconButton
           color={isRecording ? 'error' : 'primary'}
           onClick={isRecording ? stopRecording : startRecording}
           data-testid={isRecording ? 'stop-recording' : 'start-recording'}
+          onKeyDown={handleKeyPress}
+          aria-label={isRecording ? 'Parar gravação' : 'Iniciar gravação'}
+          aria-pressed={isRecording}
+          role="switch"
+          tabIndex={0}
+          sx={{
+            '&:focus-visible': {
+              outline: `2px solid ${theme.palette.primary.main}`,
+              outlineOffset: 2,
+            },
+          }}
         >
           {isRecording ? <Stop /> : <Mic />}
         </IconButton>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box 
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          role="status"
+          aria-live="polite"
+        >
           <GraphicEq color={isRecording ? 'primary' : 'disabled'} />
           <Typography
             variant="body2"
@@ -348,7 +394,11 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
         </Box>
       </Box>
 
-      <Box sx={{ mb: 2 }}>
+      <Box 
+        sx={{ mb: 2 }}
+        role="img"
+        aria-label="Visualização da forma de onda"
+      >
         <canvas
           ref={canvasRef}
           style={{ width: '100%', height: '100px' }}
@@ -356,7 +406,14 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
         />
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box 
+        sx={{ display: 'flex', gap: 2, alignItems: 'center' }}
+        role="meter"
+        aria-label="Indicador de volume"
+        aria-valuenow={audioMetrics.volume}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <VolumeUp />
         <Box
           data-testid="volume-indicator"
@@ -369,20 +426,47 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
         />
       </Box>
 
-      <Box sx={{ mt: 2 }}>
-        <Typography variant="caption" component="div" data-testid="pitch-value">
+      <Box 
+        sx={{ mt: 2 }}
+        role="region"
+        aria-label="Métricas de áudio"
+      >
+        <Typography 
+          variant="caption" 
+          component="div" 
+          data-testid="pitch-value"
+          role="status"
+          aria-live="polite"
+        >
           Pitch: {audioMetrics.pitch.toFixed(1)}
         </Typography>
-        <Typography variant="caption" component="div" data-testid="clarity-value">
+        <Typography 
+          variant="caption" 
+          component="div" 
+          data-testid="clarity-value"
+          role="status"
+          aria-live="polite"
+        >
           Clarity: {audioMetrics.clarity.toFixed(1)}%
         </Typography>
-        <Typography variant="caption" component="div" data-testid="snr-value">
+        <Typography 
+          variant="caption" 
+          component="div" 
+          data-testid="snr-value"
+          role="status"
+          aria-live="polite"
+        >
           SNR: {audioMetrics.snr.toFixed(1)} dB
         </Typography>
       </Box>
 
       {timbreFeatures && (
-        <TimbreVisualizer features={timbreFeatures} data-testid="timbre-visualizer" />
+        <TimbreVisualizer 
+          features={timbreFeatures} 
+          data-testid="timbre-visualizer"
+          aria-label="Visualizador de timbre"
+          role="img"
+        />
       )}
     </Box>
   );
