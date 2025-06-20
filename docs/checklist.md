@@ -2,7 +2,7 @@
 
 ## Prioridades Imediatas
 
-### Prioridade Crítica - Análise de Voz 🟡
+### Prioridade Crítica - Análise de Voz ✅
 - [x] Melhorar processamento de áudio
   - [x] Implementar detecção de silêncio
   - [x] Adicionar cálculo de SNR
@@ -22,7 +22,7 @@
   - [x] Melhorar tempo de resposta (Adicionado processamento paralelo)
   - [x] Implementar cache de análise
 
-### Prioridade Alta - Interface do Usuário 🟡
+### Prioridade Alta - Interface do Usuário ✅
 - [x] Melhorar feedback visual
   - [x] Adicionar indicador de qualidade de áudio
   - [x] Implementar visualização de silêncio
@@ -33,6 +33,20 @@
   - [x] Melhorar indicadores visuais
   - [x] Implementar guias interativos
   - [x] Adicionar feedback de intensidade
+
+### Prioridade Alta - Acessibilidade 🟡
+- [ ] Implementar ARIA labels
+  - [ ] Adicionar roles apropriados
+  - [ ] Implementar descrições para leitores de tela
+  - [ ] Adicionar estados ARIA
+- [ ] Suporte a navegação por teclado
+  - [ ] Implementar focus management
+  - [ ] Adicionar atalhos de teclado
+  - [ ] Melhorar ordem de tabulação
+- [ ] Modo de alto contraste
+  - [ ] Implementar temas acessíveis
+  - [ ] Adicionar opções de contraste
+  - [ ] Suporte a preferências do sistema
 
 ### Prioridade Média - Documentação 📋
 - [x] Atualizar documentação técnica
@@ -112,11 +126,6 @@
 - [ ] Adicionar microinterações
   - [ ] Hover states
   - [ ] Focus states
-
-### Acessibilidade
-- [ ] Implementar ARIA labels
-- [ ] Suporte a navegação por teclado
-- [ ] Modo de alto contraste
 
 ### Performance
 - [ ] Otimizar bundle size
