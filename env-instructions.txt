@@ -1,0 +1,107 @@
+# Frontend (.env file)
+REACT_APP_API_URL=http://localhost:3001
+REACT_APP_GOOGLE_CLIENT_ID=seu_google_client_id
+REACT_APP_FACEBOOK_APP_ID=seu_facebook_app_id
+
+# Backend (backend/.env file)
+MONGODB_URI=mongodb://localhost:27017/vocalcoach
+PORT=3001
+JWT_SECRET=seu_jwt_secret_muito_seguro
+SESSION_SECRET=another_strong_random_string_here
+GOOGLE_CLIENT_ID=seu_google_client_id
+GOOGLE_CLIENT_SECRET=seu_google_client_secret
+FRONTEND_URL=http://localhost:3000
+NODE_ENV=development
+MONGODB_URI_TEST=mongodb://localhost:27017/vocalcoach_test
+JWT_EXPIRES_IN=7d
+REFRESH_TOKEN_SECRET=seu_refresh_token_secret
+REFRESH_TOKEN_EXPIRES_IN=30d
+FACEBOOK_APP_ID=seu_facebook_app_id
+FACEBOOK_APP_SECRET=seu_facebook_app_secret
+SMTP_HOST=smtp.exemplo.com
+SMTP_PORT=587
+SMTP_USER=seu_email@exemplo.com
+SMTP_PASS=sua_senha_smtp
+
+# Instruções:
+1. Crie dois arquivos: .env na raiz do projeto e backend/.env
+2. Copie as configurações acima para os respectivos arquivos
+3. Substitua os valores "seu_*" pelos valores reais 
+
+=== Instruções de Configuração do Ambiente ===
+
+1. Variáveis de Ambiente Frontend (.env)
+---------------------------------------
+REACT_APP_API_URL=http://localhost:3001
+REACT_APP_GOOGLE_CLIENT_ID=seu_google_client_id
+REACT_APP_FACEBOOK_APP_ID=seu_facebook_app_id
+
+2. Variáveis de Ambiente Backend (.env)
+--------------------------------------
+# Servidor
+PORT=3001
+NODE_ENV=development
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/vocalcoach
+MONGODB_URI_TEST=mongodb://localhost:27017/vocalcoach_test
+
+# Autenticação
+JWT_SECRET=seu_jwt_secret_muito_seguro
+JWT_EXPIRES_IN=7d
+REFRESH_TOKEN_SECRET=seu_refresh_token_secret
+REFRESH_TOKEN_EXPIRES_IN=30d
+
+# Provedores OAuth
+GOOGLE_CLIENT_ID=seu_google_client_id
+GOOGLE_CLIENT_SECRET=seu_google_client_secret
+FACEBOOK_APP_ID=seu_facebook_app_id
+FACEBOOK_APP_SECRET=seu_facebook_app_secret
+
+# Email (opcional)
+SMTP_HOST=smtp.exemplo.com
+SMTP_PORT=587
+SMTP_USER=seu_email@exemplo.com
+SMTP_PASS=sua_senha_smtp
+
+3. Configuração do MongoDB
+-------------------------
+1. Instale o MongoDB Community Edition
+2. Crie um banco de dados chamado 'vocalcoach'
+3. Configure as credenciais no arquivo .env do backend
+
+4. Configuração do SSL (Produção)
+--------------------------------
+1. Obtenha certificados SSL
+2. Configure o nginx ou Apache como proxy reverso
+3. Atualize as URLs para usar HTTPS
+
+5. Variáveis Opcionais
+----------------------
+# Analytics (opcional)
+REACT_APP_GA_TRACKING_ID=seu_ga_id
+
+# Logging (opcional)
+LOG_LEVEL=debug
+LOG_FILE_PATH=./logs/app.log
+
+6. Desenvolvimento Local
+-----------------------
+1. Use 'npm start' para iniciar o frontend (porta 3000)
+2. Use 'npm run dev' no backend (porta 3001)
+3. MongoDB deve estar rodando na porta padrão (27017)
+
+7. Notas Importantes
+-------------------
+- Nunca commite arquivos .env para o repositório
+- Mantenha backups seguros das suas chaves
+- Use senhas fortes para todos os serviços
+- Em produção, use variáveis de ambiente do sistema
+- Configure CORS adequadamente no backend
+
+8. Troubleshooting
+-----------------
+- Erro de CORS: Verifique as origens permitidas no backend
+- Erro de conexão MongoDB: Verifique se o serviço está rodando
+- Erro de porta em uso: Mude a porta no .env
+- Problemas de auth: Verifique as chaves OAuth 
