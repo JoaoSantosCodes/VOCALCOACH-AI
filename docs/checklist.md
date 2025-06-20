@@ -3,15 +3,15 @@
 ## 🐛 Correções Prioritárias
 
 ### Dependências
-- [ ] Instalar e configurar `@mui/icons-material`
+- [x] Instalar e configurar `@mui/icons-material`
 - [ ] Atualizar tipagem do `axios` para versão mais recente
-- [ ] Resolver conflitos de versão do `react-chartjs-2`
-- [ ] Verificar compatibilidade do `framer-motion`
+- [x] Resolver conflitos de versão do `react-chartjs-2`
+- [x] Verificar compatibilidade do `framer-motion`
 
 ### TypeScript
-- [ ] Corrigir tipagem dos gradientes no tema
-  - [ ] Adicionar propriedades `text`, `button` e `buttonHover`
-  - [ ] Atualizar interface do tema
+- [x] Corrigir tipagem dos gradientes no tema
+  - [x] Adicionar propriedades `text`, `button` e `buttonHover`
+  - [x] Atualizar interface do tema
 - [ ] Resolver tipos do `ProgressChart`
   - [ ] Corrigir tipagem das opções do gráfico
   - [ ] Ajustar propriedades de fonte
@@ -31,26 +31,26 @@
 ## 🎨 UI/UX
 
 ### Componentes
-- [ ] Finalizar implementação do tema escuro
-- [ ] Melhorar feedback visual de interações
-- [ ] Adicionar mais animações de transição
+- [x] Finalizar implementação do tema escuro
+- [x] Melhorar feedback visual de interações
+- [x] Adicionar animações de transição
 - [ ] Implementar skeleton loading
 
 ### Acessibilidade
 - [ ] Adicionar ARIA labels
 - [ ] Melhorar navegação por teclado
-- [ ] Aumentar contraste de cores
+- [x] Aumentar contraste de cores
 - [ ] Implementar modo de alto contraste
 
 ### Responsividade
-- [ ] Otimizar layout para tablets
-- [ ] Melhorar experiência em telas pequenas
-- [ ] Ajustar tamanho de fontes responsivas
+- [x] Otimizar layout para tablets
+- [x] Melhorar experiência em telas pequenas
+- [x] Ajustar tamanho de fontes responsivas
 - [ ] Testar em diferentes dispositivos
 
 ## 🎵 Funcionalidades Core
 
-### Análise Vocal
+### Análise Vocal (Prioridade Alta)
 - [ ] Implementar detecção de pitch
 - [ ] Adicionar feedback em tempo real
 - [ ] Criar visualização de ondas sonoras
@@ -69,7 +69,7 @@
 - [ ] Criar sistema de pontuação
 
 ### Dashboard
-- [ ] Implementar gráficos de progresso
+- [x] Implementar estrutura base de gráficos
 - [ ] Adicionar estatísticas detalhadas
 - [ ] Criar sistema de metas
 - [ ] Desenvolver relatórios personalizados
@@ -77,9 +77,9 @@
 ## 🔒 Segurança
 
 ### Autenticação
+- [x] Implementar sistema base de login
 - [ ] Implementar recuperação de senha
 - [ ] Adicionar autenticação social
-- [ ] Melhorar validação de dados
 - [ ] Implementar 2FA
 
 ### Dados
@@ -90,13 +90,13 @@
 
 ## 📱 Apps
 
-### PWA
+### PWA (Prioridade Alta)
 - [ ] Configurar service worker
 - [ ] Implementar cache offline
 - [ ] Adicionar notificações push
 - [ ] Otimizar assets
 
-### Mobile
+### Mobile (Para Futuro)
 - [ ] Desenvolver versão React Native
 - [ ] Implementar recursos nativos
 - [ ] Otimizar performance
@@ -114,4 +114,21 @@
 - [ ] Configurar alertas de erro
 - [ ] Implementar logging detalhado
 - [ ] Monitorar uso de recursos
-- [ ] Criar relatórios automáticos 
+- [ ] Criar relatórios automáticos
+
+## 🎯 Próximas Prioridades (Junho 2024)
+
+1. Sistema de Análise Vocal
+   - [ ] Implementar captura de áudio
+   - [ ] Desenvolver análise em tempo real
+   - [ ] Criar feedback visual
+
+2. Melhorias de Performance
+   - [ ] Implementar lazy loading
+   - [ ] Otimizar bundle size
+   - [ ] Melhorar tempo de carregamento
+
+3. Experiência do Usuário
+   - [ ] Adicionar tooltips de ajuda
+   - [ ] Melhorar feedback de progresso
+   - [ ] Implementar tour guiado 

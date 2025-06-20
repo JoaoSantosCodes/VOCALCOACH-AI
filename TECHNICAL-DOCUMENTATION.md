@@ -1,5 +1,10 @@
 # Documentação Técnica - VocalCoach AI
 
+## Status Geral do Projeto
+- **Estado atual**: Em desenvolvimento
+- **Prioridade**: Alta
+- **Principais bloqueadores**: Problemas de build e dependências
+
 ## 1. Últimas Ações Realizadas
 
 ### 1.1 Webpack e Build
@@ -115,9 +120,9 @@ Ação Necessária:
 npm audit fix --force
 ```
 
-## 1. Erros Atuais
+## 6. Erros Atuais
 
-### 1.1 Erros de Compilação React Router
+### 6.1 Erros de Compilação React Router
 ```typescript
 // Problema:
 Exports não encontrados em react-router-dom:
@@ -136,7 +141,7 @@ BrowserRouter, Form, HashRouter, Link, NavLink, RouterProvider, ScrollRestoratio
 createBrowserRouter, createHashRouter, createSearchParams
 ```
 
-### 1.2 Erros de Material-UI Icons
+### 6.2 Erros de Material-UI Icons
 ```typescript
 // Erro:
 TS2307: Cannot find module '@mui/icons-material'
@@ -152,7 +157,7 @@ TS2307: Cannot find module '@mui/icons-material'
 8. pages/Practice.tsx
 ```
 
-### 1.3 Erros de TypeScript
+### 6.3 Erros de TypeScript
 ```typescript
 // 1. Erro no Axios:
 TS2305: Module '"axios"' has no exported member 'AxiosRequestConfig'
@@ -163,7 +168,7 @@ TS4104: The type 'readonly ["none", string, ...]' is 'readonly'
 Arquivo: src/utils/theme.ts
 ```
 
-### 1.4 Erros de Webpack
+### 6.4 Erros de Webpack
 ```typescript
 // Problemas de Módulos:
 1. Can't resolve '@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js'
@@ -176,7 +181,7 @@ Arquivo: src/utils/theme.ts
 ENOENT: no such file or directory, stat 'node_modules/.cache/default-development/1.pack'
 ```
 
-### 1.5 Warnings ESLint
+### 6.5 Warnings ESLint
 ```typescript
 // Em src/pages/Home.tsx:
 1. 'isMobile' não utilizado
@@ -189,9 +194,9 @@ ENOENT: no such file or directory, stat 'node_modules/.cache/default-development
 1. 'glassEffects' não utilizado
 ```
 
-## 2. Tentativas de Solução
+## 7. Tentativas de Solução
 
-### 2.1 React Router
+### 7.1 React Router
 ```typescript
 // Última tentativa:
 npm install react-router@6.22.1 react-router-dom@6.22.1 @types/react-router-dom@6.22.1 --save --legacy-peer-deps
@@ -200,7 +205,7 @@ npm install react-router@6.22.1 react-router-dom@6.22.1 @types/react-router-dom@
 // Próxima ação: Verificar compatibilidade com versão do React
 ```
 
-### 2.2 Material-UI
+### 7.2 Material-UI
 ```typescript
 // Última tentativa:
 npm install @mui/material@5.15.11 @mui/icons-material@5.15.11 --save --legacy-peer-deps
@@ -209,7 +214,7 @@ npm install @mui/material@5.15.11 @mui/icons-material@5.15.11 --save --legacy-pe
 // Próxima ação: Verificar problemas de tipos TypeScript
 ```
 
-### 2.3 Webpack
+### 7.3 Webpack
 ```typescript
 // Última tentativa:
 npm install --save-dev webpack@5.90.3 webpack-cli@5.1.4 webpack-dev-server@5.0.2 
@@ -220,8 +225,13 @@ html-webpack-plugin@5.6.0 babel-loader@9.1.3 @pmmmwh/react-refresh-webpack-plugi
 // Problemas pendentes: Módulos não encontrados
 ```
 
-## 3. Próximos Passos
+## 8. Plano de Ação
+### 8.1 Prioridades Imediatas
+1. Resolver problemas de build (Webpack)
+2. Corrigir erros de dependências (React Router, Material-UI)
+3. Resolver vulnerabilidades de segurança
 
+### 8.2 Próximos Passos
 1. **Resolver Problemas de Build**
    - Limpar cache do webpack
    - Reinstalar dependências do babel
@@ -242,228 +252,52 @@ html-webpack-plugin@5.6.0 babel-loader@9.1.3 @pmmmwh/react-refresh-webpack-plugi
    - Resolver problemas de importação de ícones
    - Atualizar imports para nova sintaxe
 
-## 4. Ambiente de Desenvolvimento
+## 9. Ambiente de Desenvolvimento
 
 ```plaintext
 Sistema Operacional: Windows 10 (win32 10.0.26100)
 Node.js: v22.16.0
 Workspace: C:\Cursor\VocalCoach AI
 Shell: PowerShell
-Porta: 3003 (alterada para evitar conflitos)
+Porta: 3003
+
+Navegadores Suportados:
+- Chrome (última versão)
+- Firefox (última versão)
+- Edge (última versão)
 ```
 
-## 5. Notas Importantes
+## 10. Estrutura do Projeto
 
-1. **Conflitos de Versão**
-   - React 19.1.0 vs Material-UI (requer React 17 ou 18)
-   - Problemas de peer dependencies
+```plaintext
+VocalCoach AI/
+├── backend/          # API e lógica do servidor
+├── src/
+│   ├── components/   # Componentes React reutilizáveis
+│   ├── pages/        # Páginas da aplicação
+│   ├── services/     # Serviços e APIs
+│   └── utils/        # Utilitários e helpers
+└── public/           # Arquivos estáticos
+```
 
-2. **PowerShell**
-   - Necessidade de usar ';' em vez de '&&' para comandos múltiplos
-   - Problemas com remoção de diretórios
+## 11. Próximos Passos
 
-3. **Webpack**
-   - Problemas com cache de desenvolvimento
-   - Erros de resolução de módulos
+1. **Correção de Dependências**
+   - Resolver conflitos de versão do React Router
+   - Corrigir importações do Material-UI
+   - Atualizar configuração do Webpack
 
-Esta documentação será atualizada conforme novos problemas forem identificados ou soluções forem implementadas. 
+2. **Melhorias de Performance**
+   - Otimizar carregamento de ícones
+   - Implementar lazy loading
+   - Reduzir bundle size
 
-## Estado Atual e Progresso (Atualizado)
-
-### Ações Realizadas (Português)
-1. **Instalação de Dependências Core**
-   ```bash
-   npm install --save react-router-dom@6.22.1 react-router@6.22.1
-   npm install --save @pmmmwh/react-refresh-webpack-plugin babel-loader webpack webpack-dev-server html-webpack-plugin
-   ```
-
-2. **Instalação Material-UI**
-   ```bash
-   npm install --save @mui/material @mui/icons-material @emotion/react @emotion/styled
-   ```
-
-3. **Limpeza de Cache**
-   ```bash
-   Remove-Item -Recurse -Force node_modules/.cache
-   npm cache clean --force
-   npm install
-   ```
-
-### Problemas Pendentes (Português)
-1. **React Router DOM**
-   - Necessário atualizar imports em:
-     - `App.tsx`
-     - `PrivateRoute.tsx`
-     - `Navbar.tsx`
-     - `Home.tsx`
-   - Imports necessários:
-     ```typescript
-     import {
-       createBrowserRouter,
-       RouterProvider,
-       useNavigate,
-       useLocation
-     } from 'react-router-dom';
-     ```
-
-2. **Material-UI Icons**
-   - Problemas de importação persistem em:
-     - `LoginModal.tsx`
-     - `Footer.tsx`
-     - `Logo.tsx`
-     - `Navbar.tsx`
-     - `Dashboard.tsx`
-     - `Home.tsx`
-     - `Karaoke.tsx`
-     - `Practice.tsx`
-
-3. **Webpack e Build**
-   - Erros de configuração do webpack persistem
-   - Problemas com plugins de desenvolvimento
-
-4. **ESLint Warnings**
-   - Variáveis não utilizadas em `Home.tsx`
-   - Dependências ausentes em hooks
-   - Código não utilizado em `theme.ts`
-
-### Próximos Passos (Português)
-1. **Atualização do Router**
-   ```typescript
-   // Novo formato de configuração do router
-   const router = createBrowserRouter([
-     {
-       path: "/",
-       element: <Layout />,
-       children: [
-         { path: "/", element: <Home /> },
-         { path: "/dashboard", element: <PrivateRoute><Dashboard /></PrivateRoute> },
-         { path: "/practice", element: <PrivateRoute><Practice /></PrivateRoute> },
-         { path: "/karaoke", element: <PrivateRoute><Karaoke /></PrivateRoute> }
-       ]
-     }
-   ]);
-   ```
-
-2. **Correção do Material-UI**
-   - Verificar versões compatíveis
-   - Reinstalar pacotes se necessário
-   - Atualizar imports para nova sintaxe
-
-3. **Otimização de Build**
-   - Configurar webpack manualmente
-   - Resolver problemas de cache
-   - Configurar hot reload
+3. **Correções de TypeScript**
+   - Resolver tipos do Axios
+   - Corrigir tipos readonly no tema
+   - Atualizar tipos do Material-UI
 
 4. **Limpeza de Código**
    - Remover variáveis não utilizadas
-   - Corrigir dependências de hooks
-   - Otimizar imports
-
----
-
-# Technical Documentation for VocalCoach AI
-## Current State and Progress (Updated)
-
-### Actions Taken (English)
-1. **Core Dependencies Installation**
-   ```bash
-   npm install --save react-router-dom@6.22.1 react-router@6.22.1
-   npm install --save @pmmmwh/react-refresh-webpack-plugin babel-loader webpack webpack-dev-server html-webpack-plugin
-   ```
-
-2. **Material-UI Installation**
-   ```bash
-   npm install --save @mui/material @mui/icons-material @emotion/react @emotion/styled
-   ```
-
-3. **Cache Cleanup**
-   ```bash
-   Remove-Item -Recurse -Force node_modules/.cache
-   npm cache clean --force
-   npm install
-   ```
-
-### Pending Issues (English)
-1. **React Router DOM**
-   - Need to update imports in:
-     - `App.tsx`
-     - `PrivateRoute.tsx`
-     - `Navbar.tsx`
-     - `Home.tsx`
-   - Required imports:
-     ```typescript
-     import {
-       createBrowserRouter,
-       RouterProvider,
-       useNavigate,
-       useLocation
-     } from 'react-router-dom';
-     ```
-
-2. **Material-UI Icons**
-   - Import issues persist in:
-     - `LoginModal.tsx`
-     - `Footer.tsx`
-     - `Logo.tsx`
-     - `Navbar.tsx`
-     - `Dashboard.tsx`
-     - `Home.tsx`
-     - `Karaoke.tsx`
-     - `Practice.tsx`
-
-3. **Webpack and Build**
-   - Webpack configuration errors persist
-   - Development plugins issues
-
-4. **ESLint Warnings**
-   - Unused variables in `Home.tsx`
-   - Missing hook dependencies
-   - Unused code in `theme.ts`
-
-### Next Steps (English)
-1. **Router Update**
-   ```typescript
-   // New router configuration format
-   const router = createBrowserRouter([
-     {
-       path: "/",
-       element: <Layout />,
-       children: [
-         { path: "/", element: <Home /> },
-         { path: "/dashboard", element: <PrivateRoute><Dashboard /></PrivateRoute> },
-         { path: "/practice", element: <PrivateRoute><Practice /></PrivateRoute> },
-         { path: "/karaoke", element: <PrivateRoute><Karaoke /></PrivateRoute> }
-       ]
-     }
-   ]);
-   ```
-
-2. **Material-UI Fix**
-   - Check compatible versions
-   - Reinstall packages if needed
-   - Update imports to new syntax
-
-3. **Build Optimization**
-   - Configure webpack manually
-   - Resolve cache issues
-   - Set up hot reload
-
-4. **Code Cleanup**
-   - Remove unused variables
-   - Fix hook dependencies
-   - Optimize imports
-
-### Environment Details
-- OS: Windows 10 (win32 10.0.26100)
-- Node.js: v22.16.0
-- Shell: PowerShell
-- Working Directory: C:\Cursor\VocalCoach AI
-- Port: 3003
-
-### Dependencies Versions
-- react-router-dom: 6.22.1
-- react-router: 6.22.1
-- @mui/material: latest
-- @mui/icons-material: latest
-- @emotion/react: latest
-- @emotion/styled: latest 
+   - Corrigir dependências do useEffect
+   - Atualizar imports obsoletos 
