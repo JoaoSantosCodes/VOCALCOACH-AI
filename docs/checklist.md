@@ -18,23 +18,25 @@
 - [x] Captura de áudio
 - [x] Visualização de forma de onda
 - [x] Processamento em Web Worker
-- [ ] Detecção de timbre
-- [ ] Feedback visual aprimorado
+- [x] Detecção de timbre
+- [x] Feedback visual aprimorado
 - [ ] Exercícios vocais guiados
 
 ### Testes 🧪
 - [x] Configuração do Jest
 - [x] Testes do VoiceCapture
-- [ ] Testes dos demais componentes
+- [x] Testes do TimbreVisualizer
+- [x] Testes da Home
+- [x] Testes do Navbar
 - [ ] Testes de integração
 - [ ] Cobertura de testes > 80%
 
 ### UI/UX 🎨
 - [x] Design responsivo
 - [x] Tema escuro
+- [x] Feedback visual aprimorado
 - [ ] Animações de transição
 - [ ] Tutorial interativo
-- [ ] Feedback visual aprimorado
 
 ## Backend
 ### API 🔧
@@ -64,6 +66,7 @@
 
 ## Otimizações 🔄
 - [x] Web Worker para processamento
+- [x] Análise de timbre otimizada
 - [ ] Lazy loading
 - [ ] Code splitting
 - [ ] Cache de recursos

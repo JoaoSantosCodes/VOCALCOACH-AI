@@ -202,3 +202,40 @@
 - Implementar testes de integração
 - Melhorar documentação da API
 - Otimizar processamento de áudio 
+
+## Sprint 4 - Análise de Timbre e Testes
+
+### Data: [Data Atual]
+
+1. Implementação da Análise de Timbre
+   - Criado worker dedicado para análise de timbre
+   - Implementado algoritmo FFT (Cooley-Tukey)
+   - Adicionadas métricas de análise:
+     - Centroide Espectral (brilho)
+     - Planicidade Espectral (riqueza harmônica)
+     - Rolloff Espectral (decaimento)
+     - Razão Harmônica
+
+2. Visualização do Timbre
+   - Criado componente TimbreVisualizer
+   - Implementada visualização em tempo real
+   - Adicionada interpretação das métricas
+   - Design responsivo e interativo
+
+3. Testes
+   - Implementados testes para Home
+   - Implementados testes para Navbar
+   - Implementados testes para TimbreVisualizer
+   - Adicionados mocks para Web Audio API
+
+### Melhorias Técnicas
+- Otimização do processamento de áudio
+- Separação de responsabilidades com Web Workers
+- Melhor feedback visual para o usuário
+- Cobertura de testes expandida
+
+### Próximos Passos
+- Implementar exercícios vocais guiados
+- Adicionar feedback personalizado
+- Melhorar precisão da análise
+- Expandir suite de testes 

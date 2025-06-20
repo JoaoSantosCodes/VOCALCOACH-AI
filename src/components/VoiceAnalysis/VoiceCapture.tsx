@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, IconButton, Typography, Alert, Snackbar } from '@mui/material';
 import { Mic, Stop, GraphicEq } from '@mui/icons-material';
+import TimbreVisualizer from './TimbreVisualizer';
 
 interface VoiceCaptureProps {
   onAnalysisUpdate?: (data: {
@@ -10,6 +11,13 @@ interface VoiceCaptureProps {
   }) => void;
 }
 
+interface TimbreFeatures {
+  spectralCentroid: number;
+  spectralFlatness: number;
+  spectralRolloff: number;
+  harmonicRatio: number;
+}
+
 const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [volumeLevel, setVolumeLevel] = useState(0);
@@ -17,6 +25,7 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
   const [clarity, setClarity] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [permissionStatus, setPermissionStatus] = useState<PermissionState>('prompt');
+  const [timbreFeatures, setTimbreFeatures] = useState<TimbreFeatures | null>(null);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -25,13 +34,15 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
   const animationFrameRef = useRef<number>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const waveformDataRef = useRef<Uint8Array | null>(null);
-  const workerRef = useRef<Worker | null>(null);
+  const audioWorkerRef = useRef<Worker | null>(null);
+  const timbreWorkerRef = useRef<Worker | null>(null);
 
-  // Inicializa o Web Worker
+  // Inicializa os Web Workers
   useEffect(() => {
-    workerRef.current = new Worker(new URL('../../workers/audioAnalyzer.worker.ts', import.meta.url));
-    
-    workerRef.current.onmessage = (e) => {
+    audioWorkerRef.current = new Worker(new URL('../../workers/audioAnalyzer.worker.ts', import.meta.url));
+    timbreWorkerRef.current = new Worker(new URL('../../workers/timbreAnalyzer.worker.ts', import.meta.url));
+
+    audioWorkerRef.current.onmessage = (e) => {
       if (e.data.type === 'result') {
         const { pitch, clarity, volume } = e.data.data;
         setPitchLevel(pitch);
@@ -46,8 +57,15 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
       }
     };
 
+    timbreWorkerRef.current.onmessage = (e) => {
+      if (e.data.type === 'result') {
+        setTimbreFeatures(e.data.data);
+      }
+    };
+
     return () => {
-      workerRef.current?.terminate();
+      audioWorkerRef.current?.terminate();
+      timbreWorkerRef.current?.terminate();
     };
   }, [onAnalysisUpdate]);
 
@@ -153,7 +171,7 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
 
       // Inicia a análise em tempo real
       const analyzeAudio = () => {
-        if (!analyserRef.current || !audioContextRef.current || !workerRef.current) return;
+        if (!analyserRef.current || !audioContextRef.current || !audioWorkerRef.current) return;
 
         // Atualiza dados da forma de onda
         if (waveformDataRef.current) {
@@ -166,7 +184,7 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
         analyserRef.current.getFloatTimeDomainData(buffer);
 
         // Envia dados para o worker
-        workerRef.current.postMessage({
+        audioWorkerRef.current.postMessage({
           type: 'analyze',
           data: {
             buffer,
@@ -180,6 +198,9 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
       analyzeAudio();
       setIsRecording(true);
       setError(null);
+
+      // Inicia a análise de timbre
+      analyzeTimbre();
     } catch (error) {
       console.error('Erro ao iniciar gravação:', error);
       setError(error instanceof Error ? error.message : 'Erro ao iniciar gravação');
@@ -203,6 +224,7 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
       setVolumeLevel(0);
       setPitchLevel(0);
       setClarity(0);
+      setTimbreFeatures(null);
 
       // Limpa o canvas
       const canvas = canvasRef.current;
@@ -213,6 +235,33 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
         }
       }
     }
+  };
+
+  const analyzeTimbre = () => {
+    if (!analyserRef.current || !isRecording) return;
+    
+    const analyser = analyserRef.current;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Float32Array(bufferLength);
+    
+    const analyze = () => {
+      if (!isRecording) return;
+      
+      analyser.getFloatTimeDomainData(dataArray);
+      
+      // Envia dados para o worker de timbre
+      timbreWorkerRef.current?.postMessage({
+        type: 'analyze',
+        data: {
+          buffer: dataArray,
+          sampleRate: audioContextRef.current?.sampleRate || 44100
+        }
+      });
+      
+      setTimeout(analyze, 100); // Analisa a cada 100ms
+    };
+    
+    analyze();
   };
 
   const getPermissionMessage = () => {
@@ -310,6 +359,10 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
           </Typography>
         </Box>
       </Box>
+
+      {timbreFeatures && (
+        <TimbreVisualizer features={timbreFeatures} />
+      )}
 
       <Snackbar
         open={!!error}
