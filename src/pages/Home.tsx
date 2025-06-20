@@ -35,21 +35,14 @@ import {
 } from '@mui/icons-material';
 import Footer from '../components/Layout/Footer';
 import LoginModal from '../components/Auth/LoginModal';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useSpring, animated, useTransition } from '@react-spring/web';
 
 const Home: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const [activeFeature, setActiveFeature] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
   const handleLoginClose = () => setIsLoginOpen(false);
   const handleLoginOpen = () => setIsLoginOpen(true);
@@ -61,35 +54,21 @@ const Home: React.FC = () => {
     { text: 'Aprender', path: '/learn', icon: <SchoolIcon /> },
   ];
 
-  const drawer = (
-    <Box sx={{ p: 2 }}>
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => navigate(item.path)}>
-              <ListItemIcon sx={{ color: 'primary.main' }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-
   const features = [
     {
       title: 'Análise em Tempo Real',
       description: 'Receba feedback instantâneo sobre sua técnica vocal enquanto canta, com análise detalhada de afinação e timbre.',
+      icon: <MicIcon data-testid="mic-icon" />,
     },
     {
       title: 'Exercícios Personalizados',
       description: 'Pratique com exercícios adaptados ao seu nível e objetivos, com progressão personalizada para seu desenvolvimento.',
+      icon: <GraphicEqIcon data-testid="graph-icon" />,
     },
     {
       title: 'Acompanhamento Detalhado',
       description: 'Visualize seu progresso através de métricas detalhadas e receba recomendações para melhorar sua performance.',
+      icon: <HeadphonesIcon data-testid="headphones-icon" />,
     },
   ];
 
@@ -136,44 +115,50 @@ const Home: React.FC = () => {
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isHovering) {
+    let interval: NodeJS.Timeout;
+    
+    if (!isHovering) {
+      interval = setInterval(() => {
         setActiveFeature((prev) => (prev + 1) % features.length);
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isHovering]);
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const waveVariants = {
-    animate: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
+      }, 3000);
     }
-  };
 
-  const handleGetStarted = () => {
-    navigate('/dashboard');
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isHovering, features.length]);
+
+  // React Spring animations
+  const fadeIn = useSpring({
+    from: { opacity: 0, y: 20 },
+    to: { opacity: 1, y: 0 },
+    config: { duration: 800 }
+  });
+
+  const backgroundAnimation = useSpring({
+    from: { rotate: 0 },
+    to: { rotate: 360 },
+    loop: true,
+    config: { duration: 20000 }
+  });
+
+  const waveAnimation = useSpring({
+    from: { y: 0 },
+    to: { y: -10 },
+    loop: { reverse: true },
+    config: { duration: 2000 }
+  });
+
+  const featureTransition = useTransition(activeFeature, {
+    from: { opacity: 0, transform: 'translate3d(0,40px,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0,0px,0)' },
+    leave: { opacity: 0, transform: 'translate3d(0,-40px,0)' },
+  });
+
+  const handleStartClick = () => {
+    navigate('/practice');
   };
 
   const handleDemoClick = () => {
@@ -192,311 +177,91 @@ const Home: React.FC = () => {
       }}
     >
       {/* Animated Background Elements */}
-      <Box
-        component={motion.div}
-        animate={{
-          rotate: 360,
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-        sx={{
+      <animated.div
+        style={{
+          ...backgroundAnimation,
           position: 'absolute',
-          top: '-30%',
-          right: '-20%',
-          width: '60%',
-          height: '60%',
-          background: 'radial-gradient(circle, rgba(124, 77, 255, 0.2) 0%, rgba(124, 77, 255, 0) 70%)',
-          filter: 'blur(60px)',
-          zIndex: 0,
+          top: '10%',
+          right: '10%',
+          width: '500px',
+          height: '500px',
+          background: alpha(theme.palette.primary.light, 0.1),
+          borderRadius: '50%',
         }}
       />
 
-      <Box
-        component={motion.div}
-        animate={{
-          rotate: -360,
-          scale: [1, 1.3, 1],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-        sx={{
-          position: 'absolute',
-          bottom: '-20%',
-          left: '-10%',
-          width: '50%',
-          height: '50%',
-          background: 'radial-gradient(circle, rgba(101, 31, 255, 0.2) 0%, rgba(101, 31, 255, 0) 70%)',
-          filter: 'blur(60px)',
-          zIndex: 0,
-        }}
-      />
-
-      {/* Main Content */}
-      <Container
-        component={motion.div}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        maxWidth="lg"
-        sx={{
-          mt: { xs: 8, md: 12 },
-          mb: { xs: 4, md: 8 },
-          px: { xs: 3, md: 4 },
-          textAlign: 'center',
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <Stack spacing={8} alignItems="center">
-          {/* Main Title with Wave Animation */}
-          <Box component={motion.div} variants={itemVariants}>
-            <Typography
-              variant="h1"
-              component={motion.h1}
-              sx={{
-                fontSize: {
-                  xs: '2.5rem',
-                  sm: '3.5rem',
-                  md: '4.5rem'
-                },
-                background: theme.gradients.text,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                maxWidth: '800px',
-                lineHeight: 1.2,
-                mb: 2
-              }}
-            >
-              Desenvolva Seu{' '}
-              <Box
-                component="span"
+      <Container maxWidth="lg" sx={{ mt: 8, position: 'relative', zIndex: 1 }}>
+        <animated.div style={fadeIn}>
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h1"
                 sx={{
-                  display: 'inline-block',
-                  position: 'relative'
+                  fontWeight: 'bold',
+                  mb: 2,
+                  background: theme.gradients.text,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
                 }}
               >
-                Potencial Vocal
-                <Box
-                  component="span"
-                  sx={{
-                    position: 'absolute',
-                    right: '-1.5rem',
-                    top: '-0.5rem',
-                    fontSize: {
-                      xs: '2rem',
-                      sm: '3rem',
-                      md: '4rem'
-                    }
-                  }}
-                >
-                  🎵
-                </Box>
-              </Box>
-            </Typography>
+                Desenvolva Seu Potencial Vocal
+              </Typography>
 
-            <Typography
-              variant="h2"
-              component={motion.h2}
-              sx={{
-                fontSize: {
-                  xs: '1.25rem',
-                  sm: '1.5rem',
-                  md: '1.75rem'
-                },
-                color: 'text.secondary',
-                maxWidth: '800px',
-                mx: 'auto',
-                px: 2,
-                lineHeight: 1.5,
-                mb: 4
-              }}
-            >
-              Treine sua voz com feedback em tempo real usando
-              <br />
-              inteligência artificial avançada
-            </Typography>
-          </Box>
+              <Typography variant="h5" sx={{ mb: 4, color: 'text.secondary' }}>
+                Treine sua voz com feedback em tempo real usando inteligência artificial
+              </Typography>
 
-          {/* Interactive Feature Icons */}
-          <Stack
-            direction="row"
-            spacing={3}
-            justifyContent="center"
-            component={motion.div}
-            variants={itemVariants}
-          >
-            {[
-              { icon: <MicIcon />, label: "Análise Vocal" },
-              { icon: <GraphicEqIcon />, label: "Visualização" },
-              { icon: <HeadphonesIcon />, label: "Treino" },
-            ].map((item, index) => (
-              <Tooltip key={index} title={item.label}>
-                <IconButton
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={handleStartClick}
+                  endIcon={<ArrowForwardIcon />}
                   sx={{
-                    width: 60,
-                    height: 60,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
+                    background: theme.gradients.button,
                     '&:hover': {
-                      background: 'rgba(255, 255, 255, 0.2)',
-                      transform: 'translateY(-5px)',
+                      background: theme.gradients.buttonHover,
                     },
-                    transition: 'all 0.3s ease',
                   }}
                 >
-                  {item.icon}
-                </IconButton>
-              </Tooltip>
-            ))}
-          </Stack>
+                  Começar Agora
+                </Button>
 
-          {/* CTA Buttons */}
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={3}
-            component={motion.div}
-            variants={itemVariants}
-          >
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleLoginOpen}
-              startIcon={<PlayArrowIcon />}
-              sx={{
-                px: 6,
-                py: 2,
-                fontSize: '1.1rem',
-                background: theme.gradients.button,
-                borderRadius: '12px',
-                boxShadow: theme.shadows[4],
-                '&:hover': {
-                  background: theme.gradients.buttonHover,
-                  boxShadow: theme.shadows[8],
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Começar Agora
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<MusicNoteIcon />}
-              onClick={handleDemoClick}
-              sx={{
-                px: 6,
-                py: 2,
-                fontSize: '1.1rem',
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-                borderWidth: 2,
-                color: 'white',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                '&:hover': {
-                  borderColor: 'white',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Ver Demonstração
-            </Button>
-          </Stack>
-
-          {/* Animated Features */}
-          <Box
-            component={motion.div}
-            variants={itemVariants}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            sx={{
-              mt: { xs: 8, md: 12 },
-              width: '100%',
-              maxWidth: '900px',
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeFeature}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Box
-                  sx={{
-                    p: 4,
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: '24px',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    transform: isHovering ? 'scale(1.02)' : 'scale(1)',
-                    transition: 'transform 0.3s ease',
-                  }}
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={handleDemoClick}
+                  sx={{ borderColor: 'primary.main', color: 'primary.main' }}
                 >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      color: theme.palette.primary.main,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {features[activeFeature].title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {features[activeFeature].description}
-                  </Typography>
-                </Box>
-              </motion.div>
-            </AnimatePresence>
+                  Ver Demo
+                </Button>
+              </Stack>
+            </Grid>
 
-            {/* Feature Indicators */}
-            <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="center"
-              mt={2}
-            >
-              {features.map((_, index) => (
-                <Box
-                  key={index}
-                  component={motion.div}
-                  animate={{
-                    scale: activeFeature === index ? 1.2 : 1,
-                    opacity: activeFeature === index ? 1 : 0.5,
-                  }}
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => setActiveFeature(index)}
-                />
+            <Grid item xs={12} md={6}>
+              {featureTransition((style, item) => (
+                <animated.div style={style}>
+                  <Card
+                    sx={{
+                      background: alpha(theme.palette.background.paper, 0.8),
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <CardContent>
+                      <Typography variant="h5" gutterBottom>
+                        {features[item].title}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary">
+                        {features[item].description}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </animated.div>
               ))}
-            </Stack>
-          </Box>
-        </Stack>
+            </Grid>
+          </Grid>
+        </animated.div>
       </Container>
 
       {/* Features Section */}
@@ -505,7 +270,7 @@ const Home: React.FC = () => {
           <Grid container spacing={4}>
             {features.map((feature, index) => (
               <Grid item xs={12} md={4} key={index}>
-                <motion.div
+                <animated.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.2 }}
@@ -530,7 +295,7 @@ const Home: React.FC = () => {
                         color: theme.palette.primary.main,
                       }}
                     >
-                      <MicIcon sx={{ fontSize: 40 }} />
+                      {feature.icon}
                     </Box>
                     <Typography variant="h5" sx={{ mb: 2 }}>
                       {feature.title}
@@ -539,7 +304,7 @@ const Home: React.FC = () => {
                       {feature.description}
                     </Typography>
                   </Box>
-                </motion.div>
+                </animated.div>
               </Grid>
             ))}
           </Grid>
@@ -559,10 +324,10 @@ const Home: React.FC = () => {
           <Grid container spacing={3}>
             {testimonials.map((testimonial, index) => (
               <Grid item xs={12} md={4} key={index}>
-                <motion.div
+                <animated.div
                   initial="hidden"
                   animate="visible"
-                  variants={itemVariants}
+                  variants={fadeIn}
                 >
                   <Card sx={{ height: '100%', p: 3 }}>
                     <CardContent>
@@ -589,7 +354,7 @@ const Home: React.FC = () => {
                       <Rating value={testimonial.rating} readOnly />
                     </CardContent>
                   </Card>
-                </motion.div>
+                </animated.div>
               </Grid>
             ))}
           </Grid>

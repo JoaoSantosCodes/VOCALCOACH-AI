@@ -1,59 +1,66 @@
 import React, { useState } from 'react';
-import { Box, Container, Typography, Paper, Grid } from '@mui/material';
+import { Container, Box, Typography, Button } from '@mui/material';
+import { ExerciseList } from '../components/VoiceExercise/ExerciseList';
+import { ExerciseGuide } from '../components/VoiceExercise/ExerciseGuide';
+import { VocalExercise, vocalExercises } from '../data/vocalExercises';
 import VoiceCapture from '../components/VoiceAnalysis/VoiceCapture';
-
-interface AnalysisData {
-  pitch: number;
-  volume: number;
-  clarity: number;
-}
+import TimbreVisualizer from '../components/VoiceAnalysis/TimbreVisualizer';
 
 const Practice: React.FC = () => {
-  const [currentAnalysis, setCurrentAnalysis] = useState<AnalysisData | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<VocalExercise | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
-  const handleAnalysisUpdate = (data: AnalysisData) => {
-    setCurrentAnalysis(data);
+  const handleExerciseComplete = () => {
+    setShowAnalysis(true);
+  };
+
+  const handleBackToList = () => {
+    setSelectedExercise(null);
+    setShowAnalysis(false);
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Prática Vocal
-      </Typography>
+    <Container maxWidth="lg">
+      {!selectedExercise ? (
+        <ExerciseList 
+          exercises={vocalExercises}
+          onSelectExercise={setSelectedExercise}
+        />
+      ) : (
+        <Box>
+          <Button 
+            onClick={handleBackToList}
+            sx={{ mb: 3 }}
+          >
+            ← Voltar para lista
+          </Button>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <VoiceCapture onAnalysisUpdate={handleAnalysisUpdate} />
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>
-              Métricas em Tempo Real
-            </Typography>
-            
-            {currentAnalysis ? (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="body1" gutterBottom>
-                  Pitch: {Math.round(currentAnalysis.pitch)}Hz
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Volume: {Math.round(currentAnalysis.volume)}%
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Clareza: {Math.round(currentAnalysis.clarity)}%
-                </Typography>
-              </Box>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                Inicie a gravação para ver as métricas em tempo real
+          {showAnalysis ? (
+            <Box>
+              <Typography variant="h5" gutterBottom>
+                Análise de Voz
               </Typography>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
+              
+              <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                <Box sx={{ flex: 1 }}>
+                  <VoiceCapture />
+                </Box>
+                
+                <Box sx={{ flex: 1 }}>
+                  <TimbreVisualizer />
+                </Box>
+              </Box>
+            </Box>
+          ) : (
+            <ExerciseGuide 
+              exercise={selectedExercise}
+              onComplete={handleExerciseComplete}
+            />
+          )}
+        </Box>
+      )}
     </Container>
   );
-};
+}; 
 
 export default Practice; 

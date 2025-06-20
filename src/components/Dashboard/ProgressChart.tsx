@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import { useSpring, animated, config } from '@react-spring/web';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,6 +46,26 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
   subtitle,
 }) => {
   const theme = useTheme();
+
+  const fadeIn = useSpring({
+    from: { opacity: 0, y: 20 },
+    to: { opacity: 1, y: 0 },
+    config: config.gentle
+  });
+
+  const titleAnimation = useSpring({
+    from: { opacity: 0, x: -20 },
+    to: { opacity: 1, x: 0 },
+    delay: 200,
+    config: config.gentle
+  });
+
+  const subtitleAnimation = useSpring({
+    from: { opacity: 0, x: -20 },
+    to: { opacity: 1, x: 0 },
+    delay: 300,
+    config: config.gentle
+  });
 
   const chartOptions: ChartOptions<'line'> = {
     responsive: true,
@@ -154,11 +174,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <animated.div style={fadeIn}>
       <Box
         sx={{
           p: 3,
@@ -187,45 +203,37 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
         }}
       >
         <Box sx={{ mb: 3 }}>
-          <Typography
-            variant="h6"
-            component={motion.h6}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            sx={{
-              fontWeight: 600,
-              color: 'white',
-              mb: 1,
-            }}
-          >
-            {title}
-          </Typography>
-          <Typography
-            variant="body2"
-            component={motion.p}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            sx={{
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontSize: '0.875rem',
-            }}
-          >
-            {subtitle}
-          </Typography>
+          <animated.div style={titleAnimation}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: 'white',
+                mb: 1,
+              }}
+            >
+              {title}
+            </Typography>
+          </animated.div>
+
+          <animated.div style={subtitleAnimation}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontSize: '0.875rem',
+              }}
+            >
+              {subtitle}
+            </Typography>
+          </animated.div>
         </Box>
 
-        <Box
-          sx={{
-            height: 300,
-            position: 'relative',
-          }}
-        >
+        <Box sx={{ height: 300, position: 'relative' }}>
           <Line options={chartOptions} data={enhancedData} />
         </Box>
       </Box>
-    </motion.div>
+    </animated.div>
   );
 };
 

@@ -1,21 +1,20 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
+import Footer from './Footer';
 
-const Layout: React.FC = () => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
-      <Box component="main" sx={{ flex: 1 }}>
-        <Outlet />
+      <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
+        {children}
       </Box>
+      <Footer />
     </Box>
   );
 };

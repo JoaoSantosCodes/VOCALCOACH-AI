@@ -1,5 +1,28 @@
 # 🗺️ Roadmap VocalCoach AI
 
+## 📅 Q1 2024
+
+### Março
+- [x] Setup inicial do projeto
+- [x] Implementação da análise de voz
+- [x] Implementação dos exercícios vocais básicos
+- [ ] Sistema de gamificação básico
+- [ ] Perfil do usuário
+
+### Abril
+- [ ] Mais exercícios vocais
+- [ ] Sistema de progresso
+- [ ] Feedback de áudio
+- [ ] Análise avançada de voz
+- [ ] Testes de integração
+
+### Maio
+- [ ] Sistema de conquistas
+- [ ] Exercícios personalizados
+- [ ] Modo offline
+- [ ] PWA
+- [ ] Analytics
+
 ## 📅 Q2 2024 - Fundação
 
 ### Fase 1: Setup e Estrutura Base (Abril) ✅
@@ -183,3 +206,124 @@ Foco:
 ---
 
 Este roadmap é um documento vivo e será atualizado conforme o projeto evolui e novas necessidades são identificadas. 
+
+## 📅 Q2 2024
+
+### Junho
+- [ ] Comunidade de usuários
+- [ ] Compartilhamento de exercícios
+- [ ] Sistema de ranking
+- [ ] Desafios diários
+- [ ] Feedback de instrutores
+
+### Julho
+- [ ] Integração com dispositivos MIDI
+- [ ] Suporte a Bluetooth
+- [ ] Modo karaoke avançado
+- [ ] Exercícios em grupo
+- [ ] Chat de voz
+
+### Agosto
+- [ ] Marketplace de exercícios
+- [ ] Sistema de mentoria
+- [ ] Eventos ao vivo
+- [ ] Workshops online
+- [ ] Integração com streaming
+
+## 📅 Q3 2024
+
+### Setembro
+- [ ] API pública
+- [ ] SDK para desenvolvedores
+- [ ] Plugins personalizados
+- [ ] Integração com DAWs
+- [ ] Análise profissional
+
+### Outubro
+- [ ] IA para feedback personalizado
+- [ ] Reconhecimento de emoção
+- [ ] Análise de estilo
+- [ ] Recomendações personalizadas
+- [ ] Composição assistida
+
+### Novembro
+- [ ] Realidade aumentada
+- [ ] Visualização 3D
+- [ ] Avatares personalizados
+- [ ] Motion capture
+- [ ] Feedback háptico
+
+## 📅 Q4 2024
+
+### Dezembro
+- [ ] Versão enterprise
+- [ ] Suporte a instituições
+- [ ] Análise em larga escala
+- [ ] Relatórios avançados
+- [ ] Integração com LMS
+
+## Prioridades Técnicas
+
+### Curto Prazo (1-2 meses)
+1. Melhorar precisão da análise de voz
+2. Implementar mais exercícios
+3. Sistema de gamificação
+4. Perfil do usuário
+5. Testes automatizados
+
+### Médio Prazo (3-6 meses)
+1. PWA e modo offline
+2. Sistema de comunidade
+3. Marketplace
+4. API pública
+5. Integração com dispositivos
+
+### Longo Prazo (6+ meses)
+1. IA avançada
+2. Realidade aumentada
+3. Análise profissional
+4. Versão enterprise
+5. Ecossistema de plugins
+
+## Métricas de Sucesso
+
+### Usuário
+- Retenção de usuários > 60%
+- NPS > 50
+- Tempo médio de sessão > 15min
+- Exercícios completados por semana > 5
+
+### Técnico
+- Uptime > 99.9%
+- Tempo de resposta < 100ms
+- Cobertura de testes > 80%
+- Erros por usuário < 0.1%
+
+### Negócio
+- CAC < LTV/3
+- Crescimento MoM > 20%
+- Conversão free para premium > 5%
+- Churn < 5%
+
+## Considerações
+
+### Riscos
+- Precisão da análise de voz
+- Escalabilidade do processamento
+- Compatibilidade de dispositivos
+- Privacidade dos dados
+- Concorrência
+
+### Oportunidades
+- Mercado em crescimento
+- Demanda por ensino remoto
+- Avanços em IA
+- Integração com dispositivos
+- Comunidade ativa
+
+### Dependências
+- Web Audio API
+- Dispositivos de entrada
+- Processamento em tempo real
+- Conectividade
+- Armazenamento local 

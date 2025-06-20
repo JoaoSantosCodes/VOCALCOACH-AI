@@ -12,7 +12,11 @@
   - [x] Configurar Jest corretamente
   - [x] Resolver conflitos de dependências
   - [x] Configurar mocks para Web Audio API
-  - [ ] Implementar testes E2E
+  - [x] Implementar testes E2E
+    - [x] Configurar Cypress
+    - [x] Implementar testes de gravação
+    - [x] Implementar testes de feedback visual
+    - [x] Implementar testes de permissões
 - [x] Otimizar performance
   - [x] Reduzir uso de CPU (Implementado sistema de cache e amostragem otimizada)
   - [x] Melhorar tempo de resposta (Adicionado processamento paralelo)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, IconButton, Typography, Alert, Snackbar } from '@mui/material';
-import { Mic, Stop, GraphicEq } from '@mui/icons-material';
+import { Box, IconButton, Typography, Alert, Snackbar, LinearProgress } from '@mui/material';
+import { Mic, Stop, GraphicEq, VolumeUp } from '@mui/icons-material';
 import TimbreVisualizer from './TimbreVisualizer';
 
 interface VoiceCaptureProps {
@@ -8,6 +8,8 @@ interface VoiceCaptureProps {
     pitch: number;
     volume: number;
     clarity: number;
+    isSilence: boolean;
+    snr: number;
   }) => void;
 }
 
@@ -18,14 +20,27 @@ interface TimbreFeatures {
   harmonicRatio: number;
 }
 
+interface AudioMetrics {
+  pitch: number;
+  volume: number;
+  clarity: number;
+  isSilence: boolean;
+  snr: number;
+}
+
 const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [volumeLevel, setVolumeLevel] = useState(0);
-  const [pitchLevel, setPitchLevel] = useState(0);
-  const [clarity, setClarity] = useState(0);
+  const [audioMetrics, setAudioMetrics] = useState<AudioMetrics>({
+    pitch: 0,
+    volume: 0,
+    clarity: 0,
+    isSilence: true,
+    snr: 0
+  });
   const [error, setError] = useState<string | null>(null);
   const [permissionStatus, setPermissionStatus] = useState<PermissionState>('prompt');
   const [timbreFeatures, setTimbreFeatures] = useState<TimbreFeatures | null>(null);
+  const [showQualityWarning, setShowQualityWarning] = useState(false);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -44,13 +59,14 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
 
     audioWorkerRef.current.onmessage = (e) => {
       if (e.data.type === 'result') {
-        const { pitch, clarity, volume } = e.data.data;
-        setPitchLevel(pitch);
-        setClarity(clarity);
-        setVolumeLevel(volume);
+        const metrics: AudioMetrics = e.data.data;
+        setAudioMetrics(metrics);
+
+        // Mostra aviso se a qualidade do áudio estiver baixa
+        setShowQualityWarning(metrics.snr < 10 && !metrics.isSilence);
 
         if (onAnalysisUpdate) {
-          onAnalysisUpdate({ pitch, clarity, volume });
+          onAnalysisUpdate(metrics);
         }
       } else if (e.data.type === 'error') {
         setError(e.data.error);
@@ -221,9 +237,13 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
       }
       
       setIsRecording(false);
-      setVolumeLevel(0);
-      setPitchLevel(0);
-      setClarity(0);
+      setAudioMetrics({
+        pitch: 0,
+        volume: 0,
+        clarity: 0,
+        isSilence: true,
+        snr: 0
+      });
       setTimbreFeatures(null);
 
       // Limpa o canvas
@@ -275,105 +295,95 @@ const VoiceCapture: React.FC<VoiceCaptureProps> = ({ onAnalysisUpdate }) => {
     }
   };
 
+  const getSignalQualityColor = (snr: number): string => {
+    if (snr > 20) return '#4caf50'; // Bom
+    if (snr > 10) return '#ff9800'; // Médio
+    return '#f44336'; // Ruim
+  };
+
   return (
-    <Box sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">
-          Análise de Voz em Tempo Real
-        </Typography>
-        <IconButton
-          color={isRecording ? 'error' : 'primary'}
-          onClick={isRecording ? stopRecording : startRecording}
-          size="large"
-          disabled={permissionStatus === 'denied'}
-        >
-          {isRecording ? <Stop /> : <Mic />}
-        </IconButton>
+    <Box sx={{ width: '100%', p: 2 }}>
+      <Box data-testid="audio-status" sx={{ display: 'none' }}>
+        {isRecording ? 'recording' : 'stopped'}
       </Box>
 
-      {getPermissionMessage() && (
-        <Alert severity={permissionStatus === 'denied' ? 'error' : 'info'} sx={{ mb: 2 }}>
-          {getPermissionMessage()}
+      {error && (
+        <Alert 
+          severity="error" 
+          data-testid="permission-error"
+          sx={{ mb: 2 }}
+        >
+          {error}
         </Alert>
       )}
 
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
-          width: '100%'
-        }}>
-          {/* Canvas para forma de onda */}
-          <Box sx={{
-            width: '100%',
-            height: 200,
-            bgcolor: 'rgb(20, 20, 30)',
-            borderRadius: 1,
-            overflow: 'hidden',
-            mb: 2
-          }}>
-            <canvas
-              ref={canvasRef}
-              width={800}
-              height={200}
-              style={{
-                width: '100%',
-                height: '100%'
-              }}
-            />
-          </Box>
+      {showQualityWarning && (
+        <Alert 
+          severity="warning" 
+          data-testid="quality-warning"
+          sx={{ mb: 2 }}
+        >
+          Qualidade do áudio está baixa. Tente reduzir o ruído ambiente.
+        </Alert>
+      )}
 
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}>
-            <GraphicEq />
-            <Box sx={{
-              width: '100%',
-              height: 10,
-              bgcolor: 'grey.200',
-              borderRadius: 5,
-              overflow: 'hidden'
-            }}>
-              <Box
-                sx={{
-                  width: `${volumeLevel}%`,
-                  height: '100%',
-                  bgcolor: 'primary.main',
-                  transition: 'width 0.1s ease'
-                }}
-              />
-            </Box>
-          </Box>
+      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+        <IconButton
+          color={isRecording ? 'error' : 'primary'}
+          onClick={isRecording ? stopRecording : startRecording}
+          data-testid={isRecording ? 'stop-recording' : 'start-recording'}
+        >
+          {isRecording ? <Stop /> : <Mic />}
+        </IconButton>
 
-          <Typography variant="body2" color="text.secondary">
-            Volume: {Math.round(volumeLevel)}%
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Pitch: {Math.round(pitchLevel)}Hz
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Clareza: {Math.round(clarity)}%
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <GraphicEq color={isRecording ? 'primary' : 'disabled'} />
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            data-testid="recording-feedback"
+          >
+            {isRecording ? 'Gravando...' : 'Pronto para gravar'}
           </Typography>
         </Box>
       </Box>
 
-      {timbreFeatures && (
-        <TimbreVisualizer features={timbreFeatures} />
-      )}
+      <Box sx={{ mb: 2 }}>
+        <canvas
+          ref={canvasRef}
+          style={{ width: '100%', height: '100px' }}
+          data-testid="waveform-display"
+        />
+      </Box>
 
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
-          {error}
-        </Alert>
-      </Snackbar>
+      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <VolumeUp />
+        <Box
+          data-testid="volume-indicator"
+          sx={{
+            width: '20px',
+            height: `${audioMetrics.volume}%`,
+            bgcolor: 'primary.main',
+            transition: 'height 0.1s ease-out'
+          }}
+        />
+      </Box>
+
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="caption" component="div" data-testid="pitch-value">
+          Pitch: {audioMetrics.pitch.toFixed(1)}
+        </Typography>
+        <Typography variant="caption" component="div" data-testid="clarity-value">
+          Clarity: {audioMetrics.clarity.toFixed(1)}%
+        </Typography>
+        <Typography variant="caption" component="div" data-testid="snr-value">
+          SNR: {audioMetrics.snr.toFixed(1)} dB
+        </Typography>
+      </Box>
+
+      {timbreFeatures && (
+        <TimbreVisualizer features={timbreFeatures} data-testid="timbre-visualizer" />
+      )}
     </Box>
   );
 };

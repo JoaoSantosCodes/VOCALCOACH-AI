@@ -1,5 +1,297 @@
 # Documentação Técnica - VocalCoach AI
 
+## Arquitetura
+
+### Frontend
+
+O frontend é construído com React e TypeScript, seguindo uma arquitetura baseada em componentes. A estrutura principal inclui:
+
+#### Componentes Core
+
+1. **VoiceAnalysis**
+   - `VoiceCapture`: Gerencia a captura e análise de áudio em tempo real
+     - Detecção de silêncio
+     - Cálculo de SNR (Signal-to-Noise Ratio)
+     - Feedback visual de qualidade
+     - Normalização de pitch aprimorada
+   - `TimbreVisualizer`: Renderiza visualizações de forma de onda e timbre
+
+2. **VoiceExercise**
+   - `ExerciseList`: Lista de exercícios disponíveis
+   - `ExerciseGuide`: Guia passo a passo dos exercícios
+   - `ExerciseAnimation`: Animações visuais para feedback
+
+#### Páginas
+
+- `Home`: Página inicial com introdução e features
+- `Practice`: Interface principal de prática
+- `Dashboard`: Visualização de progresso
+- `Karaoke`: Modo karaoke (em desenvolvimento)
+
+#### Web Workers
+
+O processamento de áudio é realizado em Web Workers para evitar bloqueio da thread principal:
+
+- `audioAnalyzer.worker.ts`: Análise de áudio em tempo real
+  ```typescript
+  interface AudioAnalysisResult {
+    type: 'result';
+    data: {
+      pitch: number;      // Frequência normalizada (0-100)
+      clarity: number;    // Clareza do sinal (0-100)
+      volume: number;     // Volume RMS normalizado (0-100)
+      isSilence: boolean; // Indicador de silêncio
+      snr: number;       // Signal-to-Noise Ratio em dB
+    };
+  }
+  ```
+- `timbreAnalyzer.worker.ts`: Análise específica de timbre
+
+### Análise de Áudio
+
+#### Configurações de Áudio
+```typescript
+const CONFIG = {
+  SILENCE_THRESHOLD: 0.01,  // Limiar para detecção de silêncio
+  MIN_PITCH: 50,           // Frequência mínima (Hz)
+  MAX_PITCH: 1500,         // Frequência máxima (Hz)
+  NOISE_FLOOR: 0.1         // Nível base de ruído
+};
+```
+
+#### Processamento de Áudio
+
+1. **Detecção de Silêncio**
+   - Utiliza RMS (Root Mean Square) para cálculo preciso de volume
+   - Threshold adaptativo para diferentes ambientes
+
+2. **Cálculo de SNR**
+   - Análise dos primeiros 100ms como ruído de fundo
+   - Cálculo logarítmico da relação sinal-ruído
+   - Feedback visual da qualidade do sinal
+
+3. **Normalização de Pitch**
+   - Escala logarítmica para melhor distribuição
+   - Limites de frequência configuráveis
+   - Filtragem de valores inválidos
+
+4. **Feedback Visual**
+   - Indicadores de qualidade em tempo real
+   - Visualização de forma de onda adaptativa
+   - Estados visuais para silêncio e ruído
+
+## Interface do Usuário
+
+### Componentes de Feedback
+
+1. **Indicadores de Qualidade**
+   ```typescript
+   const getSignalQualityColor = (snr: number): string => {
+     if (snr > 20) return '#4caf50'; // Bom
+     if (snr > 10) return '#ff9800'; // Médio
+     return '#f44336'; // Ruim
+   };
+   ```
+
+2. **Visualização de Áudio**
+   - Forma de onda em tempo real
+   - Indicadores de volume
+   - Estados visuais para diferentes condições
+
+### Estados e Métricas
+
+```typescript
+interface AudioMetrics {
+  pitch: number;     // Frequência normalizada
+  volume: number;    // Volume normalizado
+  clarity: number;   // Clareza do sinal
+  isSilence: boolean; // Estado de silêncio
+  snr: number;      // Relação sinal-ruído
+}
+```
+
+## Exercícios Vocais
+
+### Estrutura de Dados
+
+```typescript
+interface VocalExercise {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'iniciante' | 'intermediário' | 'avançado';
+  duration: number;
+  type: 'aquecimento' | 'técnica' | 'respiração' | 'afinação';
+  steps: ExerciseStep[];
+  tips: string[];
+  benefits: string[];
+}
+
+interface ExerciseStep {
+  id: string;
+  instruction: string;
+  duration: number;
+  targetNote?: string;
+  targetPitch?: number;
+  animation?: string;
+}
+```
+
+### Sistema de Animação
+
+Utiliza Framer Motion para animações suaves e responsivas:
+
+```typescript
+const animations = {
+  breathing: {
+    scale: [1, 1.2, 1],
+    opacity: [0.7, 1, 0.7],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  },
+  // ... outras animações
+};
+```
+
+## Estado da Aplicação
+
+### Gerenciamento de Estado
+
+- Estados locais com React Hooks
+- Context API para estados globais
+- Persistência local para progresso do usuário
+
+### Fluxo de Dados
+
+```mermaid
+graph TD
+    A[User Input] --> B[Audio Capture]
+    B --> C[Web Worker]
+    C --> D[Audio Analysis]
+    D --> E[State Update]
+    E --> F[UI Update]
+    F --> G[Visual Feedback]
+```
+
+## Performance
+
+### Otimizações
+
+1. **Web Workers**
+   - Processamento de áudio em thread separada
+   - Comunicação otimizada com a thread principal
+
+2. **Renderização**
+   - Memoização de componentes pesados
+   - Lazy loading de rotas
+   - Code splitting automático
+
+3. **Áudio**
+   - Buffer size otimizado
+   - Throttling de atualizações visuais
+   - Cleanup adequado de recursos
+
+## Segurança
+
+### Permissões de Áudio
+
+- Solicitação explícita de permissões
+- Fallback para navegadores não suportados
+- Tratamento seguro de streams de áudio
+
+### Dados do Usuário
+
+- Armazenamento local seguro
+- Sanitização de inputs
+- Validação de dados
+
+## Testes
+
+### Estratégia de Testes
+
+1. **Testes Unitários**
+   - Componentes isolados
+   - Funções utilitárias
+   - Workers
+
+2. **Testes de Integração**
+   - Fluxos de exercícios
+   - Análise de áudio
+   - Navegação
+
+3. **Testes E2E**
+   - Fluxos completos de usuário
+   - Compatibilidade cross-browser
+
+### Configuração Pendente
+
+1. **Jest**
+   - Configuração de transformers
+   - Setup de mocks para Web Audio API
+   - Configuração de ambiente
+
+2. **Mocks Necessários**
+   ```typescript
+   // Mock do Web Audio API
+   const mockAudioContext = {
+     createMediaStreamSource: jest.fn(),
+     createAnalyser: jest.fn(),
+     // ... outros métodos
+   };
+
+   // Mock dos Web Workers
+   class MockWorker {
+     onmessage: ((e: MessageEvent) => void) | null = null;
+     postMessage(data: any) {
+       // Implementação do mock
+     }
+   }
+   ```
+
+3. **Cobertura de Testes**
+   - Testes unitários de componentes
+   - Testes de integração
+   - Testes de performance
+
+## Dependências Principais
+
+```json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "typescript": "^4.9.5",
+    "@mui/material": "^5.14.5",
+    "framer-motion": "^10.16.4",
+    "web-vitals": "^2.1.4"
+  }
+}
+```
+
+## Próximos Desenvolvimentos
+
+1. **Sistema de Gamificação**
+   - Pontuação por exercício
+   - Conquistas e níveis
+   - Competição social
+
+2. **Análise Avançada**
+   - Detecção de vibrato
+   - Análise de formantes
+   - Reconhecimento de notas
+
+3. **Exercícios Adaptativos**
+   - Sistema de dificuldade dinâmica
+   - Feedback personalizado
+   - Progresso baseado em métricas
+
+4. **Interface Aprimorada**
+   - Microinterações
+   - Feedback contextual
+   - Acessibilidade
+
 ## Status Geral do Projeto
 - **Estado atual**: Em desenvolvimento
 - **Prioridade**: Alta

@@ -177,3 +177,190 @@
 ---
 
 Este documento será atualizado conforme o projeto evolui e novas necessidades são identificadas. 
+
+# Timeline do Projeto
+
+## Março 2024
+
+### Semana 1
+- [x] Setup inicial do projeto
+- [x] Configuração do ambiente de desenvolvimento
+- [x] Implementação da estrutura base
+
+### Semana 2
+- [x] Implementação da análise de voz
+- [x] Desenvolvimento dos componentes de áudio
+- [x] Integração com Web Workers
+
+### Semana 3
+- [x] Implementação dos exercícios vocais
+- [x] Desenvolvimento do sistema de guia
+- [x] Animações e feedback visual
+
+### Semana 4 (Atual)
+- [ ] Migração do sistema de animações
+  - [ ] Remover Framer Motion
+  - [ ] Implementar React Spring
+  - [ ] Otimizar animações CSS
+- [ ] Correção de problemas técnicos
+  - [ ] Resolver erros de tipagem
+  - [ ] Limpar código não utilizado
+  - [ ] Corrigir dependências
+- [ ] Melhorias na documentação
+  - [ ] Atualizar guias técnicos
+  - [ ] Documentar novas implementações
+  - [ ] Revisar documentação existente
+
+## Abril 2024
+
+### Semana 1
+- [ ] Sistema de gamificação
+  - [ ] Pontuação
+  - [ ] Conquistas
+  - [ ] Ranking
+- [ ] Perfil do usuário
+  - [ ] Autenticação
+  - [ ] Dados do usuário
+  - [ ] Progresso
+
+### Semana 2
+- [ ] Mais exercícios vocais
+  - [ ] Exercícios avançados
+  - [ ] Exercícios personalizados
+  - [ ] Sistema de sequências
+- [ ] Feedback de áudio
+  - [ ] Análise em tempo real
+  - [ ] Sugestões de melhoria
+  - [ ] Histórico de performance
+
+### Semana 3
+- [ ] Sistema de progresso
+  - [ ] Estatísticas detalhadas
+  - [ ] Gráficos de evolução
+  - [ ] Metas e objetivos
+- [ ] Modo offline
+  - [ ] Cache de exercícios
+  - [ ] Sincronização
+  - [ ] PWA
+
+### Semana 4
+- [ ] Testes e otimização
+  - [ ] Testes de integração
+  - [ ] Testes de performance
+  - [ ] Otimização de bundle
+- [ ] Preparação para beta
+  - [ ] Documentação final
+  - [ ] Correção de bugs
+  - [ ] Feedback de usuários
+
+## Maio 2024
+
+### Semana 1
+- [ ] Lançamento beta
+  - [ ] Deploy da versão beta
+  - [ ] Monitoramento
+  - [ ] Feedback inicial
+
+### Semana 2
+- [ ] Análise de feedback
+  - [ ] Correções prioritárias
+  - [ ] Ajustes de UX
+  - [ ] Novas funcionalidades
+
+### Semana 3
+- [ ] Implementação de melhorias
+  - [ ] Baseadas no feedback
+  - [ ] Otimizações
+  - [ ] Novos recursos
+
+### Semana 4
+- [ ] Preparação para lançamento
+  - [ ] Marketing
+  - [ ] Documentação final
+  - [ ] Testes finais
+
+## Junho 2024
+
+### Semana 1
+- [ ] Lançamento oficial
+  - [ ] Deploy em produção
+  - [ ] Anúncio oficial
+  - [ ] Suporte inicial
+
+### Backlog
+- Integração com dispositivos MIDI
+- Sistema de mentoria
+- Modo karaoke avançado
+- Análise profissional
+- Marketplace de exercícios
+- Eventos ao vivo
+- API pública
+- Versão mobile nativa
+
+## Marcos Importantes
+
+### ✅ MVP (Março 2024)
+- Análise de voz básica
+- Exercícios fundamentais
+- Interface principal
+
+### 🎯 Beta (Maio 2024)
+- Sistema completo de exercícios
+- Gamificação
+- Perfil e progresso
+- Modo offline
+
+### 🚀 Lançamento (Junho 2024)
+- Todas as funcionalidades core
+- Performance otimizada
+- Documentação completa
+- Suporte estabelecido
+
+## Métricas de Progresso
+
+### Desenvolvimento
+- Cobertura de testes: 60% → 80%
+- Tempo de build: < 2min
+- Bundle size: < 500KB
+- Performance score: > 90
+
+### Usuário
+- Tempo de sessão: > 15min
+- Exercícios completados: > 5/semana
+- Retenção: > 60%
+- NPS: > 50
+
+## Ajustes no Cronograma
+
+### Atrasos Identificados
+- Migração do sistema de animações
+- Correção de problemas técnicos
+- Documentação técnica
+
+### Medidas de Mitigação
+- Priorizar correções críticas
+- Simplificar implementações iniciais
+- Aumentar cobertura de testes
+- Melhorar documentação incremental
+
+### Impacto no Projeto
+- Atraso estimado: 1 semana
+- Necessidade de recursos adicionais
+- Ajuste nas expectativas de entrega
+
+## Próximas Prioridades
+
+### Imediato (Esta Semana)
+- Resolver problemas do Framer Motion
+- Corrigir erros de tipagem
+- Limpar código não utilizado
+
+### Curto Prazo (2 Semanas)
+- Implementar novas animações
+- Melhorar performance
+- Aumentar cobertura de testes
+
+### Médio Prazo (1 Mês)
+- Sistema de gamificação
+- Perfil do usuário
+- Mais exercícios vocais 

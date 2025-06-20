@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import { useSpring, animated, config } from '@react-spring/web';
 import { TrendingUp, TrendingDown } from '@mui/icons-material';
 
 export interface StatCardProps {
@@ -23,12 +23,44 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => {
   const theme = useTheme();
 
+  const cardAnimation = useSpring({
+    from: { opacity: 0, y: 20 },
+    to: { opacity: 1, y: 0 },
+    config: config.gentle
+  });
+
+  const [hoverProps, setHover] = useSpring(() => ({
+    scale: 1,
+    y: 0,
+    config: config.wobbly
+  }));
+
+  const valueAnimation = useSpring({
+    from: { scale: 1 },
+    to: { scale: 1.05 },
+    config: config.wobbly,
+    reset: true
+  });
+
+  const trendAnimation = useSpring({
+    from: { scale: 1 },
+    to: async (next) => {
+      while (true) {
+        await next({ scale: 1.2 });
+        await next({ scale: 1 });
+      }
+    },
+    config: { duration: 1000 }
+  });
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ scale: 1.02, translateY: -5 }}
+    <animated.div
+      style={{
+        ...cardAnimation,
+        ...hoverProps
+      }}
+      onMouseEnter={() => setHover({ scale: 1.02, y: -5 })}
+      onMouseLeave={() => setHover({ scale: 1, y: 0 })}
     >
       <Box
         sx={{
@@ -90,21 +122,20 @@ const StatCard: React.FC<StatCardProps> = ({
           </Box>
         </Box>
 
-        <Typography
-          variant="h4"
-          component={motion.h4}
-          initial={{ scale: 1 }}
-          whileHover={{ scale: 1.05 }}
-          sx={{
-            fontWeight: 700,
-            mb: 1,
-            background: theme.gradients.text,
-            backgroundClip: 'text',
-            textFillColor: 'transparent',
-          }}
-        >
-          {value}
-        </Typography>
+        <animated.div style={valueAnimation}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              mb: 1,
+              background: theme.gradients.text,
+              backgroundClip: 'text',
+              textFillColor: 'transparent',
+            }}
+          >
+            {value}
+          </Typography>
+        </animated.div>
 
         <Box
           sx={{
@@ -114,20 +145,16 @@ const StatCard: React.FC<StatCardProps> = ({
             mb: 1,
           }}
         >
-          <Box
-            component={motion.div}
-            animate={{
-              scale: [1, 1.2, 1],
-              transition: { duration: 1, repeat: Infinity },
-            }}
-            sx={{
+          <animated.div
+            style={{
+              ...trendAnimation,
               display: 'flex',
               alignItems: 'center',
               color: trend.isPositive ? '#4DFFA1' : '#FF4D94',
             }}
           >
             {trend.isPositive ? <TrendingUp /> : <TrendingDown />}
-          </Box>
+          </animated.div>
           <Typography
             variant="body2"
             sx={{
@@ -150,7 +177,7 @@ const StatCard: React.FC<StatCardProps> = ({
           {description}
         </Typography>
       </Box>
-    </motion.div>
+    </animated.div>
   );
 };
 

@@ -29,39 +29,40 @@ describe('Home Component', () => {
 
   it('renders main heading', () => {
     renderHome();
-    expect(screen.getByText(/Desenvolva Seu/i)).toBeInTheDocument();
-    expect(screen.getByText(/Potencial Vocal/i)).toBeInTheDocument();
+    expect(screen.getByText('Desenvolva Seu Potencial Vocal')).toBeInTheDocument();
   });
 
   it('renders subheading', () => {
     renderHome();
-    expect(screen.getByText(/Treine sua voz com feedback em tempo real/i)).toBeInTheDocument();
+    expect(screen.getByText('Treine sua voz com feedback em tempo real usando inteligência artificial')).toBeInTheDocument();
   });
 
   it('navigates to practice page when clicking start button', () => {
     renderHome();
-    const startButton = screen.getByText(/Começar Agora/i);
+    const startButton = screen.getByText('Começar Agora');
     fireEvent.click(startButton);
     expect(mockNavigate).toHaveBeenCalledWith('/practice');
   });
 
   it('navigates to demo page when clicking demo button', () => {
     renderHome();
-    const demoButton = screen.getByText(/Ver Demonstração/i);
+    const demoButton = screen.getByText('Ver Demo');
     fireEvent.click(demoButton);
     expect(mockNavigate).toHaveBeenCalledWith('/demo');
   });
 
   it('renders feature icons', () => {
     renderHome();
-    const icons = screen.getAllByRole('button', { name: '' });
-    expect(icons).toHaveLength(3); // Microfone, Gráfico e Fone
+    expect(screen.getByTestId('mic-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('graph-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('headphones-icon')).toBeInTheDocument();
   });
 
   it('renders real-time analysis section', () => {
     renderHome();
-    expect(screen.getByText(/Análise em Tempo Real/i)).toBeInTheDocument();
-    expect(screen.getByText(/Receba feedback instantâneo/i)).toBeInTheDocument();
+    const analysisHeadings = screen.getAllByText('Análise em Tempo Real');
+    expect(analysisHeadings.length).toBeGreaterThan(0);
+    expect(screen.getByText('Receba feedback instantâneo sobre sua técnica vocal enquanto canta, com análise detalhada de afinação e timbre.')).toBeInTheDocument();
   });
 
   // Teste de responsividade usando matchMedia
@@ -75,7 +76,7 @@ describe('Home Component', () => {
     }));
 
     renderHome();
-    const heading = screen.getByText(/Desenvolva Seu/i);
+    const heading = screen.getByText('Desenvolva Seu Potencial Vocal');
     expect(heading).toBeInTheDocument();
     // Aqui você pode adicionar mais verificações específicas de estilo
   });

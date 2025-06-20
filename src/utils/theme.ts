@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles';
-import type { Theme as MuiTheme } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 
 // Extend the Theme type to include our custom properties
 declare module '@mui/material/styles' {
@@ -96,8 +96,8 @@ const shadowScale = [
   '0px 80px 160px rgba(0,0,0,0.50)',
   '0px 84px 168px rgba(0,0,0,0.52)',
   '0px 88px 176px rgba(0,0,0,0.54)',
-  '0px 92px 184px rgba(0,0,0,0.56)',
-] as const;
+  '0px 92px 184px rgba(0,0,0,0.56)'
+] as string[];
 
 const gradients = {
   primary: 'linear-gradient(135deg, #1E1E2E 0%, #2D2D44 100%)',
@@ -212,11 +212,8 @@ const theme = createTheme({
       letterSpacing: '0.00714em',
     },
     button: {
-      fontSize: '0.875rem',
-      fontWeight: 600,
       textTransform: 'none',
-      lineHeight: 1.75,
-      letterSpacing: '0.02857em',
+      fontWeight: 600,
     },
   },
   shape: {
@@ -226,25 +223,12 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
+          borderRadius: 8,
           textTransform: 'none',
           fontWeight: 600,
-          borderRadius: 12,
-          padding: '12px 24px',
-          transition: 'all 0.3s ease',
+          boxShadow: 'none',
           '&:hover': {
-            transform: 'translateY(-2px)',
-          },
-        },
-        contained: {
-          background: gradients.button,
-          '&:hover': {
-            background: gradients.buttonHover,
-          },
-        },
-        outlined: {
-          borderWidth: 2,
-          '&:hover': {
-            borderWidth: 2,
+            boxShadow: 'none',
           },
         },
       },
@@ -252,10 +236,10 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          background: gradients.glass,
+          borderRadius: 16,
+          backgroundImage: gradients.glass,
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 24,
         },
       },
     },
@@ -335,8 +319,7 @@ const theme = createTheme({
       },
     },
   },
-  shadows: shadowScale,
+  shadows: shadowScale as Theme['shadows'],
 });
 
-export { theme };
-export type Theme = MuiTheme; 
+export { theme, Theme }; 

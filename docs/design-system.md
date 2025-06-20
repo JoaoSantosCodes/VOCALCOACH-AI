@@ -124,6 +124,81 @@ rotate: 5deg
 
 ## 🧱 Componentes
 
+### Exercícios
+
+#### ExerciseCard
+```typescript
+interface ExerciseCardProps {
+  title: string;
+  description: string;
+  difficulty: 'iniciante' | 'intermediário' | 'avançado';
+  duration: number;
+  type: string;
+  onStart: () => void;
+}
+```
+
+**Variantes**:
+- Default: Cartão padrão com hover effect
+- Featured: Destaque com borda colorida
+- Disabled: Estado desabilitado
+
+#### ExerciseGuide
+```typescript
+interface ExerciseGuideProps {
+  exercise: VocalExercise;
+  onComplete: () => void;
+}
+```
+
+**Estados**:
+- Playing: Exercício em andamento
+- Paused: Exercício pausado
+- Complete: Exercício finalizado
+
+#### ExerciseAnimation
+```typescript
+interface ExerciseAnimationProps {
+  type: string;
+  isPlaying: boolean;
+}
+```
+
+**Tipos de Animação**:
+- breathing: Respiração diafragmática
+- hold: Segurar o ar
+- release: Soltar o ar
+- lying: Posição deitada
+- inhale: Inspiração
+- exhale: Expiração
+
+### Análise de Voz
+
+#### VoiceCapture
+```typescript
+interface VoiceCaptureProps {
+  onAnalysisUpdate: (data: AnalysisData) => void;
+}
+```
+
+**Estados**:
+- Idle: Aguardando início
+- Recording: Capturando áudio
+- Processing: Analisando áudio
+- Error: Erro na captura
+
+#### TimbreVisualizer
+```typescript
+interface TimbreVisualizerProps {
+  features: VisualizerFeatures;
+}
+```
+
+**Modos**:
+- Waveform: Forma de onda
+- Frequency: Espectro de frequência
+- Timbre: Visualização de timbre
+
 ### Botões
 
 #### Variantes

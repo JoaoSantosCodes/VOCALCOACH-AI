@@ -185,4 +185,6 @@ self.onmessage = (e: MessageEvent<TimbreAnalyzerMessage>) => {
       data: features
     });
   }
-}; 
+};
+
+export {}; 
