@@ -221,6 +221,7 @@ Os beta testers podem ganhar pontos através de:
 - [SLAs e Métricas](docs/SLAS_AND_METRICS.md)
 - [Procedimentos de Suporte](docs/SUPPORT_PROCEDURES.md)
 - [Guia de Moderação](docs/MODERATION_GUIDE.md)
+- [Regras do Canal](docs/CHANNEL_RULES.md)
 
 ### ⚠️ Suporte
 
