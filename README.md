@@ -211,6 +211,7 @@ Os beta testers podem ganhar pontos através de:
 - [Código de Conduta](docs/CODE_OF_CONDUCT.md)
 - [Prioridades de Documentação](docs/DOCUMENTATION_PRIORITIES.md)
 - [Matriz de Responsabilidades](docs/RESPONSIBILITY_MATRIX.md)
+- [Plano de Comunicação](docs/COMMUNICATION_PLAN.md)
 
 ### ⚠️ Suporte
 
