@@ -56,6 +56,9 @@ Este comando irá:
 - `npm run beta:schedule-reports` - Agenda geração automática de relatórios
 - `npm run beta:backup` - Realiza backup manual dos dados
 - `npm run beta:backup:daily` - Agenda backup diário automático
+- `npm run beta:backup:verify` - Verifica integridade do último backup
+- `npm run beta:backup:restore` - Testa restauração do último backup
+- `npm run beta:backup:list` - Lista backups disponíveis
 - `npm run beta:progress` - Gera relatório de progresso do beta
 - `npm run beta:setup:ci` - Configura ambiente beta em CI
 - `npm run beta:monitor:ci` - Executa monitoramento em CI
@@ -586,4 +589,32 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes sobre como contribuir com 
 
 ## Licença 📄
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes. 
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+### 💾 Sistema de Backup
+
+O sistema de backup foi implementado com as seguintes características:
+
+- **Backup Automático**
+  - Backup diário do MongoDB
+  - Retenção de 7 dias
+  - Compressão gzip
+  - Armazenamento local e S3
+  - Verificação de integridade
+
+- **Monitoramento**
+  - Alertas via Discord
+  - Verificação de integridade
+  - Logs detalhados
+  - Métricas de tamanho e duração
+
+- **Restauração**
+  - Teste automático de restauração
+  - Validação de integridade
+  - Ambiente de teste isolado
+  - Verificação de coleções
+
+- **Documentação**
+  - [Procedimentos de Backup](docs/BACKUP_PROCEDURES.md)
+  - [Procedimentos de Restauração](docs/ROLLBACK_PROCEDURES.md)
+  - [Documentação Técnica](docs/TECHNICAL-DOCUMENTATION.md) 
