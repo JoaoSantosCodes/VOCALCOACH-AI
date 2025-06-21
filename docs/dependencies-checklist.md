@@ -1,179 +1,201 @@
-# Checklist de Dependências - VocalCoach AI
+# Checklist Dependências - VocalCoach AI
 
-## 📦 Dependências Frontend
+## 📋 Status Geral: 85% Concluído
 
-### React e Roteamento
-- [x] `react` - Biblioteca principal do React
-- [x] `react-dom` - Renderização do React no DOM
-- [x] `react-router-dom` - Roteamento da aplicação
-- [x] `@types/react` - Tipos TypeScript para React
-- [x] `@types/react-dom` - Tipos TypeScript para React DOM
+> **Como usar:**
+> - **Crítica:** Essencial para o build, execução e segurança do projeto. Sem elas, o sistema não funciona.
+> - **Alta:** Importante para features principais, mas o sistema ainda roda sem todas.
+> - **Média:** Melhora experiência, performance ou DX, mas não bloqueia o core.
+> - **Baixa/Opcional:** Utilidades, ferramentas, integrações extras.
 
-### UI e Componentes
-- [x] `@mui/material` - Biblioteca de componentes Material-UI
-- [x] `@emotion/react` - Runtime do Emotion (CSS-in-JS)
-- [x] `@emotion/styled` - Styled components do Emotion
-- [x] `@mui/icons-material` - Ícones do Material-UI
+---
 
-### Gráficos e Visualização
-- [x] `react-chartjs-2` - Wrapper React para Chart.js
-- [x] `chart.js` - Biblioteca de gráficos
-- [x] `@types/chart.js` - Tipos TypeScript para Chart.js
+## 🔥 Dependências Críticas
 
-### Análise de Áudio
-- [x] `pitchy` - Análise de pitch e frequência
-- [x] `@types/pitchy` - Tipos TypeScript para pitchy (se disponível)
+### Frontend
+- [x] react
+- [x] react-dom
+- [x] react-router-dom
+- [x] react-scripts
+- [x] @mui/material
+- [x] @emotion/react
+- [x] @emotion/styled
 
-### Service Worker e PWA
-- [x] `workbox-webpack-plugin` - Plugin do Workbox para Webpack
-- [x] `workbox-cacheable-response` - Cache de respostas
-- [x] `workbox-precaching` - Pré-cache de recursos
-- [x] `workbox-expiration` - Expiração de cache
-- [x] `workbox-recipes` - Receitas do Workbox
-- [x] `workbox-background-sync` - Sincronização em background
-- [x] `workbox-routing` - Roteamento do Workbox
-- [x] `workbox-strategies` - Estratégias de cache
+### Backend
+- [x] express
+- [x] mongoose
+- [x] mongodb
+- [x] cors
+- [x] helmet
+- [x] dotenv
 
-### Animações
-- [x] `react-spring` - Animações baseadas em física
-- [x] `@react-spring/web` - Animações para web
-- [x] `@react-spring/native` - Animações para React Native (se necessário)
+### Segurança/Autenticação
+- [x] passport
+- [x] passport-jwt
+- [x] passport-local
+- [x] jsonwebtoken
+- [x] bcrypt
+- [x] rate-limiter-flexible
 
-## 🔧 Dependências Backend
+---
 
-### Framework e Servidor
-- [x] `express` - Framework web para Node.js
-- [x] `@types/express` - Tipos TypeScript para Express
-- [x] `cors` - Middleware CORS
-- [x] `helmet` - Headers de segurança
-- [x] `compression` - Compressão de resposta
+## 🚀 Dependências de Prioridade Alta
 
-### Banco de Dados
-- [x] `mongoose` - ODM para MongoDB
-- [x] `@types/mongoose` - Tipos TypeScript para Mongoose
-- [x] `mongodb` - Driver oficial do MongoDB
+### Frontend
+- [x] @mui/icons-material
+- [x] chart.js
+- [x] react-chartjs-2
+- [x] pitchy
+- [x] react-spring
+- [x] @react-spring/web
+- [x] workbox-* (PWA)
 
-### Autenticação e Segurança
-- [x] `passport` - Middleware de autenticação
-- [x] `passport-jwt` - Estratégia JWT do Passport
-- [x] `passport-local` - Estratégia local do Passport
-- [x] `jsonwebtoken` - Geração e verificação de JWT
-- [x] `bcrypt` - Hash de senhas
-- [x] `@types/bcrypt` - Tipos TypeScript para bcrypt
-- [x] `rate-limiter-flexible` - Rate limiting
+### Backend
+- [x] joi
+- [x] express-validator
+- [x] morgan
+- [x] winston
+- [x] axios
 
-### Validação e Sanitização
-- [x] `joi` - Validação de dados
-- [x] `express-validator` - Validação para Express
-- [x] `sanitize-html` - Sanitização de HTML
+---
 
-### Logs e Monitoramento
-- [x] `winston` - Sistema de logs
-- [x] `morgan` - Logs de requisições HTTP
-- [x] `axios` - Cliente HTTP
-- [x] `dotenv` - Variáveis de ambiente
+## ⚡ Dependências de Prioridade Média
 
-### Utilitários
-- [x] `lodash` - Biblioteca de utilitários
-- [x] `moment` - Manipulação de datas
-- [x] `uuid` - Geração de UUIDs
-- [x] `@types/uuid` - Tipos TypeScript para UUID
+### Dev/Build
+- [x] typescript
+- [x] @types/node
+- [x] @types/react
+- [x] @types/react-dom
+- [x] eslint
+- [x] @typescript-eslint/eslint-plugin
+- [x] @typescript-eslint/parser
+- [x] jest
+- [x] @testing-library/jest-dom
+- [x] @testing-library/react
+- [x] @testing-library/user-event
+- [x] cypress
+- [x] webpack-bundle-analyzer
+- [x] compression-webpack-plugin
+- [x] terser-webpack-plugin
+- [x] lighthouse
+- [x] puppeteer
+- [x] autocannon
 
-## 🧪 Dependências de Desenvolvimento
+---
 
-### TypeScript
-- [x] `typescript` - Compilador TypeScript
-- [x] `@types/node` - Tipos TypeScript para Node.js
+## 🟢 Dependências Baixa/Opcionais
+- [ ] storybook
+- [ ] @storybook/react
+- [ ] @storybook/addon-essentials
+- [ ] husky
+- [ ] lint-staged
+- [ ] commitizen
+- [ ] typedoc
+- [ ] express-rate-limit
+- [ ] express-slow-down
+- [ ] helmet-csp
+- [ ] compression
+- [ ] sonarqube-scanner
+- [ ] codecov
 
-### Linting e Formatação
-- [x] `eslint` - Linter JavaScript/TypeScript
-- [x] `@typescript-eslint/eslint-plugin` - Plugin ESLint para TypeScript
-- [x] `@typescript-eslint/parser` - Parser TypeScript para ESLint
-- [x] `prettier` - Formatador de código
-- [x] `eslint-config-prettier` - Configuração ESLint para Prettier
-- [x] `eslint-plugin-prettier` - Plugin Prettier para ESLint
+---
 
-### Testes
-- [x] `jest` - Framework de testes
-- [x] `@types/jest` - Tipos TypeScript para Jest
-- [x] `react-testing-library` - Biblioteca de testes para React
-- [x] `@testing-library/jest-dom` - Matchers customizados para Jest
-- [x] `@testing-library/user-event` - Simulação de eventos do usuário
-- [x] `cypress` - Testes end-to-end
-- [x] `@types/cypress` - Tipos TypeScript para Cypress
+## 📊 Tabela Visual: Dependências Críticas x Features
 
-### Build e Deploy
-- [x] `react-scripts` - Scripts do Create React App
-- [x] `webpack` - Bundler (incluído no react-scripts)
-- [x] `babel` - Transpilador (incluído no react-scripts)
+| Dependência         | Backend | Frontend | Segurança | PWA | Testes | Build |
+|--------------------|:-------:|:--------:|:---------:|:---:|:------:|:-----:|
+| express            |   X     |          |           |     |        |       |
+| mongoose/mongodb   |   X     |          |           |     |        |       |
+| cors/helmet/dotenv |   X     |          |     X     |     |        |       |
+| passport/jwt/bcrypt|   X     |          |     X     |     |        |       |
+| react/react-dom    |         |    X     |           |     |        |   X   |
+| react-router-dom   |         |    X     |           |     |        |   X   |
+| @mui/material      |         |    X     |           |     |        |   X   |
+| @emotion/react     |         |    X     |           |     |        |   X   |
+| react-scripts      |         |    X     |           |     |        |   X   |
+| rate-limiter-flexible| X     |          |     X     |     |        |       |
+| typescript/eslint  |   X     |    X     |           |     |   X    |   X   |
+| jest/cypress       |   X     |    X     |           |     |   X    |       |
+| workbox-* (PWA)    |         |    X     |           |  X  |        |       |
 
-### Monitoramento e Performance
-- [x] `web-vitals` - Métricas de performance web
-- [x] `lighthouse` - Auditoria de performance
-- [x] `@types/lighthouse` - Tipos TypeScript para Lighthouse
+Legenda: X = Essencial para a área/feature
 
-## 📋 Dependências Opcionais
+---
 
-### Análise de Código
-- [ ] `sonarqube-scanner` - Análise de qualidade de código
-- [ ] `codecov` - Cobertura de testes
+## 📋 Scripts e Ferramentas
 
-### Documentação
-- [ ] `typedoc` - Geração de documentação TypeScript
-- [ ] `storybook` - Desenvolvimento de componentes
+### ✅ Scripts Existentes
+- [x] `npm run deps:check` - Verificar dependências
+- [x] `npm run audit` - Auditoria de segurança
+- [x] `npm run audit:fix` - Corrigir vulnerabilidades
+- [x] `npm run analyze:bundle` - Análise de bundle
 
-### CI/CD
-- [ ] `husky` - Git hooks
-- [ ] `lint-staged` - Lint apenas arquivos staged
-- [ ] `commitizen` - Commits padronizados
+### ❌ Scripts Adicionais
+- [ ] `npm run deps:update` - Atualizar dependências
+- [ ] `npm run deps:audit` - Auditoria completa
+- [ ] `npm run deps:report` - Relatório de dependências
+- [ ] `npm run deps:clean` - Limpar dependências não utilizadas
 
-## 🚨 Problemas Conhecidos
+---
 
-### Dependências com Conflitos
-- [ ] Verificar versões compatíveis do Material-UI
-- [ ] Resolver conflitos de tipos TypeScript
-- [ ] Verificar compatibilidade do Workbox
+## 🎯 Próximos Passos
 
-### Dependências Desatualizadas
-- [ ] Atualizar dependências com vulnerabilidades
-- [ ] Verificar compatibilidade com Node.js 18+
-- [ ] Atualizar React para versão mais recente
+### Prioridade 1 (Esta Semana)
+1. **Verificar vulnerabilidades** - Executar auditoria completa
+2. **Atualizar dependências críticas** - Patch de segurança
+3. **Configurar alertas** - Monitoramento automático
 
-## 📝 Comandos Úteis
+### Prioridade 2 (Próxima Semana)
+1. **Implementar auditoria avançada** - Snyk ou similar
+2. **Otimizar bundle** - Reduzir tamanho
+3. **Configurar atualizações automáticas** - Patch releases
 
-### Instalação de Dependências
+### Prioridade 3 (Semanas Seguintes)
+1. **Implementar CDN** - Dependências estáticas
+2. **Configurar cache** - Otimização de performance
+3. **Documentar política** - Atualizações e manutenção
+
+---
+
+## 🎯 Métricas de Sucesso
+
+### Critérios de Aceitação
+- [ ] Zero vulnerabilidades críticas
+- [ ] Todas as dependências necessárias instaladas
+- [ ] Bundle size < 2MB
+- [ ] Tempo de carregamento < 3s
+- [ ] Cobertura de testes > 80%
+
+### KPIs
+- **Vulnerabilidades**: 0 críticas, < 5 moderadas
+- **Dependências**: 100% necessárias instaladas
+- **Performance**: Bundle < 2MB, Load time < 3s
+- **Manutenção**: Atualizações mensais automáticas
+
+---
+
+## 🔗 Comandos Úteis
+
 ```bash
-# Instalar todas as dependências
-npm install
+# Verificar dependências
+npm run deps:check
 
-# Instalar apenas dependências de produção
-npm install --production
+# Auditoria de segurança
+npm run audit
 
-# Instalar apenas dependências de desenvolvimento
-npm install --dev
-```
+# Corrigir vulnerabilidades
+npm run audit:fix
 
-### Verificação de Dependências
-```bash
-# Verificar vulnerabilidades
-npm audit
+# Análise de bundle
+npm run analyze:bundle
 
-# Verificar dependências desatualizadas
-npm outdated
+# Verificar progresso geral
+npm run beta:checklist
 
-# Listar dependências
-npm list --depth=0
-```
-
-### Limpeza
-```bash
-# Limpar cache do npm
-npm cache clean --force
-
-# Remover node_modules e reinstalar
-rm -rf node_modules package-lock.json && npm install
+# Dashboard de monitoramento
+npm run beta:dashboard
 ```
 
 ---
 
-*Última atualização: 21/12/2024* 
+*Última atualização: 21/06/2025* 

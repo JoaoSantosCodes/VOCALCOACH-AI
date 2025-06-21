@@ -806,4 +806,57 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
-**Desenvolvido com ❤️ pela equipe VocalCoach AI** 
+**Desenvolvido com ❤️ pela equipe VocalCoach AI**
+
+# VocalCoach AI - Beta Test
+
+## 📚 Navegação Rápida dos Checklists
+
+Acompanhe o progresso do projeto por área e prioridade:
+
+- [Checklist Geral](./docs/checklist.md)
+- [Backend Checklist](./docs/backend-checklist.md)
+- [Frontend Checklist](./docs/frontend-checklist.md)
+- [Dependencies Checklist](./docs/dependencies-checklist.md)
+- [Scripts & Ferramentas](./docs/scripts-checklist.md)
+- [Testes](./docs/tests-checklist.md)
+- [Documentação](./docs/documentation-checklist.md)
+- [Monitoramento](./docs/monitoring-checklist.md)
+- [Priority List](./docs/priority-list.md)
+
+## 🏷️ Como funcionam as prioridades?
+
+- **Crítica:** Essencial para funcionamento, build, segurança e operação.
+- **Alta:** Importante para features principais e integração.
+- **Média:** Melhora experiência, performance, DX ou documentação.
+- **Baixa/Opcional:** Utilidades, integrações extras, experimentação.
+
+Todos os checklists seguem esse padrão para facilitar o foco e a execução.
+
+## 🚦 Comandos Úteis para Acompanhamento
+
+```bash
+# Verificar progresso dos checklists
+npm run beta:checklist
+
+# Verificar dependências
+npm run deps:check
+
+# Dashboard de monitoramento
+npm run beta:dashboard
+
+# Testes
+npm run test
+npm run test:e2e
+```
+
+## 📈 Recomendações
+
+- Priorize tarefas críticas e de alta prioridade.
+- Use os checklists para organizar sprints e revisões.
+- Atualize os checklists conforme avança.
+- Consulte a documentação para dúvidas e procedimentos.
+
+---
+
+*Última atualização: 21/06/2025* 
