@@ -6,39 +6,75 @@ Este guia descreve como configurar o ambiente para o beta test do VocalCoach AI.
 
 - Node.js v16 ou superior
 - MongoDB v4.4 ou superior
+- MongoDB Database Tools (mongodump, mongorestore)
 - Conta Gmail para envio de emails
 - Servidor Discord para monitoramento
 
-## 2. Configuração do MongoDB
+## 2. Instalação das Ferramentas
+
+### MongoDB Database Tools
+```powershell
+# Windows (Administrador)
+choco install mongodb-database-tools -y
+
+# Verificar instalação
+mongodump --version
+mongorestore --version
+```
+
+### MongoDB
+```bash
+# Windows (Administrador)
+choco install mongodb -y
+
+# macOS (usando Homebrew)
+brew tap mongodb/brew
+brew install mongodb-community
+```
+
+## 3. Configuração do MongoDB
 
 1. **Instalação Local**
+   - Certifique-se de que o MongoDB está instalado e rodando
+   - Verifique se o MongoDB Database Tools está instalado
+
+2. **Configuração do Ambiente**
    ```bash
-   # Windows (usando Chocolatey)
-   choco install mongodb
+   # 1. Criar diretório de configuração
+   mkdir -p config/env
 
-   # macOS (usando Homebrew)
-   brew tap mongodb/brew
-   brew install mongodb-community
+   # 2. Criar arquivo de configuração de staging
+   cat > config/env/staging.env << EOL
+   # MongoDB
+   MONGODB_URI=mongodb://localhost:27017
+   MONGODB_DB=vocalcoach_staging
+
+   # Backup
+   BACKUP_RETENTION_DAYS=7
+   BACKUP_COMPRESSION=true
+   BACKUP_PATH=./backups/staging
+
+   # Teste
+   TEST_USER_EMAIL=test@vocalcoach.ai
+   TEST_USER_NAME=Test User
+   TEST_RESTORE_DB=vocalcoach_staging_test
+   EOL
    ```
-
-2. **Configuração**
-   - Crie um arquivo `.env` na raiz do projeto
-   - Adicione as seguintes variáveis:
-     ```
-     MONGODB_URI=mongodb://localhost:27017
-     MONGODB_DB=vocalcoach
-     ```
 
 3. **Verificação**
    ```bash
    # Inicie o MongoDB
    mongod
 
-   # Teste a conexão
+   # Configure o ambiente de staging
    npm run beta:setup-staging
+
+   # Teste o backup e restore
+   npm run beta:backup-staging
+   npm run beta:test-restore
    ```
 
-## 3. Configuração do Email
+## 4. Configuração do Email
 
 1. **Configuração do Gmail**
    - Ative a autenticação de duas etapas
@@ -57,7 +93,7 @@ Este guia descreve como configurar o ambiente para o beta test do VocalCoach AI.
    - Aguarde a propagação (até 48h)
    - Verifique: `npm run beta:verify-dns`
 
-## 4. Configuração do Discord
+## 5. Configuração do Discord
 
 1. **Criar Webhook**
    - Abra as configurações do servidor
@@ -77,7 +113,7 @@ Este guia descreve como configurar o ambiente para o beta test do VocalCoach AI.
    npm run beta:test-discord
    ```
 
-## 5. Configuração do Beta
+## 6. Configuração do Beta
 
 1. **Domínio**
    - Adicione ao `.env`:
@@ -94,7 +130,7 @@ Este guia descreve como configurar o ambiente para o beta test do VocalCoach AI.
    npm run beta:test-restore
    ```
 
-## 6. Verificação Final
+## 7. Verificação Final
 
 Execute a seguinte sequência de testes:
 
@@ -113,7 +149,7 @@ npm run beta:verify-dns
 npm run beta:test-discord
 ```
 
-## 7. Solução de Problemas
+## 8. Solução de Problemas
 
 ### MongoDB
 - **Erro de conexão**: Verifique se o MongoDB está rodando
@@ -127,14 +163,14 @@ npm run beta:test-discord
 - **Webhook falha**: Verifique a URL do webhook
 - **Mensagens não chegam**: Verifique as permissões do canal
 
-## 8. Próximos Passos
+## 9. Próximos Passos
 
 1. Execute todos os testes de verificação
 2. Documente quaisquer erros encontrados
 3. Atualize o checklist com o progresso
 4. Prepare o ambiente de produção
 
-## 9. Contatos
+## 10. Contatos
 
 - **Suporte Técnico**: tech@vocalcoach.ai
 - **Discord**: #beta-support

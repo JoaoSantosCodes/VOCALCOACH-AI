@@ -40,18 +40,21 @@
   - [x] Configurar dados de teste
   - [x] Criar guia de configuração
   - [x] Configurar variáveis de ambiente
+  - [ ] Instalar ferramentas necessárias
   - [ ] Realizar teste em ambiente de staging
   - [ ] Validar dados restaurados
-- [ ] Documentação
+- [x] Documentação
   - [x] Procedimentos de backup
   - [x] Procedimentos de restore
   - [x] Plano de disaster recovery
+  - [x] Guia de instalação de ferramentas
 
 ### ⚠️ Pendências de Configuração
 1. **MongoDB**
    - [x] Configurar MONGODB_URI
    - [x] Configurar MONGODB_DB
    - [x] Verificar permissões de acesso
+   - [ ] Instalar MongoDB Database Tools
 
 2. **Email**
    - [ ] Configurar SMTP_HOST
@@ -104,10 +107,10 @@
 
 ## Progresso Geral 📈
 - Sistema de Email: 🔄 45% (9/20 tarefas)
-- Backup: 🔄 95% (14/16 tarefas)
+- Backup: 🔄 95% (15/17 tarefas)
 - Monitoramento: 🔄 70% (7/10 tarefas)
 - Suporte: ⏳ 0% (0/9 tarefas)
-- **Total: 55% (30/55 tarefas)**
+- **Total: 55.4% (31/56 tarefas)**
 
 ## Próximas 24 Horas 🎯
 1. **Email (Prioridade 1)**
@@ -121,7 +124,8 @@
    - ✅ Configurar dados de teste
    - ✅ Criar guia de configuração
    - ✅ Configurar variáveis de ambiente
-   - 🔄 Executar teste de backup/restore
+   - 🔄 Instalar ferramentas necessárias
+   - ⏳ Executar teste de backup/restore
    - ⏳ Validar integridade dos dados
 
 3. **Monitoramento (Prioridade 3)**
