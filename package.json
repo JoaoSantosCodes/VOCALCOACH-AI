@@ -35,7 +35,10 @@
     "beta:validate-email": "node scripts/validate-email.js",
     "beta:validate-email:ci": "NODE_ENV=ci node scripts/validate-email.js",
     "beta:setup-gmail": "node scripts/setup-gmail.js",
-    "beta:setup-gmail:ci": "NODE_ENV=ci node scripts/setup-gmail.js"
+    "beta:setup-gmail:ci": "NODE_ENV=ci node scripts/setup-gmail.js",
+    "beta:backup-db": "node scripts/backup-mongodb.js",
+    "beta:backup-db:ci": "NODE_ENV=ci node scripts/backup-mongodb.js",
+    "beta:backup-db:schedule": "node -e \"setInterval(() => require('./scripts/backup-mongodb.js'), 24 * 60 * 60 * 1000)\""
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
