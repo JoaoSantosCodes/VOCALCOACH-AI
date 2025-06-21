@@ -11,7 +11,7 @@
 1. **Migração de Animações para React Spring**
    - [x] StatCard
    - [x] ProgressChart
-   - [ ] Dashboard
+   - [x] Dashboard
    - [ ] Testes de regressão visual
    - [ ] Documentação da migração
 
