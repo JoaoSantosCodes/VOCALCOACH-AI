@@ -33,7 +33,9 @@
     "beta:verify-db": "node scripts/verify-mongodb.js",
     "beta:verify-db:ci": "cross-env CI=true npm run beta:verify-db",
     "beta:validate-email": "node scripts/validate-email.js",
-    "beta:validate-email:ci": "NODE_ENV=ci node scripts/validate-email.js"
+    "beta:validate-email:ci": "NODE_ENV=ci node scripts/validate-email.js",
+    "beta:setup-gmail": "node scripts/setup-gmail.js",
+    "beta:setup-gmail:ci": "NODE_ENV=ci node scripts/setup-gmail.js"
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
