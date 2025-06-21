@@ -16,13 +16,13 @@
    - [ ] Documentação da migração
 
 2. **Atualização da Documentação Principal**
-   - [ ] Atualizar README.md
-     - [ ] Adicionar novas features (Gamificação, Offline)
-     - [ ] Atualizar requisitos de sistema
-     - [ ] Melhorar instruções de instalação
-     - [ ] Documentar novas configurações
-     - [ ] Adicionar badges de status
-     - [ ] Incluir exemplos de uso
+   - [x] Atualizar README.md
+     - [x] Adicionar novas features (Gamificação, Offline)
+     - [x] Atualizar requisitos de sistema
+     - [x] Melhorar instruções de instalação
+     - [x] Documentar novas configurações
+     - [x] Adicionar badges de status
+     - [x] Incluir exemplos de uso
 
 ### 🟡 ALTA
 1. **Preparação para Beta**
