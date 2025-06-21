@@ -220,6 +220,7 @@ Os beta testers podem ganhar pontos através de:
 - [Guia de Atendimento](docs/SUPPORT_GUIDE.md)
 - [SLAs e Métricas](docs/SLAS_AND_METRICS.md)
 - [Procedimentos de Suporte](docs/SUPPORT_PROCEDURES.md)
+- [Guia de Moderação](docs/MODERATION_GUIDE.md)
 
 ### ⚠️ Suporte
 
