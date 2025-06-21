@@ -118,10 +118,22 @@ module.exports = {
     channels: {
       discord: {
         channels: {
-          general: 'beta-general',
-          bugs: 'beta-bugs',
-          feedback: 'beta-feedback',
-          announcements: 'beta-announcements',
+          general: {
+            name: 'beta-general',
+            id: '1385873899249733642'
+          },
+          bugs: {
+            name: 'beta-bugs',
+            id: '1385873971043369030'
+          },
+          feedback: {
+            name: 'beta-feedback',
+            id: '1385874022298026020'
+          },
+          announcements: {
+            name: 'beta-announcements',
+            id: '1385874296185950379'
+          }
         },
       },
       email: {

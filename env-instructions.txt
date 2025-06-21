@@ -23,6 +23,14 @@ SMTP_PORT=587
 SMTP_USER=seu_email@exemplo.com
 SMTP_PASS=sua_senha_smtp
 
+# Discord Configuration
+DISCORD_BOT_TOKEN=your_bot_token_here
+DISCORD_GUILD_ID=your_guild_id_here
+DISCORD_GENERAL_CHANNEL=1385873899249733642
+DISCORD_BUGS_CHANNEL=1385873971043369030
+DISCORD_FEEDBACK_CHANNEL=1385874022298026020
+DISCORD_ANNOUNCEMENTS_CHANNEL=1385874296185950379
+
 # Instruções:
 1. Crie dois arquivos: .env na raiz do projeto e backend/.env
 2. Copie as configurações acima para os respectivos arquivos

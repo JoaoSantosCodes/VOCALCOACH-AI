@@ -88,4 +88,11 @@ export const helmetConfig = {
     useDefaults: true,
     directives: cspConfig.directives,
   },
+};
+
+export const DISCORD_CHANNELS = {
+  GENERAL: '1385873899249733642',
+  BUGS: '1385873971043369030',
+  FEEDBACK: '1385874022298026020',
+  ANNOUNCEMENTS: '1385874296185950379'
 }; 
