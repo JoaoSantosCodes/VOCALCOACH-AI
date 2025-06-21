@@ -1,0 +1,17 @@
+{
+  "spf": {
+    "name": "vocalcoach.ai",
+    "type": "TXT",
+    "value": "v=spf1 include:_spf.google.com ~all"
+  },
+  "dkim": {
+    "name": "beta._domainkey.vocalcoach.ai",
+    "type": "TXT",
+    "value": "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApnbl64zwnvgV1ztjkoDniAw5/yWhui3X0lpn19S4vciMpLsT+JgYLzBebRZynuUSLHtaFDOgBql92zs+OjtByqdg7KlpZ767n0Kxe2QjhYTxRY1ZNp71NdWJcNOYgWrvTV+z7Z2IP/1RFdG33n0HRzeBTqruyUhEOQrdJ6cE/B0HkpPjoOIaqd/9v0J7mOrpVtHQaJK8VeSgIbl2Rq33j5LjZXtGLrzEAWZuHgQfmvu/NKh2aOdwM77TocRhtG8yfv0tMKaeM+7mpcsSCkm4E82G8dhBK8m5VU5XZNppHRj03Fr1bu3Yem3/XV17BYdVeqwrxmKMUvkQZnyp0oMcBQIDAQAB"
+  },
+  "dmarc": {
+    "name": "_dmarc.vocalcoach.ai",
+    "type": "TXT",
+    "value": "v=DMARC1; p=quarantine; rua=mailto:dmarc@vocalcoach.ai"
+  }
+}
