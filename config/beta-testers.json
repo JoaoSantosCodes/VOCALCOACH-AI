@@ -1,0 +1,161 @@
+{
+  "beta_testers": {
+    "advanced": [
+      {
+        "email": "joaocarlosrh23@gmail.com",
+        "group": "advanced",
+        "features": ["all"],
+        "role": "developer"
+      },
+      {
+        "email": "supernerdconectado@gmail.com",
+        "group": "advanced",
+        "features": ["all"],
+        "role": "tech_lead"
+      },
+      {
+        "email": "suporteshownerd@gmail.com",
+        "group": "advanced",
+        "features": ["all"],
+        "role": "support"
+      },
+      {
+        "email": "pequenogeniodenegocios@gmail.com",
+        "group": "advanced",
+        "features": ["all"],
+        "role": "business"
+      },
+      {
+        "email": "deu.ruim.papai@gmail.com",
+        "group": "advanced",
+        "features": ["all"],
+        "role": "qa"
+      }
+    ],
+    "intermediate": [
+      {
+        "email": "joao.infoword@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "joao.c.s.santos01@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "inter.joaosantos@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "nubank.joaosantos@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "c6bank.joaosantos@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "mercadopago.joaosantos1@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "picpay.joaosantos@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      },
+      {
+        "email": "nubankmei.joaosantos@gmail.com",
+        "group": "intermediate",
+        "features": ["voice_analysis", "gamification"]
+      }
+    ],
+    "beginner": [
+      {
+        "email": "neon.joaosantos@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "udemy.joaosantos@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "xpinvestimentos.joaosantos@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "rico.joaosantos@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "xjhonnybrx@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "jobs.helena1@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "jmbrazilstore@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "moneyflowoffcial@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "sophiahelenaxx2022@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "isabelyvictoriaxx2022@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      },
+      {
+        "email": "operacionaldpsp@gmail.com",
+        "group": "beginner",
+        "features": ["basic_exercises", "offline_mode"]
+      }
+    ]
+  },
+  "distribution": {
+    "advanced": {
+      "total": 5,
+      "features": ["all"],
+      "max_users": 20
+    },
+    "intermediate": {
+      "total": 8,
+      "features": ["voice_analysis", "gamification"],
+      "max_users": 40
+    },
+    "beginner": {
+      "total": 11,
+      "features": ["basic_exercises", "offline_mode"],
+      "max_users": 40
+    }
+  },
+  "status": {
+    "total_users": 24,
+    "slots_available": {
+      "advanced": 15,
+      "intermediate": 32,
+      "beginner": 29
+    },
+    "last_updated": "2024-03-20"
+  }
+} 
