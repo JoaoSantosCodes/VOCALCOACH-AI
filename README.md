@@ -222,6 +222,7 @@ Os beta testers podem ganhar pontos através de:
 - [Procedimentos de Suporte](docs/SUPPORT_PROCEDURES.md)
 - [Guia de Moderação](docs/MODERATION_GUIDE.md)
 - [Regras do Canal](docs/CHANNEL_RULES.md)
+- [Guia de Comunicação](docs/COMMUNICATION_GUIDELINES.md)
 
 ### ⚠️ Suporte
 
