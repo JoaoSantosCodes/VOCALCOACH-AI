@@ -13,7 +13,7 @@
    - [x] ProgressChart
    - [x] Dashboard
    - [x] Testes de regressão visual
-   - [ ] Documentação da migração
+   - [x] Documentação da migração
 
 2. **Atualização da Documentação Principal**
    - [x] Atualizar README.md
