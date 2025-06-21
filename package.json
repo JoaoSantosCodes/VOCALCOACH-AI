@@ -31,7 +31,9 @@
     "beta:backup:ci": "cross-env CI=true npm run beta:backup",
     "beta:backup:daily": "node scripts/backup-beta.js --daily",
     "beta:verify-db": "node scripts/verify-mongodb.js",
-    "beta:verify-db:ci": "cross-env CI=true npm run beta:verify-db"
+    "beta:verify-db:ci": "cross-env CI=true npm run beta:verify-db",
+    "beta:validate-email": "node scripts/validate-email.js",
+    "beta:validate-email:ci": "NODE_ENV=ci node scripts/validate-email.js"
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
@@ -53,7 +55,6 @@
     "mixpanel-browser": "^2.47.0",
     "mongodb": "^6.3.0",
     "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -69,7 +70,9 @@
     "chrome-launcher": "^0.15.2",
     "compression-webpack-plugin": "^10.0.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^16.5.0",
     "lighthouse": "^9.6.8",
+    "nodemailer": "^7.0.3",
     "puppeteer": "^21.3.8",
     "terser-webpack-plugin": "^5.3.9",
     "webpack-bundle-analyzer": "^4.9.1"
