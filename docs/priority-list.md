@@ -1,5 +1,20 @@
 # Lista de Prioridades - VocalCoach AI
 
+## 📚 Checklists Específicos
+
+### 🎯 Checklists Detalhados por Área
+- **[Backend Checklist](./backend-checklist.md)** - Status: 35% Concluído
+- **[Frontend Checklist](./frontend-checklist.md)** - Status: 60% Concluído
+- **[Checklist Geral](./checklist.md)** - Checklist principal do projeto
+
+### 🔗 Links Rápidos
+- [Configuração de Ambiente](./ENVIRONMENT_SETUP.md)
+- [Guia de Deploy](./DEPLOYMENT_GUIDE.md)
+- [Procedimentos de Backup](./BACKUP_PROCEDURES.md)
+- [Guia de Monitoramento](./MONITORING_GUIDE.md)
+
+---
+
 ## 🚨 PRIORIDADE CRÍTICA (Implementar Imediatamente)
 
 ### ✅ 1. Corrigir Dashboard de Monitoramento
@@ -154,4 +169,4 @@
 
 ---
 
-*Última atualização: 21/12/2024* 
+*Última atualização: 21/06/2025* 

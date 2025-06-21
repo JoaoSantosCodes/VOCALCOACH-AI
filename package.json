@@ -72,6 +72,8 @@
     "beta:backup:restore": "node scripts/test-restore.js",
     "beta:backup:verify": "node scripts/verify-backup.js",
     "beta:progress": "node scripts/generate-beta-progress.js",
+    "beta:checklist": "node scripts/checklist-progress.js",
+    "beta:checklist:update": "node scripts/checklist-progress.js --update",
     "monitor:dns": "node scripts/monitor-dns.js",
     "monitor:test": "node scripts/test-discord.js",
     "monitor:build": "tsc -p tsconfig.monitor.json",
