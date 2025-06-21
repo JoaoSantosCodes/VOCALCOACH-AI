@@ -216,6 +216,7 @@ Os beta testers podem ganhar pontos através de:
 - [Configuração de Ambiente](docs/ENVIRONMENT_SETUP.md)
 - [Guia de Início Rápido](docs/QUICK_START_GUIDE.md)
 - [Manual do Usuário Básico](docs/BASIC_USER_MANUAL.md)
+- [Base de Conhecimento](docs/KNOWLEDGE_BASE.md)
 
 ### ⚠️ Suporte
 
