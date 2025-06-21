@@ -4,8 +4,199 @@
 [![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](https://github.com/JoaoSantosCodes/VOCALCOACH-AI)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PWA](https://img.shields.io/badge/PWA-ready-blue.svg)](https://web.dev/progressive-web-apps/)
+[![Beta](https://img.shields.io/badge/beta-in%20progress-orange.svg)](https://vocalcoach.ai/beta)
 
-Uma aplicação web moderna para treinamento vocal com feedback em tempo real, exercícios guiados e sistema de gamificação. Funciona offline e oferece uma experiência imersiva de aprendizado.
+Uma plataforma inovadora de treinamento vocal que utiliza inteligência artificial para fornecer feedback em tempo real e exercícios personalizados.
+
+## 🚀 Beta Test
+
+O VocalCoach AI está atualmente em fase beta! Se você recebeu um convite, siga as instruções abaixo para começar.
+
+### 📋 Requisitos
+
+- Node.js 18+
+- MongoDB 6+
+- Discord Bot Token
+- SMTP Server (para envio de emails)
+
+### 🛠️ Configuração do Ambiente Beta
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/vocalcoach-ai.git
+cd vocalcoach-ai
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Configure o ambiente beta:
+```bash
+npm run beta:setup
+```
+
+Este comando irá:
+- Verificar e configurar variáveis de ambiente necessárias
+- Criar diretórios para logs, relatórios e dados
+- Configurar banco de dados e índices
+- Configurar canais do Discord
+- Instalar dependências adicionais se necessário
+
+### 🎮 Comandos do Beta
+
+- `npm run beta:setup` - Configura o ambiente beta
+- `npm run beta:monitor` - Inicia o monitoramento em tempo real
+- `npm run beta:send-invites` - Envia convites para beta testers
+- `npm run beta:report` - Gera relatório manual
+- `npm run beta:report:daily` - Gera relatório diário
+- `npm run beta:report:weekly` - Gera relatório semanal
+- `npm run beta:schedule-reports` - Agenda geração automática de relatórios
+- `npm run beta:backup` - Realiza backup manual dos dados
+- `npm run beta:backup:daily` - Agenda backup diário automático
+- `npm run beta:progress` - Gera relatório de progresso do beta
+- `npm run beta:setup:ci` - Configura ambiente beta em CI
+- `npm run beta:monitor:ci` - Executa monitoramento em CI
+
+### 📊 Monitoramento
+
+O sistema de monitoramento coleta as seguintes métricas:
+
+- **Usuários**
+  - Total de beta testers
+  - Usuários ativos (diário/semanal)
+  - Retenção por grupo
+  - Progresso nos exercícios
+
+- **Performance**
+  - Taxa de erro
+  - Latência média
+  - Uso de recursos
+  - Disponibilidade
+
+- **Feedback**
+  - Bugs reportados
+  - Sugestões de features
+  - Avaliações gerais
+  - Satisfação do usuário
+
+### 📈 Relatórios
+
+Os relatórios são gerados nos seguintes formatos:
+
+- **Diário**: Métricas das últimas 24 horas
+- **Semanal**: Análise completa da semana
+- **Manual**: Relatório personalizado por período
+
+Os relatórios são salvos em `reports/beta` e enviados por email.
+
+### 🎯 Grupos de Beta Testers
+
+- **Iniciante**
+  - Foco em exercícios básicos
+  - Modo offline disponível
+  - 40 vagas
+
+- **Intermediário**
+  - Análise de voz em tempo real
+  - Sistema de gamificação
+  - 40 vagas
+
+- **Avançado**
+  - Acesso a todas as features
+  - Feedback prioritário
+  - 20 vagas
+
+### 💬 Canais de Comunicação
+
+- **Discord**
+  - #beta-general: Discussões gerais
+  - #beta-bugs: Reporte de problemas
+  - #beta-feedback: Sugestões
+  - #beta-announcements: Anúncios importantes
+
+- **Email**: beta@vocalcoach.ai
+- **Suporte**: [Portal de Suporte](https://support.vocalcoach.ai)
+
+### 🏆 Sistema de Recompensas
+
+Os beta testers podem ganhar pontos através de:
+
+- Reporte de bugs (10 pontos)
+- Sugestões de features (5 pontos)
+- Preenchimento de pesquisas (15 pontos)
+- Login diário (1 ponto)
+- Conclusão de exercícios (2 pontos)
+
+**Níveis e Recompensas:**
+
+- **Bronze** (0+ pontos)
+  - 1 mês premium
+
+- **Prata** (100+ pontos)
+  - 3 meses premium
+  - Acesso antecipado
+
+- **Ouro** (300+ pontos)
+  - 6 meses premium
+  - Acesso antecipado
+  - Badge exclusiva
+
+- **Platina** (1000+ pontos)
+  - 12 meses premium
+  - Acesso antecipado
+  - Badge exclusiva
+  - Menção especial
+
+### 📝 Documentação Adicional
+
+- [Guia do Beta Tester](docs/BETA_TESTER_GUIDE.md)
+- [Plano de Testes Beta](docs/BETA_TEST_PLAN.md)
+- [Procedimentos de Rollback](docs/ROLLBACK_PROCEDURES.md)
+- [Checklist de Desenvolvimento](docs/checklist.md)
+
+### ⚠️ Suporte
+
+Para problemas urgentes:
+- Discord: @VocalCoachSupport
+- Email: beta@vocalcoach.ai
+- Telefone: +XX XX XXXX-XXXX
+
+Horário de atendimento:
+- Segunda a Sexta: 9:00-18:00
+- Sábado e Domingo: 10:00-16:00
+(Horário de Brasília)
+
+## 🌟 Features
+
+- Análise de voz em tempo real
+- Exercícios personalizados
+- Feedback detalhado
+- Sistema de gamificação
+- Modo offline
+- Integração com Discord
+- Relatórios de progresso
+- Comunidade ativa
+
+## 🛠️ Tecnologias
+
+- React
+- TypeScript
+- Node.js
+- MongoDB
+- Discord.js
+- WebRTC
+- TensorFlow.js
+- Web Audio API
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👥 Contribuição
+
+Veja o guia de [contribuição](CONTRIBUTING.md) para detalhes sobre nosso código de conduta e o processo para enviar pull requests.
 
 ## ✨ Destaques
 
@@ -77,29 +268,6 @@ npm run dev
 ```
 
 5. Abra [http://localhost:3000](http://localhost:3000) no seu navegador.
-
-## 🏗️ Tecnologias
-
-- **Frontend**
-  - React 18
-  - TypeScript 5
-  - Material-UI v5
-  - React Spring para animações
-  - PWA com Workbox
-  - IndexedDB para storage
-
-- **Análise de Áudio**
-  - Web Audio API
-  - FFT para análise espectral
-  - ML.js para pitch detection
-  - WebAssembly para processamento
-
-- **Performance**
-  - Code splitting
-  - Service Workers
-  - Cache strategies
-  - Lazy loading
-  - Bundle optimization
 
 ## 📁 Estrutura do Projeto
 
@@ -210,10 +378,6 @@ npm run build:pwa    # Build com suporte PWA
    git push origin feature/MinhaFeature
    ```
 7. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
 
 ## 📱 PWA
 
