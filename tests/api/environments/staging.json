@@ -1,0 +1,18 @@
+{
+  "id": "staging",
+  "name": "Staging Environment",
+  "values": [
+    {
+      "key": "BASE_URL",
+      "value": "https://staging-api.vocalcoach.ai",
+      "type": "string",
+      "enabled": true
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "enabled": true
+    }
+  ]
+} 

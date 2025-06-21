@@ -1,110 +1,58 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { authConfig } from '../config/auth.config';
-import { logError, logSecurity } from '../config/logger';
+import { AuthService } from '../services/auth.service';
 import { User } from '../models/User';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
-      token?: string;
+      user?: User;
     }
   }
 }
 
-export const verifyToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'No authorization token provided',
-      });
+      return res.status(401).json({ message: 'Token não fornecido' });
     }
 
-    const [bearer, token] = authHeader.split(' ');
+    const [, token] = authHeader.split(' ');
 
-    if (bearer !== 'Bearer' || !token) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid authorization header format',
-      });
+    if (!token) {
+      return res.status(401).json({ message: 'Token não fornecido' });
     }
 
     try {
-      const decoded = jwt.verify(token, authConfig.jwt.secret);
-      const user = await User.findById((decoded as any).id).select('-password');
+      const decoded = AuthService.verifyToken(token);
+      const user = await User.findById(decoded.id);
 
       if (!user) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'User not found',
-        });
-      }
-
-      if (!user.isActive) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'User account is inactive',
-        });
+        return res.status(401).json({ message: 'Usuário não encontrado' });
       }
 
       req.user = user;
-      req.token = token;
-      next();
+      return next();
     } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'Token expired',
-        });
-      }
-      if (error instanceof jwt.JsonWebTokenError) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'Invalid token',
-        });
-      }
-      throw error;
+      return res.status(401).json({ message: 'Token inválido' });
     }
   } catch (error) {
-    logError(error as Error, 'Auth Middleware Error');
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error during authentication',
-    });
+    return res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
 
-export const requireRoles = (roles: string[]) => {
+export const roleMiddleware = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'User not authenticated',
-      });
+      return res.status(401).json({ message: 'Usuário não autenticado' });
     }
 
     if (!roles.includes(req.user.role)) {
-      logSecurity('Unauthorized Role Access', {
-        userId: req.user.id,
-        requiredRoles: roles,
-        userRole: req.user.role,
-        path: req.path,
-      });
-      return res.status(403).json({
-        status: 'error',
-        message: 'Insufficient permissions',
-      });
+      return res.status(403).json({ message: 'Acesso negado' });
     }
 
-    next();
+    return next();
   };
 };
 
@@ -187,10 +135,6 @@ export const checkIpBlacklist = async (
     const isBlacklisted = false;
 
     if (isBlacklisted) {
-      logSecurity('Blocked IP Access Attempt', {
-        ip: clientIp,
-        path: req.path,
-      });
       return res.status(403).json({
         status: 'error',
         message: 'Access denied',
@@ -199,8 +143,7 @@ export const checkIpBlacklist = async (
 
     next();
   } catch (error) {
-    logError(error as Error, 'IP Blacklist Check Error');
-    next();
+    return next();
   }
 };
 
@@ -242,8 +185,8 @@ export const refreshToken = async (
   }
 
   try {
-    const decoded = jwt.verify(refreshToken, authConfig.jwt.secret);
-    const user = await User.findById((decoded as any).id).select('-password');
+    const decoded = AuthService.verifyToken(refreshToken);
+    const user = await User.findById(decoded.id);
 
     if (!user) {
       return res.status(401).json({
@@ -252,24 +195,19 @@ export const refreshToken = async (
       });
     }
 
-    const accessToken = jwt.sign(
-      { id: user.id },
-      authConfig.jwt.secret,
-      { expiresIn: authConfig.jwt.expiresIn }
-    );
+    const accessToken = AuthService.generateToken(user);
 
     res.json({
       status: 'success',
       accessToken,
     });
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
+    if (error instanceof AuthService.TokenExpiredError) {
       return res.status(401).json({
         status: 'error',
         message: 'Refresh token expired',
       });
     }
-    logError(error as Error, 'Refresh Token Error');
     return res.status(500).json({
       status: 'error',
       message: 'Internal server error during token refresh',

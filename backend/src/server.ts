@@ -11,23 +11,25 @@ import achievementRoutes from './routes/achievement.routes';
 import blogRoutes from './routes/blog.routes';
 import voiceRoutes from './routes/voice.routes';
 import { globalLimiter, authLimiter } from './middleware/rateLimit.middleware';
+import helmet from 'helmet';
+import { corsOptions } from './config/cors.config';
+import { apiLimiter } from './middleware/rateLimit.middleware';
+import { logger } from './config/logger';
+import { helmetConfig, sanitizeInput } from './config/security.config';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.config';
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-}));
+// Middlewares de segurança
+app.use(helmet(helmetConfig));
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(session({
-  secret: authConfig.session.secret,
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(express.urlencoded({ extended: true }));
+app.use(sanitizeInput);
 
-// Rate Limiting
-app.use(globalLimiter); // Aplicar limite global para todas as rotas
+// Rate limiting global
+app.use(apiLimiter);
 
 // Inicializar Passport
 app.use(passport.initialize());
@@ -38,6 +40,18 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vocalcoac
   .then(() => console.log('Conectado ao MongoDB'))
   .catch((err) => console.error('Erro ao conectar ao MongoDB:', err));
 
+// Documentação Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'VocalCoach AI API Documentation',
+}));
+
+// Endpoint para baixar a especificação OpenAPI
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // Routes com rate limiting específico
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/voice', voiceRoutes);
@@ -47,15 +61,13 @@ app.use('/api/blog', blogRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: 'error',
-    message: 'Erro interno do servidor',
-  });
+  logger.error('Erro não tratado:', err);
+  res.status(500).json({ message: 'Erro interno do servidor' });
 });
 
 // Iniciar servidor
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  logger.info(`Servidor rodando na porta ${PORT}`);
+  logger.info(`Documentação da API disponível em http://localhost:${PORT}/api-docs`);
 }); 

@@ -1,5 +1,4 @@
-import { createTheme } from '@mui/material/styles';
-import type { Theme } from '@mui/material/styles';
+import { createTheme, PaletteOptions, Theme } from '@mui/material';
 
 // Extend the Theme type to include our custom properties
 declare module '@mui/material/styles' {
@@ -125,6 +124,157 @@ const glassEffects = {
     backdropFilter: 'blur(10px)',
     border: '1px solid rgba(0, 0, 0, 0.1)',
   },
+};
+
+// Tipos para as opções de contraste
+export type ContrastLevel = 'normal' | 'high';
+
+// Interface para as opções do tema
+interface ThemeOptions {
+  mode: 'light' | 'dark';
+  contrastLevel: ContrastLevel;
+}
+
+// Função para gerar cores com contraste adequado
+const getAccessibleColor = (baseColor: string, contrastLevel: ContrastLevel): string => {
+  if (contrastLevel === 'high') {
+    // Aumenta o contraste das cores para melhor acessibilidade
+    return baseColor === '#ffffff' ? '#ffffff' : '#000000';
+  }
+  return baseColor;
+};
+
+// Paleta de cores para alto contraste
+const getHighContrastPalette = (mode: 'light' | 'dark'): PaletteOptions => ({
+  mode,
+  primary: {
+    main: mode === 'light' ? '#000000' : '#ffffff',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  secondary: {
+    main: mode === 'light' ? '#000000' : '#ffffff',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  error: {
+    main: mode === 'light' ? '#9a0000' : '#ff6b6b',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  warning: {
+    main: mode === 'light' ? '#9a5700' : '#ffd06b',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  success: {
+    main: mode === 'light' ? '#006e1c' : '#6bff95',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  background: {
+    default: mode === 'light' ? '#ffffff' : '#000000',
+    paper: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  text: {
+    primary: mode === 'light' ? '#000000' : '#ffffff',
+    secondary: mode === 'light' ? '#000000' : '#ffffff',
+  },
+});
+
+// Paleta de cores normal
+const getNormalPalette = (mode: 'light' | 'dark'): PaletteOptions => ({
+  mode,
+  primary: {
+    main: mode === 'light' ? '#2196f3' : '#90caf9',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  secondary: {
+    main: mode === 'light' ? '#9c27b0' : '#ce93d8',
+    contrastText: mode === 'light' ? '#ffffff' : '#000000',
+  },
+  error: {
+    main: mode === 'light' ? '#d32f2f' : '#f44336',
+    contrastText: '#ffffff',
+  },
+  warning: {
+    main: mode === 'light' ? '#ed6c02' : '#ffa726',
+    contrastText: '#ffffff',
+  },
+  success: {
+    main: mode === 'light' ? '#2e7d32' : '#66bb6a',
+    contrastText: '#ffffff',
+  },
+  background: {
+    default: mode === 'light' ? '#f5f5f5' : '#121212',
+    paper: mode === 'light' ? '#ffffff' : '#1e1e1e',
+  },
+  text: {
+    primary: mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#ffffff',
+    secondary: mode === 'light' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+  },
+});
+
+// Função para criar o tema
+export const createAppTheme = ({ mode, contrastLevel }: ThemeOptions): Theme => {
+  const palette = contrastLevel === 'high' ? getHighContrastPalette(mode) : getNormalPalette(mode);
+
+  return createTheme({
+    palette,
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: '8px',
+            textTransform: 'none',
+            fontWeight: 600,
+          },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            '&:focus-visible': {
+              outline: `3px solid ${palette.primary.main}`,
+              outlineOffset: '2px',
+            },
+          },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: {
+            borderRadius: '8px',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+          },
+        },
+      },
+    },
+    typography: {
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      h1: {
+        fontSize: '2.5rem',
+        fontWeight: 700,
+      },
+      h2: {
+        fontSize: '2rem',
+        fontWeight: 600,
+      },
+      h3: {
+        fontSize: '1.75rem',
+        fontWeight: 600,
+      },
+      body1: {
+        fontSize: '1rem',
+        lineHeight: 1.5,
+      },
+      body2: {
+        fontSize: '0.875rem',
+        lineHeight: 1.43,
+      },
+    },
+  });
 };
 
 const theme = createTheme({

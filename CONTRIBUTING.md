@@ -29,6 +29,50 @@ Bem-vindo ao guia de contribuição do VocalCoach AI! Este documento fornece as 
    - Desenvolver e testar
    - Submeter PR
 
+3. **Processo de Checklist e Commits**
+   - Antes de iniciar uma implementação:
+     1. Atualizar o checklist com as etapas planejadas
+     2. Adicionar ideias de melhorias futuras
+     3. Criar milestone no GitHub se necessário
+   
+   - Durante o desenvolvimento:
+     1. Marcar etapas concluídas no checklist
+     2. Documentar decisões técnicas importantes
+     3. Registrar aprendizados e desafios
+   
+   - Ao finalizar uma implementação:
+     1. Atualizar o checklist (`docs/checklist.md`)
+     2. Fazer commit das alterações incluindo:
+        - Código implementado
+        - Checklist atualizado
+        - Documentação relacionada
+     3. Usar mensagem de commit descritiva:
+        ```
+        tipo(escopo): descrição curta
+
+        - Atualiza checklist com etapas concluídas
+        - Lista melhorias implementadas
+        - Documenta decisões técnicas
+        - Adiciona ideias para futuras iterações
+        ```
+     4. Push para o GitHub
+     5. Atualizar issues/milestones relacionados
+
+   - Formato do Checklist:
+     ```markdown
+     ### Nome da Feature ⬜️/✅
+     - [ ] Etapa Planejada
+       - [ ] Sub-etapa 1
+       - [ ] Sub-etapa 2
+     - [x] Etapa Concluída
+       - [x] Sub-etapa A
+       - [x] Sub-etapa B
+     
+     #### Melhorias Futuras
+     - Ideia 1: Descrição e benefícios
+     - Ideia 2: Descrição e benefícios
+     ```
+
 ## Padrões de Código
 
 1. **Estilo**
@@ -122,6 +166,8 @@ Bem-vindo ao guia de contribuição do VocalCoach AI! Este documento fornece as 
 - [ ] Sem vulnerabilidades de segurança
 - [ ] Revisado por pelo menos 2 devs
 - [ ] Testado em ambiente de staging
+- [ ] Checklist atualizado com implementações
+- [ ] Melhorias futuras documentadas
 
 ## Contato
 

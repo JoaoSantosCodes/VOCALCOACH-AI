@@ -1,73 +1,85 @@
 import rateLimit from 'express-rate-limit';
-import { authConfig } from '../config/auth.config';
-import { logSecurity } from '../config/logger';
+import RedisStore from 'rate-limit-redis';
+import Redis from 'ioredis';
+import { logger } from '../config/logger';
 
-// Base rate limiter configuration
-const createRateLimiter = (options: Partial<rateLimit.Options>) => {
-  return rateLimit({
-    windowMs: authConfig.rateLimit.windowMs,
-    max: authConfig.rateLimit.max,
-    message: authConfig.rateLimit.message,
-    standardHeaders: true,
-    legacyHeaders: false,
-    handler: (req, res) => {
-      logSecurity('Rate Limit Exceeded', {
-        ip: req.ip,
-        path: req.path,
-        headers: req.headers,
-      });
-      res.status(429).json({
-        status: 'error',
-        message: 'Too many requests, please try again later.',
-        retryAfter: Math.ceil(options.windowMs ? options.windowMs / 1000 : 900),
-      });
-    },
-    ...options,
-  });
-};
-
-// General API rate limiter
-export const apiLimiter = createRateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+// Criar cliente Redis
+const redis = new Redis({
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379'),
+  password: process.env.REDIS_PASSWORD,
 });
 
-// Stricter rate limiter for authentication routes
-export const authLimiter = createRateLimiter({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // limit each IP to 5 login attempts per hour
-  message: 'Too many login attempts, please try again after an hour',
+redis.on('error', (error) => {
+  logger.error('Erro na conexão com Redis:', error);
+});
+
+// Configuração base do rate limit
+const baseConfig = {
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: 'Muitas requisições. Por favor, tente novamente mais tarde.',
+    });
+  },
+  store: new RedisStore({
+    sendCommand: (...args: string[]) => redis.call(...args),
+  }),
+};
+
+// Rate limit para rotas de autenticação
+export const authLimiter = rateLimit({
+  ...baseConfig,
+  max: 5, // 5 tentativas
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  skipSuccessfulRequests: true, // Não conta requisições bem-sucedidas
+});
+
+// Rate limit para API geral
+export const apiLimiter = rateLimit({
+  ...baseConfig,
+  max: 100, // 100 requisições
+  windowMs: 15 * 60 * 1000, // 15 minutos
+});
+
+// Rate limit para uploads
+export const uploadLimiter = rateLimit({
+  ...baseConfig,
+  max: 10, // 10 uploads
+  windowMs: 60 * 60 * 1000, // 1 hora
+});
+
+// Rate limit para análise de voz
+export const voiceAnalysisLimiter = rateLimit({
+  ...baseConfig,
+  max: 50, // 50 análises
+  windowMs: 60 * 60 * 1000, // 1 hora
 });
 
 // Rate limiter for user registration
-export const registrationLimiter = createRateLimiter({
+export const registrationLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
   max: 3, // limit each IP to 3 registration attempts per day
   message: 'Too many accounts created from this IP, please try again after 24 hours',
 });
 
 // Rate limiter for password reset requests
-export const passwordResetLimiter = createRateLimiter({
+export const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // limit each IP to 3 password reset attempts per hour
   message: 'Too many password reset attempts, please try again after an hour',
 });
 
-// Rate limiter for API endpoints that handle file uploads
-export const uploadLimiter = createRateLimiter({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // limit each IP to 10 file uploads per hour
-  message: 'Too many file uploads, please try again after an hour',
-});
-
 // Rate limiter for public API endpoints
-export const publicApiLimiter = createRateLimiter({
+export const publicApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 30, // limit each IP to 30 requests per 15 minutes
 });
 
 // Rate limiter for webhook endpoints
-export const webhookLimiter = createRateLimiter({
+export const webhookLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 10, // limit each IP to 10 webhook calls per minute
 });
@@ -78,7 +90,7 @@ export const createCustomRateLimiter = (
   max: number,
   message: string
 ) => {
-  return createRateLimiter({
+  return rateLimit({
     windowMs,
     max,
     message,
@@ -102,7 +114,7 @@ export const dynamicRateLimiter = (roleConfig: Record<string, { windowMs: number
     const userRole = req.user?.role || 'anonymous';
     const config = roleConfig[userRole] || roleConfig.anonymous;
 
-    createRateLimiter({
+    rateLimit({
       windowMs: config.windowMs,
       max: config.max,
       message: `Rate limit exceeded for ${userRole} role`,
