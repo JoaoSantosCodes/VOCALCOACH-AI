@@ -1,94 +1,66 @@
-const { MongoClient } = require('mongodb');
-const { exec } = require('child_process');
-const dotenv = require('dotenv');
+const { execSync } = require('child_process');
 const path = require('path');
-const fs = require('fs').promises;
-const util = require('util');
-const execPromise = util.promisify(exec);
-
-// Carregar configuração baseada no ambiente
-const envFile = process.argv.includes('--staging') ? 'staging.env' : '.env';
-dotenv.config({ path: path.join(__dirname, '..', 'config', 'env', envFile) });
+const fs = require('fs');
+require('dotenv').config({ path: 'config/env/.env' });
 
 // Configurações
-const BACKUP_PATH = process.env.BACKUP_PATH || './backups';
-const RETENTION_DAYS = parseInt(process.env.BACKUP_RETENTION_DAYS || '7', 10);
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const MONGODB_DB = process.argv.includes('--db') ? process.argv[process.argv.indexOf('--db') + 1] : process.env.MONGODB_DB;
+const BACKUP_PATH = process.env.BACKUP_PATH || 'backups';
+const RETENTION_DAYS = parseInt(process.env.BACKUP_RETENTION_DAYS || '7');
 const USE_COMPRESSION = process.env.BACKUP_COMPRESSION === 'true';
 
-async function createBackup() {
-    console.log('🚀 Iniciando backup do MongoDB...\n');
-    console.log('📂 Usando configuração:', path.join(__dirname, '..', 'config', 'env', envFile));
-    console.log('💾 Diretório de backup:', BACKUP_PATH);
-    console.log('🔄 Retenção:', RETENTION_DAYS, 'dias');
-    console.log('🗜️ Compressão:', USE_COMPRESSION ? 'Ativada' : 'Desativada');
+// Caminho para o MongoDB Tools
+const TOOLS_PATH = path.join(__dirname, '..', 'tools', 'mongodb', 'mongodb-database-tools-windows-x86_64-100.9.4', 'bin');
+const MONGODUMP_PATH = path.join(TOOLS_PATH, 'mongodump.exe');
 
-    try {
-        // Criar diretório de backup se não existir
-        await fs.mkdir(BACKUP_PATH, { recursive: true });
+console.log('🚀 Iniciando backup do MongoDB...\n');
+console.log('📂 Usando configuração:', path.resolve('config/env/.env'));
+console.log('🔄 Retenção:', RETENTION_DAYS, 'dias');
+console.log('🗜️ Compressão:', USE_COMPRESSION ? 'Ativada' : 'Desativada');
+console.log('\n1️⃣ Executando backup...\n');
 
-        // Nome do arquivo de backup
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const backupFile = path.join(BACKUP_PATH, `backup-${timestamp}`);
+try {
+    // Criar diretório de backup
+    const backupDir = path.join(BACKUP_PATH, `backup-${new Date().toISOString().replace(/:/g, '-')}`);
+    fs.mkdirSync(backupDir, { recursive: true });
 
-        // Comando de backup
-        const mongodump = [
-            'mongodump',
-            `--uri="${process.env.MONGODB_URI}"`,
-            `--db=${process.env.MONGODB_DB}`,
-            `--out="${backupFile}"`,
-            USE_COMPRESSION ? '--gzip' : ''
-        ].filter(Boolean).join(' ');
+    // Comando de backup
+    const command = [
+        `"${MONGODUMP_PATH}"`,
+        `--uri="${MONGODB_URI}"`,
+        `--db=${MONGODB_DB}`,
+        `--out="${backupDir}"`,
+        USE_COMPRESSION ? '--gzip' : ''
+    ].filter(Boolean).join(' ');
 
-        console.log('\n1️⃣ Executando backup...');
-        await execPromise(mongodump);
-        console.log('✅ Backup concluído');
+    // Executar backup
+    execSync(command, { stdio: 'inherit' });
 
-        // Limpar backups antigos
-        console.log('\n2️⃣ Limpando backups antigos...');
-        const files = await fs.readdir(BACKUP_PATH);
-        const now = new Date();
+    // Limpar backups antigos
+    const backups = fs.readdirSync(BACKUP_PATH)
+        .filter(dir => dir.startsWith('backup-'))
+        .map(dir => ({
+            name: dir,
+            path: path.join(BACKUP_PATH, dir),
+            date: new Date(dir.replace('backup-', ''))
+        }))
+        .sort((a, b) => b.date - a.date);
 
-        for (const file of files) {
-            const filePath = path.join(BACKUP_PATH, file);
-            const stats = await fs.stat(filePath);
-            const daysOld = (now - stats.mtime) / (1000 * 60 * 60 * 24);
+    // Manter apenas os backups dentro do período de retenção
+    const retentionDate = new Date();
+    retentionDate.setDate(retentionDate.getDate() - RETENTION_DAYS);
 
-            if (daysOld > RETENTION_DAYS) {
-                await fs.rm(filePath, { recursive: true });
-                console.log(`🗑️ Removido backup antigo: ${file}`);
-            }
+    backups.forEach((backup, index) => {
+        if (index >= RETENTION_DAYS || backup.date < retentionDate) {
+            console.log(`🗑️ Removendo backup antigo: ${backup.name}`);
+            fs.rmSync(backup.path, { recursive: true, force: true });
         }
+    });
 
-        // Criar arquivo de metadados do backup
-        const metadata = {
-            timestamp: new Date().toISOString(),
-            database: process.env.MONGODB_DB,
-            backup_file: backupFile,
-            compression: USE_COMPRESSION,
-            retention_days: RETENTION_DAYS
-        };
-
-        await fs.writeFile(
-            path.join(backupFile, 'backup-metadata.json'),
-            JSON.stringify(metadata, null, 2)
-        );
-
-        console.log('\n🎉 Backup concluído com sucesso!');
-        console.log('\n📝 Detalhes do backup:');
-        console.log('- Arquivo:', backupFile);
-        console.log('- Banco:', process.env.MONGODB_DB);
-        console.log('- Data:', new Date().toLocaleString());
-
-        console.log('\nPróximos passos:');
-        console.log('1. Verifique os arquivos de backup');
-        console.log('2. Execute: npm run beta:test-restore');
-        console.log('3. Valide a integridade dos dados');
-
-    } catch (error) {
-        console.error('\n❌ Erro durante backup:', error);
-        process.exit(1);
-    }
-}
-
-// Executar backup
-createBackup().catch(console.error); 
+    console.log('\n✅ Backup concluído com sucesso!');
+    console.log('📂 Local:', backupDir);
+} catch (error) {
+    console.error('\n❌ Erro durante backup:', error.message);
+    process.exit(1);
+} 

@@ -1,165 +1,77 @@
-import * as Sentry from '@sentry/react';
-import { Integrations } from '@sentry/tracing';
-import mixpanel from 'mixpanel-browser';
-import { hotjar } from 'react-hotjar';
-import { init as initGA } from '@analytics/google-analytics';
+import { LogLevel } from '../types/monitoring';
 
-// Configurações do ambiente
-const isProd = process.env.NODE_ENV === 'production';
-const isBeta = process.env.REACT_APP_BETA === 'true';
-
-// Configuração do Sentry
-export const initSentry = () => {
-  if (isProd || isBeta) {
-    Sentry.init({
-      dsn: process.env.REACT_APP_SENTRY_DSN,
-      integrations: [new Integrations.BrowserTracing()],
-      tracesSampleRate: isProd ? 0.1 : 1.0,
-      environment: isProd ? 'production' : 'beta',
-      beforeSend(event) {
-        // Não enviar eventos em desenvolvimento
-        if (!isProd && !isBeta) return null;
-        return event;
-      },
-    });
-  }
-};
-
-// Configuração do Mixpanel
-export const initMixpanel = () => {
-  if (isProd || isBeta) {
-    mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN as string, {
-      debug: !isProd,
-      track_pageview: true,
-      persistence: 'localStorage',
-    });
-  }
-};
-
-// Configuração do Hotjar
-export const initHotjar = () => {
-  if (isProd || isBeta) {
-    hotjar.initialize(
-      parseInt(process.env.REACT_APP_HOTJAR_ID || '0', 10),
-      parseInt(process.env.REACT_APP_HOTJAR_VERSION || '6', 10)
-    );
-  }
-};
-
-// Configuração do Google Analytics
-export const initGA = () => {
-  if (isProd || isBeta) {
-    initGA({
-      measurementId: process.env.REACT_APP_GA_ID as string,
-    });
-  }
-};
-
-// Métricas customizadas
-export const metrics = {
-  // Performance
-  trackPerformance: (metric: {
+interface WebhookConfig {
+    url: string;
     name: string;
-    value: number;
-    tags?: Record<string, string>;
-  }) => {
-    if (!isProd && !isBeta) return;
+    level: LogLevel;
+}
 
-    // Enviar para Sentry
-    Sentry.captureMessage('Performance Metric', {
-      level: 'info',
-      extra: metric,
-    });
+interface MonitoringConfig {
+    discord: {
+        enabled: boolean;
+        webhooks: {
+            alerts: WebhookConfig;
+            errors: WebhookConfig;
+            info: WebhookConfig;
+            beta: WebhookConfig;
+        };
+        retryAttempts: number;
+        retryDelay: number; // ms
+    };
+    metrics: {
+        enabled: boolean;
+        interval: number; // ms
+        retention: number; // days
+    };
+    healthCheck: {
+        enabled: boolean;
+        interval: number; // ms
+        endpoints: string[];
+    };
+}
 
-    // Enviar para Mixpanel
-    mixpanel.track('Performance Metric', metric);
-  },
-
-  // Erros
-  trackError: (error: Error, context?: Record<string, any>) => {
-    if (!isProd && !isBeta) return;
-
-    // Enviar para Sentry
-    Sentry.captureException(error, {
-      extra: context,
-    });
-
-    // Enviar para Mixpanel
-    mixpanel.track('Error', {
-      message: error.message,
-      stack: error.stack,
-      ...context,
-    });
-  },
-
-  // Eventos de usuário
-  trackEvent: (name: string, properties?: Record<string, any>) => {
-    if (!isProd && !isBeta) return;
-
-    // Enviar para Mixpanel
-    mixpanel.track(name, properties);
-
-    // Enviar para GA
-    if (window.gtag) {
-      window.gtag('event', name, properties);
+const config: MonitoringConfig = {
+    discord: {
+        enabled: true,
+        webhooks: {
+            alerts: {
+                url: process.env.DISCORD_WEBHOOK_ALERTS || '',
+                name: 'VocalCoach-Alerts',
+                level: LogLevel.ALERT
+            },
+            errors: {
+                url: process.env.DISCORD_WEBHOOK_ERRORS || '',
+                name: 'VocalCoach-Errors',
+                level: LogLevel.ERROR
+            },
+            info: {
+                url: process.env.DISCORD_WEBHOOK_INFO || '',
+                name: 'VocalCoach-Info',
+                level: LogLevel.INFO
+            },
+            beta: {
+                url: process.env.DISCORD_WEBHOOK_BETA || '',
+                name: 'VocalCoach-Beta',
+                level: LogLevel.INFO
+            }
+        },
+        retryAttempts: 3,
+        retryDelay: 1000
+    },
+    metrics: {
+        enabled: true,
+        interval: 60000, // 1 minuto
+        retention: 30 // 30 dias
+    },
+    healthCheck: {
+        enabled: true,
+        interval: 300000, // 5 minutos
+        endpoints: [
+            '/api/health',
+            '/api/voice/status',
+            '/api/auth/status'
+        ]
     }
-  },
-
-  // Web Vitals
-  trackWebVitals: (metric: {
-    name: string;
-    value: number;
-    id: string;
-  }) => {
-    if (!isProd && !isBeta) return;
-
-    // Enviar para GA
-    if (window.gtag) {
-      window.gtag('event', 'web-vitals', {
-        event_category: 'Web Vitals',
-        event_label: metric.name,
-        value: Math.round(metric.value),
-        metric_id: metric.id,
-      });
-    }
-
-    // Enviar para Sentry
-    Sentry.captureMessage('Web Vitals', {
-      level: 'info',
-      extra: metric,
-    });
-  },
 };
 
-// Inicialização de todas as ferramentas
-export const initMonitoring = () => {
-  initSentry();
-  initMixpanel();
-  initHotjar();
-  initGA();
-};
-
-// Tipos para as métricas
-export interface PerformanceMetric {
-  name: string;
-  value: number;
-  tags?: Record<string, string>;
-}
-
-export interface WebVitalMetric {
-  name: string;
-  value: number;
-  id: string;
-}
-
-// Declaração de tipos para TypeScript
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
-
-export default {
-  initMonitoring,
-  metrics,
-}; 
+export default config; 

@@ -3,16 +3,16 @@ const dotenv = require('dotenv');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Carregar variáveis de ambiente
-dotenv.config();
+// Carregar variáveis de ambiente de staging
+dotenv.config({ path: path.join(__dirname, '..', 'config', 'env', 'staging.env') });
 
 // Configurações
-const STAGING_DB = process.env.MONGODB_DB + '_staging';
+const STAGING_DB = process.env.MONGODB_DB;
 const SAMPLE_DATA = {
     users: [
         {
-            email: 'test1@vocalcoach.ai',
-            name: 'Test User 1',
+            email: process.env.TEST_USER_EMAIL || 'test@vocalcoach.ai',
+            name: process.env.TEST_USER_NAME || 'Test User',
             created_at: new Date()
         },
         {
@@ -51,6 +51,8 @@ const SAMPLE_DATA = {
 
 async function setupStagingDatabase() {
     console.log('🚀 Configurando ambiente de staging...\n');
+    console.log('📂 Usando configuração:', path.join(__dirname, '..', 'config', 'env', 'staging.env'));
+    console.log('🗄️ Banco de dados:', STAGING_DB);
 
     const client = new MongoClient(process.env.MONGODB_URI);
     try {
@@ -68,15 +70,15 @@ async function setupStagingDatabase() {
         
         for (const [collection, data] of Object.entries(SAMPLE_DATA)) {
             await db.collection(collection).insertMany(data);
-            console.log(\`✅ Coleção \${collection} criada com \${data.length} documentos\`);
+            console.log(`✅ Coleção ${collection} criada com ${data.length} documentos`);
         }
 
         // Verificar tamanho do banco
         const stats = await db.stats();
         console.log('\n📊 Estatísticas do banco de staging:');
-        console.log(\`- Tamanho: \${(stats.dataSize / 1024 / 1024).toFixed(2)} MB\`);
-        console.log(\`- Coleções: \${stats.collections}\`);
-        console.log(\`- Documentos: \${stats.objects}\`);
+        console.log(`- Tamanho: ${(stats.dataSize / 1024 / 1024).toFixed(2)} MB`);
+        console.log(`- Coleções: ${stats.collections}`);
+        console.log(`- Documentos: ${stats.objects}`);
 
         // Criar arquivo de metadados
         const metadata = {
@@ -90,16 +92,21 @@ async function setupStagingDatabase() {
             }
         };
 
+        // Criar diretório de backup se não existir
+        const backupPath = process.env.BACKUP_PATH || './backups/staging';
+        await fs.mkdir(backupPath, { recursive: true });
+
         await fs.writeFile(
-            path.join(__dirname, '..', 'config', 'staging-metadata.json'),
+            path.join(backupPath, 'staging-metadata.json'),
             JSON.stringify(metadata, null, 2)
         );
 
         console.log('\n🎉 Ambiente de staging configurado com sucesso!');
+        console.log('\n📝 Metadados salvos em:', path.join(backupPath, 'staging-metadata.json'));
         console.log('\nPróximos passos:');
-        console.log('1. Execute o backup do ambiente de staging');
-        console.log('2. Tente restaurar em um novo banco de dados');
-        console.log('3. Compare os dados para verificar integridade');
+        console.log('1. Execute: npm run beta:backup-staging');
+        console.log('2. Execute: npm run beta:test-restore');
+        console.log('3. Verifique a integridade dos dados');
 
     } catch (error) {
         console.error('\n❌ Erro durante configuração:', error);

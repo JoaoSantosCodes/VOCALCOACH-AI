@@ -1,0 +1,14 @@
+{
+  "database": "vocalcoach_staging",
+  "collections": [
+    "users",
+    "achievements",
+    "stats"
+  ],
+  "created_at": "2025-06-21T08:05:18.638Z",
+  "stats": {
+    "size_mb": "0.00",
+    "collections": 3,
+    "documents": 6
+  }
+}

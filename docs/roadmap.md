@@ -327,3 +327,116 @@ Este roadmap é um documento vivo e será atualizado conforme o projeto evolui e
 - Processamento em tempo real
 - Conectividade
 - Armazenamento local 
+
+## Prioridades Imediatas (24-48h) 🚨
+
+### Prioridade 1: Configuração DNS e Email
+**Dependência Crítica: Propagação dos Nameservers**
+1. Monitorar propagação dos nameservers usando whatsmydns.net (verificar a cada 4h)
+2. Após confirmação da propagação:
+   - Configurar registros SPF no Cloudflare
+   - Configurar DKIM no Cloudflare
+   - Configurar DMARC no Cloudflare
+3. Validar configuração de email:
+   - Teste de envio
+   - Verificação de autenticação
+   - Análise de entregabilidade
+
+### Prioridade 2: Monitoramento
+**Dependência: Nenhuma - Pode ser executado em paralelo**
+1. Finalizar configuração de webhooks Discord
+2. Implementar alertas de produção
+3. Configurar dashboard de métricas
+4. Testar sistema de notificações
+
+## Prioridades de Curto Prazo (72h) 🔄
+
+### Sistema de Suporte
+1. Desenvolver FAQ inicial
+2. Criar templates de resposta
+3. Configurar canal Discord de suporte
+4. Implementar sistema de tickets
+
+### Documentação
+1. Finalizar guia do beta tester
+2. Criar documentação de troubleshooting
+3. Desenvolver guias de uso
+4. Documentar procedimentos de suporte
+
+## Prioridades de Médio Prazo (1 semana) 📈
+
+### Preparação para Beta
+1. Configurar sistema de feedback
+2. Implementar coleta de métricas
+3. Preparar questionários de avaliação
+4. Definir KPIs do beta test
+
+### Infraestrutura
+1. Otimizar backup automático
+2. Implementar restore automatizado
+3. Configurar monitoramento avançado
+4. Preparar escalabilidade
+
+## Prioridades de Longo Prazo (2+ semanas) 🎯
+
+### Expansão
+1. Implementar análise de feedback
+2. Desenvolver dashboard de beta
+3. Preparar relatórios automáticos
+4. Planejar expansão pós-beta
+
+## Matriz de Priorização
+
+### Critérios de Prioridade
+🔴 **Crítico**
+- Bloqueia outros processos
+- Impacto direto no lançamento
+- Dependência técnica crítica
+
+🟡 **Alto**
+- Importante para experiência do usuário
+- Necessário para beta test
+- Impacto significativo
+
+🟢 **Médio**
+- Melhoria significativa
+- Pode ser feito em paralelo
+- Impacto moderado
+
+⚪ **Baixo**
+- Nice to have
+- Pode ser adiado
+- Impacto menor
+
+### Status Atual das Prioridades
+
+| Tarefa | Prioridade | Status | Dependências |
+|--------|------------|--------|--------------|
+| Propagação DNS | 🔴 | Em Andamento | Nenhuma |
+| Config. Cloudflare | 🔴 | Aguardando | Propagação DNS |
+| Webhooks Discord | 🟡 | Pendente | Nenhuma |
+| FAQ Beta | 🟡 | Pendente | Nenhuma |
+| Dashboard | 🟢 | Pendente | Webhooks |
+| Tickets | 🟢 | Pendente | Discord |
+| Relatórios | ⚪ | Planejado | Dashboard |
+
+## Pontos de Atenção ⚠️
+
+1. **Bloqueadores Atuais**
+   - Propagação DNS (24-48h)
+   - Configuração Cloudflare pendente
+
+2. **Riscos**
+   - Atraso na propagação DNS
+   - Problemas de configuração de email
+   - Complexidade de webhooks
+
+3. **Mitigações**
+   - Monitoramento constante de DNS
+   - Testes paralelos de email
+   - Desenvolvimento incremental
+
+## Próxima Revisão de Prioridades
+- Data: Em 48h
+- Foco: Validação pós-DNS
+- Ajustes: Baseados em progresso 

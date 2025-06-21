@@ -13,11 +13,44 @@ Este guia descreve como configurar o ambiente para o beta test do VocalCoach AI.
 ## 2. Instalação das Ferramentas
 
 ### MongoDB Database Tools
-```powershell
-# Windows (Administrador)
-choco install mongodb-database-tools -y
 
-# Verificar instalação
+Escolha um dos métodos abaixo para instalar:
+
+#### Método 1: Chocolatey (Requer Administrador)
+```powershell
+# Windows (PowerShell como Administrador)
+choco install mongodb-database-tools -y
+```
+
+#### Método 2: Download Manual
+1. Visite a página oficial: https://www.mongodb.com/try/download/database-tools
+2. Baixe a versão mais recente para seu sistema operacional
+3. Extraia o arquivo ZIP para uma pasta local (ex: `C:\mongodb-tools`)
+4. Adicione o caminho ao PATH do sistema:
+   ```powershell
+   # PowerShell (Temporário)
+   $env:PATH += ";C:\mongodb-tools\bin"
+
+   # PowerShell (Permanente, requer Administrador)
+   [Environment]::SetEnvironmentVariable(
+       "Path",
+       [Environment]::GetEnvironmentVariable("Path", "Machine") + ";C:\mongodb-tools\bin",
+       "Machine"
+   )
+   ```
+
+#### Método 3: Instalação via NPM
+```bash
+# Instalar globalmente
+npm install -g mongodb-tools
+
+# Ou localmente no projeto
+npm install --save-dev mongodb-tools
+```
+
+#### Verificação da Instalação
+```bash
+# Verificar se as ferramentas estão disponíveis
 mongodump --version
 mongorestore --version
 ```
@@ -36,7 +69,8 @@ brew install mongodb-community
 
 1. **Instalação Local**
    - Certifique-se de que o MongoDB está instalado e rodando
-   - Verifique se o MongoDB Database Tools está instalado
+   - Verifique se o MongoDB Database Tools está instalado usando um dos métodos acima
+   - Se instalado localmente, configure o PATH para as ferramentas
 
 2. **Configuração do Ambiente**
    ```bash
@@ -44,6 +78,24 @@ brew install mongodb-community
    mkdir -p config/env
 
    # 2. Criar arquivo de configuração de staging
+   # Windows (PowerShell)
+   @"
+   # MongoDB
+   MONGODB_URI=mongodb://localhost:27017
+   MONGODB_DB=vocalcoach_staging
+
+   # Backup
+   BACKUP_RETENTION_DAYS=7
+   BACKUP_COMPRESSION=true
+   BACKUP_PATH=./backups/staging
+
+   # Teste
+   TEST_USER_EMAIL=test@vocalcoach.ai
+   TEST_USER_NAME=Test User
+   TEST_RESTORE_DB=vocalcoach_staging_test
+   "@ | Out-File -FilePath config/env/staging.env -Encoding UTF8
+
+   # Linux/macOS
    cat > config/env/staging.env << EOL
    # MongoDB
    MONGODB_URI=mongodb://localhost:27017
@@ -73,6 +125,27 @@ brew install mongodb-community
    npm run beta:backup-staging
    npm run beta:test-restore
    ```
+
+### Solução de Problemas Comuns
+
+1. **Ferramentas não encontradas**
+   ```bash
+   # Verificar PATH
+   echo $env:PATH
+
+   # Adicionar ao PATH temporariamente
+   $env:PATH += ";C:\caminho\para\mongodb-tools\bin"
+   ```
+
+2. **Erro de permissão**
+   - Verifique se o MongoDB está rodando
+   - Verifique se tem permissão de escrita no diretório de backup
+   - Use `sudo` ou privilégios de administrador se necessário
+
+3. **Erro de conexão**
+   - Verifique se o MongoDB está rodando
+   - Verifique a string de conexão no arquivo .env
+   - Tente conectar via mongo shell para testar
 
 ## 4. Configuração do Email
 

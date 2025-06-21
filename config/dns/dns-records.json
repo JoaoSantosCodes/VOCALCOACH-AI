@@ -7,7 +7,7 @@
   "dkim": {
     "name": "beta._domainkey.vocalcoach.ai",
     "type": "TXT",
-    "value": "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApnbl64zwnvgV1ztjkoDniAw5/yWhui3X0lpn19S4vciMpLsT+JgYLzBebRZynuUSLHtaFDOgBql92zs+OjtByqdg7KlpZ767n0Kxe2QjhYTxRY1ZNp71NdWJcNOYgWrvTV+z7Z2IP/1RFdG33n0HRzeBTqruyUhEOQrdJ6cE/B0HkpPjoOIaqd/9v0J7mOrpVtHQaJK8VeSgIbl2Rq33j5LjZXtGLrzEAWZuHgQfmvu/NKh2aOdwM77TocRhtG8yfv0tMKaeM+7mpcsSCkm4E82G8dhBK8m5VU5XZNppHRj03Fr1bu3Yem3/XV17BYdVeqwrxmKMUvkQZnyp0oMcBQIDAQAB"
+    "value": "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmf7cLRTL+PTmaRdUmW9NO2RIilXvBGB7rKcUfw6OIZ7MOATPkYN8ajWRW91r5V2O1EAgdICaYNldxa35a7jqltE+5WHXtV+VzigAaXIQ4kni7JW00o1ei1W9NNS5xxSzSHITsuGpyYtPJFQL5ftx3YWowSJjakbfZWC8/4KoG/p4QpXBVOxjkXJ6ycExod8jLZQvzIYeSvkGlvYa6yJPFsuvEyg8W0dPy8X2PfgjJQkhlqlRhr+iXfCgIGKuMbTAN0Lw1mG8ljQDUHheKkNq5S6zfKXxAIC53qmiDh+k9jfmQIUVhLJpFJo3lC4I95QDkVRhgS3oChLAtPyO0kqqnQIDAQAB"
   },
   "dmarc": {
     "name": "_dmarc.vocalcoach.ai",

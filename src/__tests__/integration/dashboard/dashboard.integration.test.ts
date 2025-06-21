@@ -1,9 +1,10 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { ThemeProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from '../../../utils/theme';
 import Dashboard from '../../../pages/Dashboard';
-import { theme } from '../../../utils/theme';
 import '../../../__mocks__/matchMedia.mock';
 
 const server = setupServer(
@@ -57,6 +58,23 @@ const renderDashboard = () => {
 };
 
 describe('Dashboard Integration Tests', () => {
+  beforeEach(() => {
+    // Mock das dependências necessárias
+    jest.clearAllMocks();
+  });
+
+  it('renders dashboard components correctly', () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <Dashboard />
+      </ThemeProvider>
+    );
+
+    // Verificar componentes principais
+    expect(screen.getByTestId('progress-chart')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-cards')).toBeInTheDocument();
+  });
+
   describe('Initial Loading', () => {
     it('should show loading state initially', () => {
       renderDashboard();

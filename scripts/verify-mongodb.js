@@ -1,5 +1,7 @@
 const { MongoClient } = require('mongodb');
-const betaConfig = require('../config/beta.config');
+require('dotenv').config({ path: './backend/.env' });
+
+const MONGODB_URI = 'mongodb://localhost:27017/vocalcoach';
 
 async function verifyMongoDB() {
   console.log('🔍 Iniciando verificação do MongoDB...\n');
@@ -7,16 +9,24 @@ async function verifyMongoDB() {
   try {
     // Testar conexão
     console.log('1. Testando conexão...');
-    const client = new MongoClient(process.env.MONGODB_URI);
+    const client = new MongoClient(MONGODB_URI);
     await client.connect();
     console.log('✅ Conexão estabelecida com sucesso\n');
 
     const db = client.db('vocalcoach');
 
-    // Verificar índices
-    console.log('2. Verificando índices...');
+    // Criar coleções necessárias
+    console.log('2. Criando coleções...');
     const collections = ['users', 'feedback', 'performance_metrics', 'beta_metrics'];
     
+    for (const collection of collections) {
+      await db.createCollection(collection);
+      console.log(`✅ Coleção ${collection} criada com sucesso`);
+    }
+    console.log('\n');
+
+    // Verificar índices
+    console.log('3. Verificando índices...');
     for (const collection of collections) {
       const indexes = await db.collection(collection).indexes();
       console.log(`📊 Índices em ${collection}:`, indexes.length);
@@ -27,7 +37,7 @@ async function verifyMongoDB() {
     console.log('✅ Índices verificados com sucesso\n');
 
     // Testar inserção
-    console.log('3. Testando operações CRUD...');
+    console.log('4. Testando operações CRUD...');
     const testCollection = db.collection('test_beta');
     
     // Create
@@ -54,7 +64,7 @@ async function verifyMongoDB() {
     console.log('✅ Deleção realizada:', deleteResult.deletedCount);
 
     // Testar performance
-    console.log('\n4. Testando performance...');
+    console.log('\n5. Testando performance...');
     const startTime = Date.now();
     
     // Inserir 1000 documentos para teste
@@ -82,7 +92,7 @@ async function verifyMongoDB() {
     await testCollection.drop();
 
     // Verificar backup
-    console.log('5. Verificando configuração de backup...');
+    console.log('6. Verificando configuração de backup...');
     const adminDb = client.db('admin');
     const backup = await adminDb.command({ listBackups: 1 }).catch(() => null);
     
