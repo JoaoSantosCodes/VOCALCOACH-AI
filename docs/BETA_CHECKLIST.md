@@ -33,10 +33,10 @@
 - [x] Configurar backup por coleção
 - [x] Adicionar compressão gzip
 - [ ] Testes de Backup/Restore
-  - [ ] Teste de backup completo
-  - [ ] Teste de restore completo
-  - [ ] Teste de backup incremental
-  - [ ] Verificação de integridade
+  - [x] Criar script de teste de restore
+  - [x] Implementar verificação de integridade
+  - [ ] Realizar teste completo
+  - [ ] Validar dados restaurados
 - [ ] Documentação
   - [ ] Procedimentos de backup
   - [ ] Procedimentos de restore
@@ -73,8 +73,8 @@
   - [ ] Definir rotação de suporte
 
 ## Status Atual
-- Sistema de Email: 🔄 Em Progresso (30%)
-- Backup: 🔄 Em Progresso (70%)
+- Sistema de Email: 🔄 Em Progresso (40%)
+- Backup: 🔄 Em Progresso (80%)
 - Monitoramento: 🔄 Em Progresso (50%)
 - Suporte: ⏳ Pendente (0%)
 

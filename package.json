@@ -42,7 +42,9 @@
     "beta:backup-db:schedule": "node -e \"setInterval(() => require('./scripts/backup-mongodb.js'), 24 * 60 * 60 * 1000)\"",
     "beta:setup-dns": "node scripts/setup-email-dns.js generate",
     "beta:verify-dns": "node scripts/setup-email-dns.js verify",
-    "beta:setup-dns:ci": "NODE_ENV=ci npm run beta:setup-dns"
+    "beta:setup-dns:ci": "NODE_ENV=ci npm run beta:setup-dns",
+    "beta:test-restore": "node scripts/test-restore.js",
+    "beta:test-restore:ci": "NODE_ENV=ci npm run beta:test-restore"
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
