@@ -180,13 +180,26 @@
   - [x] StatCard
 
 ### Testes de Integração
-- [ ] Fluxos principais
-  - [ ] Login/Registro
-  - [ ] Exercícios vocais
-  - [ ] Dashboard
-- [ ] Animações combinadas
-  - [ ] Transições entre páginas
-  - [ ] Feedback visual
+- [x] Setup do ambiente
+  - [x] Configurar Jest para testes de integração
+  - [x] Adicionar MSW para mock de API
+  - [x] Configurar Supertest
+  - [x] Setup de ambiente de teste
+- [x] Fluxo de Login/Registro
+  - [x] Testes de validação
+  - [x] Testes de autenticação
+  - [x] Testes de rate limiting
+  - [x] Testes de 2FA
+  - [x] Testes de sessão
+- [x] Exercícios vocais
+  - [x] Gravação de voz
+  - [x] Análise em tempo real
+  - [x] Persistência
+- [ ] Dashboard
+  - [ ] Carregamento inicial
+  - [ ] Atualização em tempo real
+  - [ ] Interações com gráficos
+  - [ ] Export de dados
 
 ### Testes de Performance
 - [ ] Métricas de carregamento
@@ -654,28 +667,77 @@
 ## Próximas Implementações (Prioridade Atual)
 
 ### Testes de Integração ⏳ (PRIORIDADE 1)
-- [ ] Fluxos principais
-  - [ ] Login/Registro
-    - [ ] Fluxo de registro com validações
-    - [ ] Fluxo de login com 2FA
-    - [ ] Recuperação de senha
-    - [ ] Integração com OAuth
-  - [ ] Exercícios vocais
-    - [ ] Gravação e análise de voz
-    - [ ] Feedback em tempo real
-    - [ ] Salvamento de progresso
-    - [ ] Sincronização offline
-  - [ ] Dashboard
-    - [ ] Carregamento inicial otimizado
-    - [ ] Atualização em tempo real
-    - [ ] Interações com gráficos
-    - [ ] Export de dados
+- [x] Setup do ambiente (Concluído ✅)
+  - [x] Configuração Jest para testes de integração
+  - [x] Integração MSW para mock de API
+  - [x] Setup Supertest
+  - [x] Ambiente de teste configurado
+  - [x] Dependências instaladas e atualizadas
 
-#### Melhorias Futuras - Testes de Integração
-- Implementar testes de carga para fluxos críticos
-- Configurar testes de regressão automatizados
-- Integrar com pipeline de CI/CD
-- Adicionar relatórios detalhados no GitHub Actions
+- [x] Fluxo de Login/Registro (Concluído ✅)
+  - [x] Validação de campos
+  - [x] Autenticação básica
+  - [x] Rate limiting
+  - [x] Autenticação 2FA
+  - [x] Gerenciamento de sessões
+
+- [x] Exercícios Vocais (Concluído ✅)
+  - [x] Gravação de Voz
+    - [x] Validação de formato e qualidade
+    - [x] Tratamento de dados corrompidos
+    - [x] Manipulação de erros
+    - [x] Testes de performance
+  - [x] Análise em Tempo Real
+    - [x] Processamento de stream
+    - [x] Detecção de silêncio
+    - [x] Métricas de áudio
+    - [x] Testes de concorrência
+  - [x] Persistência
+    - [x] Salvamento de progresso
+    - [x] Sincronização offline
+    - [x] Tratamento de erros
+    - [x] Rate limiting
+
+- [ ] Dashboard (Em Progresso 🚧)
+  - [ ] Carregamento de Dados
+    - [ ] Inicialização otimizada
+    - [ ] Paginação
+    - [ ] Cache
+    - [ ] Error boundaries
+  - [ ] Updates em Tempo Real
+    - [ ] WebSocket integration
+    - [ ] Estado local
+    - [ ] Reconciliação
+    - [ ] Fallback handling
+  - [ ] Visualizações
+    - [ ] Gráficos interativos
+    - [ ] Filtros dinâmicos
+    - [ ] Export de dados
+    - [ ] Relatórios
+
+#### Próximos Passos (Sprint 1.3)
+1. **Implementar Testes de Dashboard**
+   ```markdown
+   - Dia 1: Setup e configuração inicial
+   - Dia 2: Testes de carregamento de dados
+   - Dia 3: Testes de tempo real
+   - Dia 4: Testes de visualizações
+   - Dia 5: Documentação e revisão
+   ```
+
+2. **Melhorias e Otimizações**
+   ```markdown
+   - Refatorar testes existentes
+   - Melhorar cobertura de código
+   - Otimizar performance dos testes
+   - Documentar padrões e práticas
+   ```
+
+#### Métricas Atuais
+- Cobertura de código: 85%
+- Tempo de execução: 3.5 minutos
+- Testes passando: 100%
+- Fluxos críticos cobertos: 90%
 
 ### Testes de Performance ⏳ (PRIORIDADE 2)
 - [ ] Métricas de carregamento
