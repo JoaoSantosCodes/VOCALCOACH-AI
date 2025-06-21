@@ -213,6 +213,7 @@ Os beta testers podem ganhar pontos através de:
 - [Matriz de Responsabilidades](docs/RESPONSIBILITY_MATRIX.md)
 - [Plano de Comunicação](docs/COMMUNICATION_PLAN.md)
 - [Arquitetura do Sistema](docs/SYSTEM_ARCHITECTURE.md)
+- [Guia de Deployment](docs/DEPLOYMENT_GUIDE.md)
 
 ### ⚠️ Suporte
 
