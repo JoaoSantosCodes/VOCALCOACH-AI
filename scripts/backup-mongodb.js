@@ -1,120 +1,94 @@
+const { MongoClient } = require('mongodb');
 const { exec } = require('child_process');
-const fs = require('fs').promises;
-const path = require('path');
 const dotenv = require('dotenv');
+const path = require('path');
+const fs = require('fs').promises;
+const util = require('util');
+const execPromise = util.promisify(exec);
 
-// Carregar variáveis de ambiente
-dotenv.config();
+// Carregar configuração baseada no ambiente
+const envFile = process.argv.includes('--staging') ? 'staging.env' : '.env';
+dotenv.config({ path: path.join(__dirname, '..', 'config', 'env', envFile) });
 
 // Configurações
-const BACKUP_DIR = path.join(__dirname, '..', 'backups');
-const BACKUP_RETENTION_DAYS = 7;
-const COLLECTIONS = [
-    'users',
-    'achievements',
-    'blogposts',
-    'feedback',
-    'stats',
-    'userprogress',
-    'vocalexercises',
-    'voiceanalysis'
-];
+const BACKUP_PATH = process.env.BACKUP_PATH || './backups';
+const RETENTION_DAYS = parseInt(process.env.BACKUP_RETENTION_DAYS || '7', 10);
+const USE_COMPRESSION = process.env.BACKUP_COMPRESSION === 'true';
 
-async function createBackupDirectory() {
-    try {
-        await fs.mkdir(BACKUP_DIR, { recursive: true });
-        console.log('✅ Diretório de backup criado:', BACKUP_DIR);
-    } catch (error) {
-        console.error('❌ Erro ao criar diretório de backup:', error);
-        process.exit(1);
-    }
-}
+async function createBackup() {
+    console.log('🚀 Iniciando backup do MongoDB...\n');
+    console.log('📂 Usando configuração:', path.join(__dirname, '..', 'config', 'env', envFile));
+    console.log('💾 Diretório de backup:', BACKUP_PATH);
+    console.log('🔄 Retenção:', RETENTION_DAYS, 'dias');
+    console.log('🗜️ Compressão:', USE_COMPRESSION ? 'Ativada' : 'Desativada');
 
-async function cleanOldBackups() {
     try {
-        const files = await fs.readdir(BACKUP_DIR);
+        // Criar diretório de backup se não existir
+        await fs.mkdir(BACKUP_PATH, { recursive: true });
+
+        // Nome do arquivo de backup
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const backupFile = path.join(BACKUP_PATH, `backup-${timestamp}`);
+
+        // Comando de backup
+        const mongodump = [
+            'mongodump',
+            `--uri="${process.env.MONGODB_URI}"`,
+            `--db=${process.env.MONGODB_DB}`,
+            `--out="${backupFile}"`,
+            USE_COMPRESSION ? '--gzip' : ''
+        ].filter(Boolean).join(' ');
+
+        console.log('\n1️⃣ Executando backup...');
+        await execPromise(mongodump);
+        console.log('✅ Backup concluído');
+
+        // Limpar backups antigos
+        console.log('\n2️⃣ Limpando backups antigos...');
+        const files = await fs.readdir(BACKUP_PATH);
         const now = new Date();
 
         for (const file of files) {
-            const filePath = path.join(BACKUP_DIR, file);
+            const filePath = path.join(BACKUP_PATH, file);
             const stats = await fs.stat(filePath);
             const daysOld = (now - stats.mtime) / (1000 * 60 * 60 * 24);
 
-            if (daysOld > BACKUP_RETENTION_DAYS) {
-                await fs.unlink(filePath);
-                console.log(`🗑️ Backup antigo removido: ${file}`);
+            if (daysOld > RETENTION_DAYS) {
+                await fs.rm(filePath, { recursive: true });
+                console.log(`🗑️ Removido backup antigo: ${file}`);
             }
         }
-    } catch (error) {
-        console.error('⚠️ Erro ao limpar backups antigos:', error);
-    }
-}
 
-async function backupMongoDB() {
-    console.log('🚀 Iniciando backup do MongoDB...\n');
-
-    // Verificar variáveis de ambiente
-    const requiredEnvVars = ['MONGODB_URI', 'MONGODB_DB'];
-    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-    
-    if (missingVars.length > 0) {
-        console.error('❌ Variáveis de ambiente faltando:', missingVars.join(', '));
-        process.exit(1);
-    }
-
-    // Criar diretório de backup
-    await createBackupDirectory();
-
-    // Limpar backups antigos
-    await cleanOldBackups();
-
-    // Gerar nome do arquivo de backup
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupFile = path.join(BACKUP_DIR, `backup-${timestamp}`);
-
-    try {
-        // Backup de cada coleção
-        for (const collection of COLLECTIONS) {
-            const outputFile = `${backupFile}-${collection}.gz`;
-            const command = `mongodump --uri="${process.env.MONGODB_URI}" --db=${process.env.MONGODB_DB} --collection=${collection} --gzip --archive="${outputFile}"`;
-
-            console.log(`📦 Fazendo backup da coleção: ${collection}`);
-            await new Promise((resolve, reject) => {
-                exec(command, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`❌ Erro no backup de ${collection}:`, stderr);
-                        reject(error);
-                    } else {
-                        console.log(`✅ Backup de ${collection} concluído`);
-                        resolve(stdout);
-                    }
-                });
-            });
-        }
-
-        // Criar arquivo de metadados
+        // Criar arquivo de metadados do backup
         const metadata = {
             timestamp: new Date().toISOString(),
-            collections: COLLECTIONS,
-            mongodb_version: process.env.MONGODB_VERSION || 'unknown',
-            backup_files: COLLECTIONS.map(col => `backup-${timestamp}-${col}.gz`)
+            database: process.env.MONGODB_DB,
+            backup_file: backupFile,
+            compression: USE_COMPRESSION,
+            retention_days: RETENTION_DAYS
         };
 
         await fs.writeFile(
-            `${backupFile}-metadata.json`,
+            path.join(backupFile, 'backup-metadata.json'),
             JSON.stringify(metadata, null, 2)
         );
 
         console.log('\n🎉 Backup concluído com sucesso!');
-        console.log('📂 Arquivos salvos em:', BACKUP_DIR);
-        console.log('📊 Total de coleções:', COLLECTIONS.length);
-        console.log('🕒 Timestamp:', timestamp);
+        console.log('\n📝 Detalhes do backup:');
+        console.log('- Arquivo:', backupFile);
+        console.log('- Banco:', process.env.MONGODB_DB);
+        console.log('- Data:', new Date().toLocaleString());
+
+        console.log('\nPróximos passos:');
+        console.log('1. Verifique os arquivos de backup');
+        console.log('2. Execute: npm run beta:test-restore');
+        console.log('3. Valide a integridade dos dados');
 
     } catch (error) {
-        console.error('\n❌ Erro durante o backup:', error);
+        console.error('\n❌ Erro durante backup:', error);
         process.exit(1);
     }
 }
 
 // Executar backup
-backupMongoDB().catch(console.error); 
+createBackup().catch(console.error); 
