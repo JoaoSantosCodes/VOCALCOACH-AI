@@ -15,6 +15,15 @@
    - [ ] Testes de regressão visual
    - [ ] Documentação da migração
 
+2. **Atualização da Documentação Principal**
+   - [ ] Atualizar README.md
+     - [ ] Adicionar novas features (Gamificação, Offline)
+     - [ ] Atualizar requisitos de sistema
+     - [ ] Melhorar instruções de instalação
+     - [ ] Documentar novas configurações
+     - [ ] Adicionar badges de status
+     - [ ] Incluir exemplos de uso
+
 ### 🟡 ALTA
 1. **Preparação para Beta**
    - [ ] Plano de testes beta
@@ -29,6 +38,13 @@
    - [ ] Testes de carga
 
 ## ✅ Funcionalidades Concluídas
+
+### 📚 Documentação
+- [x] Documentação técnica inicial
+- [x] Guias de contribuição
+- [x] Documentação de API
+- [x] Guias de desenvolvimento
+- [ ] README atualizado
 
 ### 🎮 Sistema de Gamificação
 - [x] Sistema de pontos e recompensas
@@ -87,8 +103,9 @@
 
 ### Curto Prazo (1-2 semanas)
 1. Completar migração do Dashboard para React Spring
-2. Finalizar documentação técnica
-3. Preparar ambiente de beta testing
+2. Atualizar README com novas features e instruções
+3. Finalizar documentação técnica
+4. Preparar ambiente de beta testing
 
 ### Médio Prazo (2-4 semanas)
 1. Lançamento beta fechado
