@@ -13,7 +13,7 @@ import {
   EmojiEvents as EmojiEventsIcon,
   GraphicEq as GraphicEqIcon,
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useSpring, useTrail, useTransition, animated, config } from '@react-spring/web';
 import StatCard from '../components/Dashboard/StatCard';
 import ProgressChart from '../components/Dashboard/ProgressChart';
 
@@ -85,165 +85,166 @@ const Dashboard: React.FC = () => {
     },
   ] : [];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.1,
-      },
-    },
-  };
+  // Animação de fade in do container
+  const containerSpring = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: !isLoading && stats && progressData ? 1 : 0 },
+    config: config.gentle,
+  });
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-    },
-  };
+  // Animação de entrada dos itens em sequência
+  const trails = useTrail(statsData.length + 3, {
+    from: { y: 20, opacity: 0 },
+    to: { y: 0, opacity: 1 },
+    config: config.gentle,
+    delay: 300,
+  });
+
+  // Animação de transição para mensagens de erro
+  const errorTransition = useTransition(error, {
+    from: { opacity: 0, y: -20 },
+    enter: { opacity: 1, y: 0 },
+    leave: { opacity: 0, y: -20 },
+    config: config.gentle,
+  });
 
   if (error) {
     return (
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-        <Alert severity="error" data-testid="error-message">
-          {error}
-        </Alert>
+        {errorTransition((style, item) => 
+          item && (
+            <animated.div style={style}>
+              <Alert severity="error" data-testid="error-message">
+                {error}
+              </Alert>
+            </animated.div>
+          )
+        )}
       </Container>
     );
   }
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-      <AnimatePresence>
-        {!isLoading && stats && progressData && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            data-testid="dashboard-content"
-          >
-            {/* Header */}
-            <Box
-              component={motion.div}
-              variants={itemVariants}
-              sx={{ mb: 6 }}
+      {!isLoading && stats && progressData && (
+        <animated.div style={containerSpring} data-testid="dashboard-content">
+          {/* Header */}
+          <Box sx={{ mb: 6 }} component={animated.div} style={trails[0]}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                mb: 2,
+                background: theme.gradients.text,
+                backgroundClip: 'text',
+                textFillColor: 'transparent',
+              }}
             >
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  background: theme.gradients.text,
-                  backgroundClip: 'text',
-                  textFillColor: 'transparent',
-                }}
-              >
-                Olá, Músico!
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  maxWidth: 600,
-                }}
-              >
-                Acompanhe seu progresso e continue evoluindo. Aqui está um resumo do seu desempenho:
-              </Typography>
-            </Box>
+              Olá, Músico!
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                maxWidth: 600,
+              }}
+            >
+              Acompanhe seu progresso e continue evoluindo. Aqui está um resumo do seu desempenho:
+            </Typography>
+          </Box>
 
-            {/* Stats Grid */}
-            <Grid container spacing={3} sx={{ mb: 6 }}>
-              {statsData.map((stat, index) => (
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={3}
-                  key={index}
-                  component={motion.div}
-                  variants={itemVariants}
-                >
-                  <StatCard {...stat} />
-                </Grid>
-              ))}
+          {/* Stats Grid */}
+          <Grid container spacing={3} sx={{ mb: 6 }}>
+            {statsData.map((stat, index) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={3}
+                key={index}
+                component={animated.div}
+                style={trails[index + 1]}
+              >
+                <StatCard {...stat} />
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Charts */}
+          <Grid container spacing={3}>
+            <Grid
+              item
+              xs={12}
+              md={8}
+              component={animated.div}
+              style={trails[statsData.length + 1]}
+            >
+              <ProgressChart
+                data={progressData}
+                title="Evolução do Desempenho"
+                subtitle="Acompanhe sua evolução ao longo do tempo"
+                data-testid="progress-chart"
+              />
             </Grid>
 
-            {/* Charts */}
-            <Grid container spacing={3}>
-              <Grid
-                item
-                xs={12}
-                md={8}
-                component={motion.div}
-                variants={itemVariants}
+            <Grid
+              item
+              xs={12}
+              md={4}
+              component={animated.div}
+              style={trails[statsData.length + 2]}
+            >
+              <Box
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  background: theme.gradients.glass,
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 4,
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: theme.gradients.secondary,
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                  },
+                  '&:hover::before': {
+                    opacity: 1,
+                  },
+                }}
               >
-                <ProgressChart
-                  data={progressData}
-                  title="Evolução do Desempenho"
-                  subtitle="Acompanhe sua evolução ao longo do tempo"
-                  data-testid="progress-chart"
-                />
-              </Grid>
-
-              <Grid
-                item
-                xs={12}
-                md={4}
-                component={motion.div}
-                variants={itemVariants}
-              >
-                <Box
+                <Typography
+                  variant="h6"
                   sx={{
-                    p: 3,
-                    height: '100%',
-                    background: theme.gradients.glass,
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: 4,
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '4px',
-                      background: theme.gradients.secondary,
-                      opacity: 0,
-                      transition: 'opacity 0.3s ease',
-                    },
-                    '&:hover::before': {
-                      opacity: 1,
-                    },
+                    mb: 2,
+                    fontWeight: 600,
                   }}
                 >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Dicas para Melhorar
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    • Pratique regularmente para manter seu streak
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
-                    • Complete os exercícios diários
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
-                    • Participe dos desafios da comunidade
-                  </Typography>
-                </Box>
-              </Grid>
+                  Dicas para Melhorar
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                  • Pratique regularmente para manter seu streak
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
+                  • Complete os exercícios diários
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
+                  • Participe dos desafios da comunidade
+                </Typography>
+              </Box>
             </Grid>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </Grid>
+        </animated.div>
+      )}
     </Container>
   );
 };
