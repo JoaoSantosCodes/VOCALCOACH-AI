@@ -133,6 +133,7 @@
 - [x] Guia de Monitoramento ✅
 - [x] Procedimentos de Suporte ✅
 - [x] Plano de Contingência ✅
+- [x] Métricas e KPIs ✅
 
 ### Semana 2
 - [ ] Arquitetura do Sistema
@@ -156,7 +157,7 @@
 - [ ] Tradução (se necessário)
 
 ## 📊 Status Atual
-- Prioridade 1: 60% completo
+- Prioridade 1: 70% completo
 - Prioridade 2: 10% completo
 - Prioridade 3: 5% completo
 - Prioridade 4: 0% completo
