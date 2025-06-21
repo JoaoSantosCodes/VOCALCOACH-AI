@@ -202,6 +202,14 @@ Os beta testers podem ganhar pontos através de:
 - [Plano de Testes Beta](docs/BETA_TEST_PLAN.md)
 - [Procedimentos de Rollback](docs/ROLLBACK_PROCEDURES.md)
 - [Checklist de Desenvolvimento](docs/checklist.md)
+- [Guia de Monitoramento](docs/MONITORING_GUIDE.md)
+- [Procedimentos de Suporte](docs/SUPPORT_PROCEDURES.md)
+- [Plano de Contingência](docs/CONTINGENCY_PLAN.md)
+- [Métricas e KPIs](docs/METRICS_AND_KPIS.md)
+- [Guia de Feedback](docs/FEEDBACK_GUIDE.md)
+- [Sistema de Recompensas](docs/REWARDS_SYSTEM.md)
+- [Código de Conduta](docs/CODE_OF_CONDUCT.md)
+- [Prioridades de Documentação](docs/DOCUMENTATION_PRIORITIES.md)
 
 ### ⚠️ Suporte
 
