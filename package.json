@@ -43,10 +43,11 @@
     "beta:setup-dns": "node scripts/setup-email-dns.js generate",
     "beta:verify-dns": "node scripts/setup-email-dns.js verify",
     "beta:setup-dns:ci": "NODE_ENV=ci npm run beta:setup-dns",
-    "beta:test-restore": "node scripts/test-restore.js",
-    "beta:test-restore:ci": "NODE_ENV=ci npm run beta:test-restore",
+    "beta:test-restore": "node scripts/test-restore.js --source vocalcoach_staging --target vocalcoach_staging_test",
     "beta:test-discord": "node scripts/discord-alerts.js",
-    "beta:test-discord:ci": "NODE_ENV=ci npm run beta:test-discord"
+    "beta:test-discord:ci": "NODE_ENV=ci npm run beta:test-discord",
+    "beta:setup-staging": "node scripts/setup-staging.js",
+    "beta:backup-staging": "node scripts/backup-mongodb.js --db vocalcoach_staging"
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
