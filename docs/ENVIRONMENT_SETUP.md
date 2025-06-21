@@ -1,250 +1,368 @@
-# Guia de Configuração do Ambiente - VocalCoach AI Beta
+# 🛠️ Configuração de Ambiente
 
-Este guia descreve como configurar o ambiente para o beta test do VocalCoach AI.
+## 📋 Visão Geral
+Este guia fornece instruções detalhadas para configurar os ambientes de desenvolvimento, teste e produção do VocalCoach AI. Inclui todos os requisitos, dependências e configurações necessárias para cada ambiente.
 
-## 1. Pré-requisitos
+## 🎯 Objetivos
+- Padronizar ambientes de desenvolvimento
+- Garantir consistência entre ambientes
+- Minimizar problemas de "funciona na minha máquina"
+- Facilitar onboarding de novos desenvolvedores
+- Automatizar configuração quando possível
 
-- Node.js v16 ou superior
-- MongoDB v4.4 ou superior
-- MongoDB Database Tools (mongodump, mongorestore)
-- Conta Gmail para envio de emails
-- Servidor Discord para monitoramento
+## 💻 Requisitos do Sistema
 
-## 2. Instalação das Ferramentas
+### Hardware Mínimo
+- CPU: 4 cores
+- RAM: 8GB
+- Disco: 256GB SSD
+- Microfone (para testes locais)
 
-### MongoDB Database Tools
+### Hardware Recomendado
+- CPU: 8 cores
+- RAM: 16GB
+- Disco: 512GB SSD
+- Microfone de alta qualidade
 
-Escolha um dos métodos abaixo para instalar:
+### Software Base
+- Windows 10/11, macOS 12+, ou Linux (Ubuntu 20.04+)
+- Git 2.34+
+- Node.js 18.x LTS
+- Docker Desktop 4.x
+- MongoDB 6.0+
+- Redis 7.0+
+- VS Code (recomendado)
 
-#### Método 1: Chocolatey (Requer Administrador)
+## 🚀 Configuração Inicial
+
+### 1. Instalação de Dependências
+
+#### Windows
 ```powershell
-# Windows (PowerShell como Administrador)
-choco install mongodb-database-tools -y
+# Instalar Chocolatey
+Set-ExecutionPolicy Bypass -Scope Process -Force
+iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+# Instalar dependências
+choco install -y git nodejs-lts docker-desktop mongodb redis vscode
+
+# Instalar ferramentas globais do Node
+npm install -g yarn typescript ts-node nodemon
 ```
 
-#### Método 2: Download Manual
-1. Visite a página oficial: https://www.mongodb.com/try/download/database-tools
-2. Baixe a versão mais recente para seu sistema operacional
-3. Extraia o arquivo ZIP para uma pasta local (ex: `C:\mongodb-tools`)
-4. Adicione o caminho ao PATH do sistema:
-   ```powershell
-   # PowerShell (Temporário)
-   $env:PATH += ";C:\mongodb-tools\bin"
-
-   # PowerShell (Permanente, requer Administrador)
-   [Environment]::SetEnvironmentVariable(
-       "Path",
-       [Environment]::GetEnvironmentVariable("Path", "Machine") + ";C:\mongodb-tools\bin",
-       "Machine"
-   )
-   ```
-
-#### Método 3: Instalação via NPM
+#### macOS
 ```bash
-# Instalar globalmente
-npm install -g mongodb-tools
+# Instalar Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Ou localmente no projeto
-npm install --save-dev mongodb-tools
+# Instalar dependências
+brew install git node docker mongodb-community redis
+brew install --cask visual-studio-code
+
+# Instalar ferramentas globais do Node
+npm install -g yarn typescript ts-node nodemon
 ```
 
-#### Verificação da Instalação
+#### Linux (Ubuntu)
 ```bash
-# Verificar se as ferramentas estão disponíveis
-mongodump --version
-mongorestore --version
+# Atualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Instalar Docker
+curl -fsSL https://get.docker.com | sudo bash
+sudo usermod -aG docker $USER
+
+# Instalar MongoDB
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt update
+sudo apt install -y mongodb-org
+
+# Instalar Redis
+sudo apt install -y redis-server
+
+# Instalar VS Code
+sudo snap install code --classic
+
+# Instalar ferramentas globais do Node
+npm install -g yarn typescript ts-node nodemon
 ```
 
-### MongoDB
-```bash
-# Windows (Administrador)
-choco install mongodb -y
-
-# macOS (usando Homebrew)
-brew tap mongodb/brew
-brew install mongodb-community
-```
-
-## 3. Configuração do MongoDB
-
-1. **Instalação Local**
-   - Certifique-se de que o MongoDB está instalado e rodando
-   - Verifique se o MongoDB Database Tools está instalado usando um dos métodos acima
-   - Se instalado localmente, configure o PATH para as ferramentas
-
-2. **Configuração do Ambiente**
-   ```bash
-   # 1. Criar diretório de configuração
-   mkdir -p config/env
-
-   # 2. Criar arquivo de configuração de staging
-   # Windows (PowerShell)
-   @"
-   # MongoDB
-   MONGODB_URI=mongodb://localhost:27017
-   MONGODB_DB=vocalcoach_staging
-
-   # Backup
-   BACKUP_RETENTION_DAYS=7
-   BACKUP_COMPRESSION=true
-   BACKUP_PATH=./backups/staging
-
-   # Teste
-   TEST_USER_EMAIL=test@vocalcoach.ai
-   TEST_USER_NAME=Test User
-   TEST_RESTORE_DB=vocalcoach_staging_test
-   "@ | Out-File -FilePath config/env/staging.env -Encoding UTF8
-
-   # Linux/macOS
-   cat > config/env/staging.env << EOL
-   # MongoDB
-   MONGODB_URI=mongodb://localhost:27017
-   MONGODB_DB=vocalcoach_staging
-
-   # Backup
-   BACKUP_RETENTION_DAYS=7
-   BACKUP_COMPRESSION=true
-   BACKUP_PATH=./backups/staging
-
-   # Teste
-   TEST_USER_EMAIL=test@vocalcoach.ai
-   TEST_USER_NAME=Test User
-   TEST_RESTORE_DB=vocalcoach_staging_test
-   EOL
-   ```
-
-3. **Verificação**
-   ```bash
-   # Inicie o MongoDB
-   mongod
-
-   # Configure o ambiente de staging
-   npm run beta:setup-staging
-
-   # Teste o backup e restore
-   npm run beta:backup-staging
-   npm run beta:test-restore
-   ```
-
-### Solução de Problemas Comuns
-
-1. **Ferramentas não encontradas**
-   ```bash
-   # Verificar PATH
-   echo $env:PATH
-
-   # Adicionar ao PATH temporariamente
-   $env:PATH += ";C:\caminho\para\mongodb-tools\bin"
-   ```
-
-2. **Erro de permissão**
-   - Verifique se o MongoDB está rodando
-   - Verifique se tem permissão de escrita no diretório de backup
-   - Use `sudo` ou privilégios de administrador se necessário
-
-3. **Erro de conexão**
-   - Verifique se o MongoDB está rodando
-   - Verifique a string de conexão no arquivo .env
-   - Tente conectar via mongo shell para testar
-
-## 4. Configuração do Email
-
-1. **Configuração do Gmail**
-   - Ative a autenticação de duas etapas
-   - Gere uma senha de aplicativo
-   - Adicione ao `.env`:
-     ```
-     SMTP_HOST=smtp.gmail.com
-     SMTP_PORT=587
-     SMTP_USER=seu_email@gmail.com
-     SMTP_PASS=sua_senha_de_aplicativo
-     ```
-
-2. **Configuração DNS**
-   - Execute: `npm run beta:setup-dns`
-   - Siga as instruções em `config/dns/INSTRUCTIONS.md`
-   - Aguarde a propagação (até 48h)
-   - Verifique: `npm run beta:verify-dns`
-
-## 5. Configuração do Discord
-
-1. **Criar Webhook**
-   - Abra as configurações do servidor
-   - Vá para Integrações > Webhooks
-   - Crie um novo webhook
-   - Copie a URL do webhook
-
-2. **Configuração**
-   - Adicione ao `.env`:
-     ```
-     DISCORD_WEBHOOK_URL=sua_url_do_webhook
-     DISCORD_CHANNEL_ID=id_do_canal
-     ```
-
-3. **Teste**
-   ```bash
-   npm run beta:test-discord
-   ```
-
-## 6. Configuração do Beta
-
-1. **Domínio**
-   - Adicione ao `.env`:
-     ```
-     BETA_DOMAIN=vocalcoach.ai
-     DKIM_SELECTOR=beta
-     ```
-
-2. **Verificação**
-   ```bash
-   # Teste o ambiente completo
-   npm run beta:setup-staging
-   npm run beta:backup-staging
-   npm run beta:test-restore
-   ```
-
-## 7. Verificação Final
-
-Execute a seguinte sequência de testes:
+### 2. Configuração do Projeto
 
 ```bash
-# 1. Configurar ambiente de staging
-npm run beta:setup-staging
+# Clonar repositório
+git clone https://github.com/seu-usuario/vocalcoach-ai.git
+cd vocalcoach-ai
 
-# 2. Testar backup e restore
-npm run beta:backup-staging
-npm run beta:test-restore
+# Instalar dependências do projeto
+yarn install
 
-# 3. Verificar DNS
-npm run beta:verify-dns
-
-# 4. Testar alertas Discord
-npm run beta:test-discord
+# Configurar ambiente local
+yarn setup:dev
 ```
 
-## 8. Solução de Problemas
+## 🔧 Configuração de Ambiente
 
-### MongoDB
-- **Erro de conexão**: Verifique se o MongoDB está rodando
-- **Erro de permissão**: Verifique as credenciais no `.env`
+### 1. Variáveis de Ambiente
 
-### Email
-- **Erro SMTP**: Verifique a senha de aplicativo
-- **DNS não propaga**: Aguarde 48h e tente novamente
+#### Desenvolvimento (.env.development)
+```env
+# Server
+PORT=3000
+NODE_ENV=development
+API_URL=http://localhost:3000
 
-### Discord
-- **Webhook falha**: Verifique a URL do webhook
-- **Mensagens não chegam**: Verifique as permissões do canal
+# Database
+MONGODB_URI=mongodb://localhost:27017/vocalcoach_dev
+REDIS_URL=redis://localhost:6379
 
-## 9. Próximos Passos
+# Auth
+JWT_SECRET=your-dev-secret
+JWT_EXPIRY=24h
 
-1. Execute todos os testes de verificação
-2. Documente quaisquer erros encontrados
-3. Atualize o checklist com o progresso
-4. Prepare o ambiente de produção
+# AWS (opcional para desenvolvimento)
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_REGION=us-east-1
 
-## 10. Contatos
+# Discord (opcional para desenvolvimento)
+DISCORD_CLIENT_ID=your-client-id
+DISCORD_CLIENT_SECRET=your-client-secret
+DISCORD_BOT_TOKEN=your-bot-token
 
-- **Suporte Técnico**: tech@vocalcoach.ai
-- **Discord**: #beta-support
-- **Emergência**: ops@vocalcoach.ai 
+# Email (opcional para desenvolvimento)
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_USER=test
+SMTP_PASS=test
+```
+
+#### Produção (.env.production)
+```env
+# Solicitar ao DevOps as configurações de produção
+# NUNCA commitar este arquivo
+```
+
+### 2. Banco de Dados
+
+#### MongoDB
+```bash
+# Iniciar MongoDB
+sudo systemctl start mongod
+
+# Criar índices
+yarn db:setup
+
+# Importar dados de teste
+yarn db:seed
+```
+
+#### Redis
+```bash
+# Iniciar Redis
+sudo systemctl start redis
+
+# Verificar status
+redis-cli ping
+```
+
+### 3. Serviços Externos
+
+#### AWS
+1. Criar conta AWS
+2. Configurar IAM User
+3. Configurar S3 Bucket
+4. Configurar CloudFront
+5. Configurar Route53 (se necessário)
+
+#### Discord
+1. Criar aplicação no Discord Developer Portal
+2. Configurar OAuth2
+3. Adicionar bot ao servidor
+4. Configurar permissões
+
+## 🔒 Segurança
+
+### Certificados SSL
+```bash
+# Gerar certificado local
+yarn ssl:generate
+
+# Instalar certificado
+yarn ssl:install
+```
+
+### Firewalls
+```bash
+# Configurar regras básicas
+yarn security:setup
+
+# Verificar configuração
+yarn security:check
+```
+
+## 📊 Monitoramento Local
+
+### Logs
+```bash
+# Visualizar logs em tempo real
+yarn logs:watch
+
+# Filtrar logs por serviço
+yarn logs:watch --service=api
+```
+
+### Métricas
+```bash
+# Iniciar dashboard local
+yarn metrics:dashboard
+
+# Coletar métricas
+yarn metrics:collect
+```
+
+## 🧪 Ambiente de Testes
+
+### Jest
+```bash
+# Executar todos os testes
+yarn test
+
+# Executar testes específicos
+yarn test:unit
+yarn test:integration
+yarn test:e2e
+```
+
+### Coverage
+```bash
+# Gerar relatório de cobertura
+yarn test:coverage
+```
+
+## 🐳 Docker
+
+### Desenvolvimento
+```bash
+# Iniciar serviços
+docker-compose up -d
+
+# Parar serviços
+docker-compose down
+
+# Visualizar logs
+docker-compose logs -f
+```
+
+### Produção
+```bash
+# Build de imagens
+docker-compose -f docker-compose.prod.yml build
+
+# Deploy
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+## 🔄 Scripts Úteis
+
+### Desenvolvimento
+```bash
+# Iniciar em modo desenvolvimento
+yarn dev
+
+# Compilar TypeScript
+yarn build
+
+# Limpar cache
+yarn clean
+
+# Lint e formatação
+yarn lint
+yarn format
+```
+
+### Database
+```bash
+# Backup local
+yarn db:backup
+
+# Restaurar backup
+yarn db:restore
+
+# Migrations
+yarn db:migrate
+yarn db:rollback
+```
+
+## 🚨 Troubleshooting
+
+### Problemas Comuns
+
+#### 1. Erro de Porta em Uso
+```bash
+# Verificar processos
+lsof -i :3000
+
+# Matar processo
+kill -9 <PID>
+```
+
+#### 2. Problemas com MongoDB
+```bash
+# Reparar database
+yarn db:repair
+
+# Resetar dados
+yarn db:reset
+```
+
+#### 3. Problemas com Node
+```bash
+# Limpar cache do npm
+npm cache clean --force
+
+# Reinstalar módulos
+rm -rf node_modules
+yarn install
+```
+
+## 📝 VS Code
+
+### Extensões Recomendadas
+- ESLint
+- Prettier
+- GitLens
+- Docker
+- MongoDB for VS Code
+- Thunder Client
+
+### Configurações Recomendadas
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always"
+}
+```
+
+## 🔄 Processo de Atualização
+
+Este guia deve ser atualizado:
+- Quando novas dependências são adicionadas
+- Após mudanças significativas na infraestrutura
+- Quando processos de setup são modificados
+- Durante atualizações de versões major
+
+## 📝 Notas Importantes
+1. Nunca commitar arquivos .env
+2. Manter dependências atualizadas
+3. Seguir padrões de segurança
+4. Documentar mudanças de configuração
+5. Testar em ambiente limpo periodicamente 

@@ -214,6 +214,7 @@ Os beta testers podem ganhar pontos através de:
 - [Plano de Comunicação](docs/COMMUNICATION_PLAN.md)
 - [Arquitetura do Sistema](docs/SYSTEM_ARCHITECTURE.md)
 - [Guia de Deployment](docs/DEPLOYMENT_GUIDE.md)
+- [Configuração de Ambiente](docs/ENVIRONMENT_SETUP.md)
 
 ### ⚠️ Suporte
 
