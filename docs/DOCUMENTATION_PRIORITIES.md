@@ -127,11 +127,12 @@
 
 ### Semana 1 (Antes do Beta)
 - [x] Procedimentos de Backup ✅
-- [ ] Guia de Feedback
-- [ ] Sistema de Recompensas
-- [ ] Código de Conduta
-- [ ] Guia de Monitoramento
-- [ ] Procedimentos de Suporte
+- [x] Guia de Feedback ✅
+- [x] Sistema de Recompensas ✅
+- [x] Código de Conduta ✅
+- [x] Guia de Monitoramento ✅
+- [x] Procedimentos de Suporte ✅
+- [x] Plano de Contingência ✅
 
 ### Semana 2
 - [ ] Arquitetura do Sistema
@@ -155,7 +156,7 @@
 - [ ] Tradução (se necessário)
 
 ## 📊 Status Atual
-- Prioridade 1: 20% completo
+- Prioridade 1: 60% completo
 - Prioridade 2: 10% completo
 - Prioridade 3: 5% completo
 - Prioridade 4: 0% completo
