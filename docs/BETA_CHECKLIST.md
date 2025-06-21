@@ -49,9 +49,11 @@
 - [x] Implementar health checks
 - [x] Definir thresholds de alerta
 - [ ] Integração Discord
-  - [ ] Configurar webhook
-  - [ ] Implementar alertas em tempo real
-  - [ ] Configurar níveis de severidade
+  - [x] Criar sistema de alertas
+  - [x] Implementar webhooks
+  - [x] Configurar templates de mensagem
+  - [ ] Testar em produção
+  - [ ] Ajustar thresholds
 - [ ] Dashboard
   - [ ] Métricas em tempo real
   - [ ] Histórico de incidentes
@@ -75,11 +77,11 @@
 ## Status Atual
 - Sistema de Email: 🔄 Em Progresso (40%)
 - Backup: 🔄 Em Progresso (80%)
-- Monitoramento: 🔄 Em Progresso (50%)
+- Monitoramento: 🔄 Em Progresso (70%)
 - Suporte: ⏳ Pendente (0%)
 
 ## Próximos Passos Imediatos
 1. Configurar registros DNS para email
 2. Realizar testes de restore do backup
-3. Integrar monitoramento com Discord
+3. Testar alertas do Discord em produção
 4. Iniciar documentação de suporte 

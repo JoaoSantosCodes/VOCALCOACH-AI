@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const fs = require('fs').promises;
 const path = require('path');
 const os = require('os');
+const { sendDiscordAlert, sendStatusUpdate } = require('./discord-alerts');
 
 // Carregar variáveis de ambiente
 dotenv.config();
@@ -142,6 +143,23 @@ async function monitorHealth() {
         // Verificar alertas
         const alerts = await checkAlerts(metrics);
 
+        // Enviar alertas para o Discord
+        for (const alert of alerts) {
+            const [type, severity] = alert.split(':');
+            const message = alert.substring(alert.indexOf(' ') + 1);
+
+            await sendDiscordAlert(type.toLowerCase(), {
+                category: type.toLowerCase(),
+                severity: severity.toLowerCase(),
+                title: message,
+                description: \`Detectado em \${new Date().toLocaleString()}\`,
+                metrics: systemMetrics
+            });
+        }
+
+        // Atualizar status no Discord
+        await sendStatusUpdate(metrics);
+
         // Exibir resultados
         console.log('📊 Métricas do Sistema:');
         console.log(\`CPU: \${systemMetrics.cpu_usage}%\`);
@@ -161,6 +179,21 @@ async function monitorHealth() {
 
     } catch (error) {
         console.error('\n❌ Erro durante monitoramento:', error);
+        
+        // Enviar alerta de erro para o Discord
+        await sendDiscordAlert('system', {
+            category: 'error',
+            severity: 'error',
+            title: 'Erro no Sistema de Monitoramento',
+            description: error.message,
+            fields: [
+                {
+                    name: '🔍 Detalhes',
+                    value: error.stack || 'Sem stack trace disponível',
+                    inline: false
+                }
+            ]
+        });
     }
 }
 
