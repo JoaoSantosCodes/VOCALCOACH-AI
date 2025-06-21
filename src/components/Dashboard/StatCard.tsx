@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import { useSpring, animated, config } from '@react-spring/web';
 import { TrendingUp, TrendingDown } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 
 export interface StatCardProps {
   title: string;
@@ -63,6 +64,8 @@ const StatCard: React.FC<StatCardProps> = ({
       onMouseLeave={() => setHover({ scale: 1, y: 0 })}
     >
       <Box
+        component={motion.div}
+        whileHover={{ scale: 1.02 }}
         sx={{
           p: 3,
           background: theme.gradients.glass,
@@ -161,6 +164,8 @@ const StatCard: React.FC<StatCardProps> = ({
               color: trend.isPositive ? '#4DFFA1' : '#FF4D94',
               fontWeight: 600,
             }}
+            data-testid="trend-indicator"
+            className={trend.isPositive ? 'positive' : 'negative'}
           >
             {trend.value}%
           </Typography>

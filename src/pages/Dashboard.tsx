@@ -5,6 +5,7 @@ import {
   Grid,
   Typography,
   useTheme,
+  Alert,
 } from '@mui/material';
 import {
   Mic as MicIcon,
@@ -19,59 +20,70 @@ import ProgressChart from '../components/Dashboard/ProgressChart';
 const Dashboard: React.FC = () => {
   const theme = useTheme();
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [progressData, setProgressData] = useState<any>(null);
+
+  const fetchData = async () => {
+    try {
+      setError(null);
+      const [statsResponse, progressResponse] = await Promise.all([
+        fetch('/api/stats'),
+        fetch('/api/progress')
+      ]);
+
+      if (!statsResponse.ok || !progressResponse.ok) {
+        throw new Error('Erro ao carregar dados');
+      }
+
+      const statsData = await statsResponse.json();
+      const progressData = await progressResponse.json();
+
+      setStats(statsData);
+      setProgressData(progressData);
+    } catch (err) {
+      setError('Erro ao carregar dados');
+      // Retry after 5 seconds
+      setTimeout(fetchData, 5000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Simular carregamento de dados
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
+    fetchData();
   }, []);
 
-  const statsData = [
+  const statsData = stats ? [
     {
       icon: <MicIcon />,
       title: 'Sessões de Treino',
-      value: '32',
-      trend: { value: 12, isPositive: true },
+      value: stats.sessionsCount.toString(),
+      trend: stats.trends.sessions,
       description: 'Total de sessões este mês',
     },
     {
       icon: <TimerIcon />,
       title: 'Tempo Total',
-      value: '24h',
-      trend: { value: 8, isPositive: true },
+      value: `${stats.totalHours}h`,
+      trend: stats.trends.hours,
       description: 'Horas de prática acumuladas',
     },
     {
       icon: <EmojiEventsIcon />,
       title: 'Pontuação',
-      value: '850',
-      trend: { value: 15, isPositive: true },
+      value: stats.score.toString(),
+      trend: stats.trends.score,
       description: 'Sua pontuação atual',
     },
     {
       icon: <GraphicEqIcon />,
       title: 'Precisão',
-      value: '92%',
-      trend: { value: 5, isPositive: true },
+      value: `${stats.accuracy}%`,
+      trend: stats.trends.accuracy,
       description: 'Taxa de acerto nas notas',
     },
-  ];
-
-  const progressData = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-    datasets: [
-      {
-        label: 'Pontuação',
-        data: [650, 700, 720, 780, 820, 850],
-      },
-      {
-        label: 'Precisão',
-        data: [75, 78, 82, 85, 88, 92],
-      },
-    ],
-  };
+  ] : [];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,14 +104,25 @@ const Dashboard: React.FC = () => {
     },
   };
 
+  if (error) {
+    return (
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
+        <Alert severity="error" data-testid="error-message">
+          {error}
+        </Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
       <AnimatePresence>
-        {!isLoading && (
+        {!isLoading && stats && progressData && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
+            data-testid="dashboard-content"
           >
             {/* Header */}
             <Box
@@ -160,6 +183,7 @@ const Dashboard: React.FC = () => {
                   data={progressData}
                   title="Evolução do Desempenho"
                   subtitle="Acompanhe sua evolução ao longo do tempo"
+                  data-testid="progress-chart"
                 />
               </Grid>
 
@@ -199,60 +223,21 @@ const Dashboard: React.FC = () => {
                   <Typography
                     variant="h6"
                     sx={{
-                      fontWeight: 600,
                       mb: 2,
-                      color: 'white',
+                      fontWeight: 600,
                     }}
                   >
-                    Próximos Objetivos
+                    Dicas para Melhorar
                   </Typography>
-                  <Box
-                    component={motion.div}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 2,
-                    }}
-                  >
-                    {[
-                      'Alcançar 95% de precisão',
-                      'Completar 40 sessões de treino',
-                      'Atingir 1000 pontos',
-                      'Praticar por 30 horas',
-                    ].map((goal, index) => (
-                      <Box
-                        key={index}
-                        component={motion.div}
-                        whileHover={{ scale: 1.02, x: 10 }}
-                        sx={{
-                          p: 2,
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: 2,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 2,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            background: theme.gradients.secondary,
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                        >
-                          {goal}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    • Pratique regularmente para manter seu streak
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
+                    • Complete os exercícios diários
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mt: 1 }}>
+                    • Participe dos desafios da comunidade
+                  </Typography>
                 </Box>
               </Grid>
             </Grid>

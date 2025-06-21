@@ -14,6 +14,7 @@ import {
   ChartOptions,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { motion } from 'framer-motion';
 
 ChartJS.register(
   CategoryScale,
@@ -176,6 +177,8 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
   return (
     <animated.div style={fadeIn}>
       <Box
+        component={motion.div}
+        whileHover={{ scale: 1.01 }}
         sx={{
           p: 3,
           background: theme.gradients.glass,
@@ -201,6 +204,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
             opacity: 1,
           },
         }}
+        data-testid="progress-chart"
       >
         <Box sx={{ mb: 3 }}>
           <animated.div style={titleAnimation}>
