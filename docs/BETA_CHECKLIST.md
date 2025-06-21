@@ -1,6 +1,6 @@
 # Checklist de Lançamento Beta - VocalCoach AI
 
-## Prioridade 1: Sistema de Email 📧 (40%)
+## Prioridade 1: Sistema de Email 📧 (45%)
 ### Configuração do Gmail ✉️
 - [x] Criar script de configuração (setup-gmail.js)
 - [x] Implementar template de teste
@@ -8,6 +8,7 @@
   - [x] Criar script de configuração DNS
   - [x] Gerar chaves DKIM
   - [x] Gerar registros DNS
+  - [x] Gerar instruções de configuração
   - [ ] Adicionar registros no provedor
   - [ ] Verificar propagação
 - [ ] Testar sistema de email
@@ -75,16 +76,18 @@
   - [ ] Definir rotação de suporte
 
 ## Progresso Geral 📈
-- Sistema de Email: 🔄 40% (8/20 tarefas)
+- Sistema de Email: 🔄 45% (9/20 tarefas)
 - Backup: 🔄 80% (8/10 tarefas)
 - Monitoramento: 🔄 70% (7/10 tarefas)
 - Suporte: ⏳ 0% (0/9 tarefas)
-- **Total: 47.5% (23/49 tarefas)**
+- **Total: 49% (24/49 tarefas)**
 
 ## Próximas 24 Horas 🎯
 1. **Email (Prioridade 1)**
-   - Configurar registros DNS no provedor
-   - Iniciar testes de entrega
+   - ✅ Gerar registros DNS e instruções
+   - 🔄 Adicionar registros no provedor DNS
+   - ⏳ Aguardar propagação DNS
+   - ⏳ Iniciar testes de entrega
 
 2. **Backup (Prioridade 2)**
    - Preparar ambiente de staging para testes

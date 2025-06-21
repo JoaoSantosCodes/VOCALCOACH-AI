@@ -60,12 +60,12 @@ async function generateDNSRecords() {
             value: 'v=spf1 include:_spf.google.com ~all'
         },
         dkim: {
-            name: \`\${DKIM_SELECTOR}._domainkey.\${DOMAIN}\`,
+            name: `${DKIM_SELECTOR}._domainkey.${DOMAIN}`,
             type: 'TXT',
-            value: \`v=DKIM1; k=rsa; p=\${dnsKey}\`
+            value: `v=DKIM1; k=rsa; p=${dnsKey}`
         },
         dmarc: {
-            name: \`_dmarc.\${DOMAIN}\`,
+            name: `_dmarc.${DOMAIN}`,
             type: 'TXT',
             value: 'v=DMARC1; p=quarantine; rua=mailto:dmarc@vocalcoach.ai'
         }
@@ -78,25 +78,25 @@ async function generateDNSRecords() {
     );
 
     // Gerar instruções
-    const instructions = \`
+    const instructions = `
 # Configuração DNS para Email - VocalCoach AI
 
 ## Registros DNS Necessários
 
 1. Registro SPF (TXT):
-   - Nome: \${records.spf.name}
-   - Tipo: \${records.spf.type}
-   - Valor: \${records.spf.value}
+   - Nome: ${records.spf.name}
+   - Tipo: ${records.spf.type}
+   - Valor: ${records.spf.value}
 
 2. Registro DKIM (TXT):
-   - Nome: \${records.dkim.name}
-   - Tipo: \${records.dkim.type}
-   - Valor: \${records.dkim.value}
+   - Nome: ${records.dkim.name}
+   - Tipo: ${records.dkim.type}
+   - Valor: ${records.dkim.value}
 
 3. Registro DMARC (TXT):
-   - Nome: \${records.dmarc.name}
-   - Tipo: \${records.dmarc.type}
-   - Valor: \${records.dmarc.value}
+   - Nome: ${records.dmarc.name}
+   - Tipo: ${records.dmarc.type}
+   - Valor: ${records.dmarc.value}
 
 ## Instruções
 
@@ -114,7 +114,7 @@ async function generateDNSRecords() {
 1. Adicione os registros DNS
 2. Execute: npm run beta:verify-dns
 3. Configure as chaves no servidor SMTP
-\`;
+`;
 
     await fs.writeFile(
         path.join(DNS_CONFIG_DIR, 'INSTRUCTIONS.md'),
@@ -137,19 +137,19 @@ async function verifyDNSRecords() {
         // Verificar cada registro
         for (const [type, record] of Object.entries(records)) {
             try {
-                console.log(\`Verificando \${type.toUpperCase()}...\`);
+                console.log(`Verificando ${type.toUpperCase()}...`);
                 const results = await dns.resolveTxt(record.name);
                 const found = results.flat().some(txt => txt === record.value);
                 
                 if (found) {
-                    console.log(\`✅ Registro \${type.toUpperCase()} encontrado e correto\`);
+                    console.log(`✅ Registro ${type.toUpperCase()} encontrado e correto`);
                 } else {
-                    console.log(\`❌ Registro \${type.toUpperCase()} não encontrado ou incorreto\`);
+                    console.log(`❌ Registro ${type.toUpperCase()} não encontrado ou incorreto`);
                     console.log('Esperado:', record.value);
                     console.log('Encontrado:', results.flat().join('\n'));
                 }
             } catch (error) {
-                console.log(\`❌ Erro ao verificar \${type.toUpperCase()}:`, error.message);
+                console.log(`❌ Erro ao verificar ${type.toUpperCase()}:`, error.message);
             }
             console.log();
         }
@@ -167,7 +167,7 @@ if (command === 'generate') {
 } else if (command === 'verify') {
     verifyDNSRecords().catch(console.error);
 } else {
-    console.log(\`
+    console.log(`
 Uso: node setup-email-dns.js <comando>
 
 Comandos:
@@ -177,5 +177,5 @@ Comandos:
 Exemplo:
   node setup-email-dns.js generate
   node setup-email-dns.js verify
-\`);
+`);
 } 
