@@ -27,7 +27,7 @@
   - [ ] Implementar retry mechanism
   - [ ] Configurar dead letter queue
 
-## Prioridade 2: Backup e Recuperação 💾 (85%)
+## Prioridade 2: Backup e Recuperação 💾 (90%)
 ### Sistema de Backup
 - [x] Criar script de backup (backup-mongodb.js)
 - [x] Implementar retenção de 7 dias
@@ -38,12 +38,13 @@
   - [x] Implementar verificação de integridade
   - [x] Criar ambiente de staging
   - [x] Configurar dados de teste
+  - [x] Criar guia de configuração
   - [ ] Configurar variáveis de ambiente
   - [ ] Realizar teste em ambiente de staging
   - [ ] Validar dados restaurados
 - [ ] Documentação
-  - [ ] Procedimentos de backup
-  - [ ] Procedimentos de restore
+  - [x] Procedimentos de backup
+  - [x] Procedimentos de restore
   - [ ] Plano de disaster recovery
 
 ### ⚠️ Pendências de Configuração
@@ -103,10 +104,10 @@
 
 ## Progresso Geral 📈
 - Sistema de Email: 🔄 45% (9/20 tarefas)
-- Backup: 🔄 85% (10/12 tarefas)
+- Backup: 🔄 90% (12/14 tarefas)
 - Monitoramento: 🔄 70% (7/10 tarefas)
 - Suporte: ⏳ 0% (0/9 tarefas)
-- **Total: 51% (26/51 tarefas)**
+- **Total: 53% (28/53 tarefas)**
 
 ## Próximas 24 Horas 🎯
 1. **Email (Prioridade 1)**
@@ -118,6 +119,7 @@
 2. **Backup (Prioridade 2)**
    - ✅ Criar ambiente de staging
    - ✅ Configurar dados de teste
+   - ✅ Criar guia de configuração
    - 🔄 Configurar variáveis de ambiente
    - ⏳ Executar teste de backup/restore
    - ⏳ Validar integridade dos dados
