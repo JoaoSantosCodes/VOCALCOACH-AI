@@ -212,9 +212,9 @@ Os beta testers podem ganhar pontos através de:
 - [Prioridades de Documentação](docs/DOCUMENTATION_PRIORITIES.md)
 - [Matriz de Responsabilidades](docs/RESPONSIBILITY_MATRIX.md)
 - [Plano de Comunicação](docs/COMMUNICATION_PLAN.md)
-- [Arquitetura do Sistema](docs/SYSTEM_ARCHITECTURE.md)
 - [Guia de Deployment](docs/DEPLOYMENT_GUIDE.md)
 - [Configuração de Ambiente](docs/ENVIRONMENT_SETUP.md)
+- [Guia de Início Rápido](docs/QUICK_START_GUIDE.md)
 
 ### ⚠️ Suporte
 
