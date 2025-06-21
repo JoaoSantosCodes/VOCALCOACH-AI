@@ -4,13 +4,13 @@
 [![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](https://github.com/JoaoSantosCodes/VOCALCOACH-AI)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PWA](https://img.shields.io/badge/PWA-ready-blue.svg)](https://web.dev/progressive-web-apps/)
-[![Beta](https://img.shields.io/badge/beta-in%20progress-orange.svg)](https://vocalcoach.ai/beta)
+[![Beta](https://img.shields.io/badge/beta-launching-orange.svg)](https://vocalcoach.ai/beta)
 
 Uma plataforma inovadora de treinamento vocal que utiliza inteligência artificial para fornecer feedback em tempo real e exercícios personalizados.
 
 ## 🚀 Beta Test
 
-O VocalCoach AI está atualmente em fase beta! Se você recebeu um convite, siga as instruções abaixo para começar.
+O VocalCoach AI está iniciando sua fase beta! O lançamento está programado para começar com um grupo seleto de beta testers.
 
 ### 📋 Requisitos
 
@@ -58,6 +58,31 @@ Este comando irá:
 - `npm run beta:progress` - Gera relatório de progresso do beta
 - `npm run beta:setup:ci` - Configura ambiente beta em CI
 - `npm run beta:monitor:ci` - Executa monitoramento em CI
+
+### 📊 Status do Beta
+
+- **Fase Atual:** Preparação para Lançamento
+- **Grupos Configurados:** 3 (Advanced, Intermediate, Beginner)
+- **Beta Testers:** 24 selecionados
+- **Início Previsto:** 20/03/2024
+- **Duração:** 6 semanas
+
+### 🎯 Distribuição de Grupos
+
+- **Advanced (5/20)**
+  - Acesso a todas as features
+  - Feedback prioritário
+  - Suporte dedicado
+
+- **Intermediate (8/40)**
+  - Análise de voz em tempo real
+  - Sistema de gamificação
+  - Suporte padrão
+
+- **Beginner (11/40)**
+  - Exercícios básicos
+  - Modo offline
+  - Suporte comunitário
 
 ### 📊 Monitoramento
 
