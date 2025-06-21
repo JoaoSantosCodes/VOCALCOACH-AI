@@ -26,7 +26,7 @@
 
 ### 🟡 ALTA
 1. **Preparação para Beta**
-   - [ ] Plano de testes beta
+   - [x] Plano de testes beta
    - [ ] Setup de monitoramento
    - [ ] Procedimentos de rollback
    - [ ] Documentação para beta testers
