@@ -12,7 +12,7 @@
    - [x] StatCard
    - [x] ProgressChart
    - [x] Dashboard
-   - [ ] Testes de regressão visual
+   - [x] Testes de regressão visual
    - [ ] Documentação da migração
 
 2. **Atualização da Documentação Principal**
