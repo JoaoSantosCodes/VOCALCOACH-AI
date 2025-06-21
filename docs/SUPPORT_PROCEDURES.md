@@ -1,14 +1,11 @@
-# 🎯 Procedimentos de Suporte - VocalCoach AI Beta
+# 🎯 Procedimentos de Suporte - VocalCoach AI
 
-## 📋 Índice
-1. [Visão Geral](#visão-geral)
-2. [Canais de Atendimento](#canais-de-atendimento)
-3. [Níveis de Prioridade](#níveis-de-prioridade)
-4. [Fluxo de Atendimento](#fluxo-de-atendimento)
-5. [Templates de Resposta](#templates-de-resposta)
-6. [Escalação](#escalação)
-7. [Base de Conhecimento](#base-de-conhecimento)
-8. [Métricas e SLAs](#métricas-e-slas)
+## 📋 Sumário
+1. [Fluxo de Atendimento](#fluxo-de-atendimento)
+2. [Categorização de Tickets](#categorização-de-tickets)
+3. [Procedimentos por Tipo](#procedimentos-por-tipo)
+4. [Escalamento](#escalamento)
+5. [Fechamento de Tickets](#fechamento-de-tickets)
 
 ## 🎯 Visão Geral
 
@@ -27,6 +24,16 @@
 - Documentação completa
 - Proatividade
 - Profissionalismo
+
+## 📋 Índice
+1. [Visão Geral](#visão-geral)
+2. [Canais de Atendimento](#canais-de-atendimento)
+3. [Níveis de Prioridade](#níveis-de-prioridade)
+4. [Fluxo de Atendimento](#fluxo-de-atendimento)
+5. [Templates de Resposta](#templates-de-resposta)
+6. [Escalação](#escalação)
+7. [Base de Conhecimento](#base-de-conhecimento)
+8. [Métricas e SLAs](#métricas-e-slas)
 
 ## 📱 Canais de Atendimento
 
@@ -82,175 +89,210 @@
 
 ## 🔄 Fluxo de Atendimento
 
-### 1. Recebimento
-- Registrar ticket
-- Classificar prioridade
-- Atribuir responsável
-- Confirmar recebimento
+### 1. Recebimento do Ticket
+1. **Verificação Inicial**
+   - Confirmar recebimento em até 10 minutos
+   - Verificar se é usuário ativo
+   - Checar histórico de tickets
+   - Identificar categoria do problema
 
-### 2. Análise
-- Entender o problema
-- Verificar duplicidade
-- Coletar informações
-- Reproduzir o problema
+2. **Coleta de Informações**
+   - Sistema operacional
+   - Navegador e versão
+   - Tipo de microfone
+   - Logs de erro (se disponível)
 
-### 3. Resolução
-- Aplicar solução
-- Documentar passos
-- Verificar resolução
-- Atualizar base de conhecimento
+3. **Priorização**
+   - Impacto no usuário
+   - Urgência do problema
+   - Complexidade da solução
+   - Recursos necessários
 
-### 4. Fechamento
-- Confirmar com usuário
-- Coletar feedback
-- Fechar ticket
-- Atualizar métricas
+### 2. Análise do Problema
+1. **Diagnóstico**
+   - Reproduzir o problema
+   - Consultar base de conhecimento
+   - Verificar problemas similares
+   - Identificar causa raiz
 
-## 📝 Templates de Resposta
+2. **Documentação**
+   - Registrar passos de reprodução
+   - Anotar tentativas realizadas
+   - Documentar comportamento esperado
+   - Registrar logs relevantes
 
-### Saudação Inicial
-```
-Olá [Nome]! 
+## 📝 Categorização de Tickets
 
-Obrigado por entrar em contato com o suporte do VocalCoach AI. 
-Estou aqui para ajudar com [problema].
+### Problemas Técnicos
+1. **Áudio**
+   - Microfone não detectado
+   - Qualidade do áudio
+   - Latência
+   - Feedback incorreto
 
-Pode me fornecer mais detalhes sobre [ponto específico]?
+2. **Performance**
+   - Lentidão
+   - Travamentos
+   - Consumo de recursos
+   - Erros de carregamento
 
-Atenciosamente,
-[Seu Nome]
-```
+3. **Conectividade**
+   - Desconexões
+   - Timeout
+   - Sincronização
+   - Falhas de rede
 
-### Confirmação de Bug
-```
-Olá [Nome],
+### Problemas de Usuário
+1. **Conta**
+   - Login/Logout
+   - Perfil
+   - Configurações
+   - Permissões
 
-Confirmamos o bug reportado. Nossa equipe já está trabalhando na correção.
-Atualizaremos você assim que tivermos novidades.
-
-Agradecemos o reporte!
-
-Atenciosamente,
-[Seu Nome]
-```
-
-### Solução Fornecida
-```
-Olá [Nome],
-
-Ótimas notícias! O problema foi resolvido.
-Por favor, teste novamente e nos informe se está tudo funcionando corretamente.
-
-Passos realizados:
-1. [Passo 1]
-2. [Passo 2]
-3. [Passo 3]
-
-Atenciosamente,
-[Seu Nome]
-```
-
-### Fechamento
-```
-Olá [Nome],
-
-Ficamos felizes em ajudar! 
-Se precisar de mais alguma coisa, não hesite em nos contatar.
-
-Você poderia avaliar nosso atendimento? Isso nos ajuda a melhorar.
-
-Atenciosamente,
-[Seu Nome]
-```
-
-## ⬆️ Escalação
-
-### Matriz de Escalação
-| Nível | Tempo | Contato | Meio |
-|-------|--------|---------|------|
-| N1 | Imediato | Suporte | Discord |
-| N2 | 15min | Dev | Discord/Slack |
-| N3 | 30min | Tech Lead | Telefone |
-| N4 | 1h | CTO | Telefone |
-
-### Critérios de Escalação
-- Tempo excedido
-- Complexidade técnica
-- Impacto no negócio
-- Segurança
-- Múltiplos usuários afetados
-
-## 📚 Base de Conhecimento
-
-### Categorias Principais
-1. **Problemas Comuns**
-   - Login/Autenticação
-   - Performance
-   - Áudio
-   - Conectividade
-   - Interface
-
-2. **Configurações**
-   - Setup inicial
-   - Microfone
-   - Conta
-   - Preferências
-   - Notificações
-
-3. **Features**
-   - Exercícios
-   - Análise de voz
-   - Feedback
+2. **Exercícios**
+   - Dificuldade
    - Progresso
-   - Gamificação
+   - Feedback
+   - Resultados
 
-4. **Troubleshooting**
-   - Diagnóstico
-   - Logs
-   - Soluções comuns
-   - Verificações
-   - Reset
+3. **Pagamento**
+   - Cobrança
+   - Reembolso
+   - Planos
+   - Faturas
 
-## 📊 Métricas e SLAs
+## 🔧 Procedimentos por Tipo
 
-### KPIs Principais
-| Métrica | Meta | Warning | Crítico |
-|---------|------|---------|----------|
-| First Response Time | < 15min | 15-30min | > 30min |
-| Resolution Time | < 24h | 24-48h | > 48h |
-| Customer Satisfaction | > 4.5/5 | 3.5-4.5/5 | < 3.5/5 |
-| First Contact Resolution | > 80% | 60-80% | < 60% |
-| Ticket Backlog | < 20 | 20-50 | > 50 |
+### Problemas de Áudio
+1. **Microfone não detectado**
+   ```javascript
+   // Verificar permissões
+   navigator.mediaDevices.getUserMedia({audio: true})
+     .then(stream => {
+       console.log('Microfone OK');
+     })
+     .catch(err => {
+       console.error('Erro:', err);
+     });
+   ```
 
-### SLAs por Canal
-| Canal | Resposta | Resolução | Satisfação |
-|-------|----------|-----------|------------|
-| Discord | 15min | 4h | 4.5/5 |
-| Email | 4h | 24h | 4.0/5 |
-| Ticket | 1h | 8h | 4.3/5 |
+2. **Qualidade do Áudio**
+   - Verificar configurações do sistema
+   - Testar outro microfone
+   - Ajustar ganho
+   - Verificar drivers
 
-### Monitoramento
-- Dashboard em tempo real
-- Alertas automáticos
-- Relatórios diários
-- Análise semanal
-- Review mensal
+### Problemas de Performance
+1. **Lentidão**
+   - Limpar cache
+   - Verificar extensões
+   - Testar outro navegador
+   - Monitorar recursos
+
+2. **Travamentos**
+   - Coletar logs
+   - Verificar memória
+   - Reiniciar aplicação
+   - Atualizar navegador
+
+## ⬆️ Escalamento
+
+### Nível 1 → Nível 2
+1. **Critérios**
+   - Sem resolução em 2h
+   - Problema técnico complexo
+   - Múltiplos usuários afetados
+   - Bug confirmado
+
+2. **Processo**
+   - Documentar tentativas
+   - Preparar relatório
+   - Notificar supervisor
+   - Transferir ticket
+
+### Nível 2 → Nível 3
+1. **Critérios**
+   - Problema crítico
+   - Necessidade de código
+   - Impacto em segurança
+   - Decisão estratégica
+
+2. **Processo**
+   - Relatório detalhado
+   - Evidências coletadas
+   - Impacto documentado
+   - Prioridade definida
+
+## ✅ Fechamento de Tickets
+
+### Verificação
+1. **Confirmação**
+   - Testar solução
+   - Validar com usuário
+   - Verificar efeitos colaterais
+   - Documentar resolução
+
+2. **Documentação**
+   - Atualizar base de conhecimento
+   - Registrar tempo de resolução
+   - Categorizar solução
+   - Adicionar notas importantes
+
+### Follow-up
+1. **Usuário**
+   - Enviar pesquisa de satisfação
+   - Solicitar feedback
+   - Verificar necessidades adicionais
+   - Agradecer colaboração
+
+2. **Interno**
+   - Atualizar métricas
+   - Identificar melhorias
+   - Compartilhar aprendizados
+   - Propor ajustes
+
+## 📊 Métricas de Acompanhamento
+
+### KPIs de Atendimento
+1. **Tempo**
+   - Primeira resposta: < 10min
+   - Resolução: < 2h
+   - Escalamento: < 30min
+   - Follow-up: < 24h
+
+2. **Qualidade**
+   - Satisfação: > 4.5/5
+   - Resolução primeira tentativa: > 80%
+   - Reaberturas: < 5%
+   - Feedback positivo: > 90%
 
 ## 🔄 Melhoria Contínua
 
-### Processo de Feedback
-1. Coletar feedback após cada atendimento
-2. Analisar métricas semanalmente
-3. Identificar pontos de melhoria
-4. Implementar ajustes
-5. Medir resultados
+### Processo de Revisão
+1. **Diário**
+   - Review de tickets abertos
+   - Verificação de escalamentos
+   - Análise de métricas
+   - Ajustes necessários
 
-### Treinamento
-- Onboarding inicial
-- Atualização mensal
-- Workshops técnicos
-- Role-playing
-- Certificações
+2. **Semanal**
+   - Análise de tendências
+   - Review de procedimentos
+   - Treinamento da equipe
+   - Atualização de documentação
+
+### Feedback Loop
+1. **Coleta**
+   - Feedback dos usuários
+   - Sugestões da equipe
+   - Métricas de performance
+   - Pontos de melhoria
+
+2. **Implementação**
+   - Priorização de melhorias
+   - Testes de mudanças
+   - Treinamento necessário
+   - Monitoramento de resultados
 
 ## 📱 Ferramentas
 
