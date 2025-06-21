@@ -1,262 +1,182 @@
-const axios = require('axios');
-const dotenv = require('dotenv');
-const fs = require('fs').promises;
-const path = require('path');
+const { WebhookClient } = require('discord.js');
+require('dotenv').config({ path: 'config/env/.env' });
 
-// Carregar variáveis de ambiente
-dotenv.config();
-
-// Configurações
-const DISCORD_WEBHOOKS = {
-    alerts: process.env.DISCORD_WEBHOOK_ALERTS,
-    status: process.env.DISCORD_WEBHOOK_STATUS,
-    errors: process.env.DISCORD_WEBHOOK_ERRORS
-};
-
-const ALERT_COLORS = {
-    info: 0x3498db,    // Azul
-    warning: 0xf1c40f, // Amarelo
-    error: 0xe74c3c,   // Vermelho
-    success: 0x2ecc71  // Verde
-};
-
-const ALERT_EMOJIS = {
-    info: 'ℹ️',
-    warning: '⚠️',
-    error: '🚨',
-    success: '✅',
-    cpu: '🔲',
-    memory: '📊',
-    api: '🌐',
-    database: '🗄️',
-    backup: '💾',
-    security: '🔒'
-};
-
-async function sendDiscordAlert(type, data) {
-    const webhook = DISCORD_WEBHOOKS[data.severity === 'error' ? 'errors' : 'alerts'];
-    if (!webhook) {
-        throw new Error(\`Webhook não configurado para \${type}\`);
+class DiscordAlerts {
+    constructor() {
+        const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+        if (!webhookUrl) {
+            console.warn('⚠️ URL do webhook do Discord não configurada. Os alertas serão apenas logados.');
+            this.webhookClient = null;
+        } else {
+            this.webhookClient = new WebhookClient({ url: webhookUrl });
+        }
     }
 
-    const embed = {
-        title: \`\${ALERT_EMOJIS[data.category] || '🔔'} \${data.title}\`,
-        description: data.description,
-        color: ALERT_COLORS[data.severity || 'info'],
-        timestamp: new Date().toISOString(),
-        fields: []
-    };
-
-    // Adicionar detalhes específicos por tipo
-    switch (type) {
-        case 'system':
-            embed.fields.push(
-                {
-                    name: '🔲 CPU',
-                    value: \`\${data.metrics.cpu_usage}%\`,
-                    inline: true
-                },
-                {
-                    name: '📊 Memória',
-                    value: \`\${data.metrics.memory_usage}%\`,
-                    inline: true
-                },
-                {
-                    name: '⏰ Uptime',
-                    value: \`\${Math.floor(data.metrics.uptime / 3600)}h \${Math.floor((data.metrics.uptime % 3600) / 60)}m\`,
-                    inline: true
-                }
-            );
-            break;
-
-        case 'api':
-            embed.fields.push(
-                {
-                    name: '🌐 Endpoint',
-                    value: data.endpoint,
-                    inline: true
-                },
-                {
-                    name: '⏱️ Latência',
-                    value: \`\${data.latency}ms\`,
-                    inline: true
-                },
-                {
-                    name: '📈 Status',
-                    value: data.status,
-                    inline: true
-                }
-            );
-            break;
-
-        case 'backup':
-            embed.fields.push(
-                {
-                    name: '📦 Coleções',
-                    value: data.collections.join(', '),
-                    inline: false
-                },
-                {
-                    name: '📊 Tamanho',
-                    value: data.size,
-                    inline: true
-                },
-                {
-                    name: '⏱️ Duração',
-                    value: data.duration,
-                    inline: true
-                }
-            );
-            break;
-    }
-
-    // Adicionar campos extras se fornecidos
-    if (data.fields) {
-        embed.fields.push(...data.fields);
-    }
-
-    try {
-        await axios.post(webhook, { embeds: [embed] });
-        console.log(\`✅ Alerta enviado: \${data.title}\`);
-    } catch (error) {
-        console.error(\`❌ Erro ao enviar alerta: \${error.message}\`);
-        throw error;
-    }
-}
-
-async function sendStatusUpdate(metrics) {
-    if (!DISCORD_WEBHOOKS.status) {
-        throw new Error('Webhook de status não configurado');
-    }
-
-    const statusEmbed = {
-        title: '📊 Status do Sistema',
-        description: 'Atualização periódica do status do sistema',
-        color: ALERT_COLORS.info,
-        timestamp: new Date().toISOString(),
-        fields: [
-            {
-                name: '🔲 CPU',
-                value: \`\${metrics.system.cpu_usage}%\`,
-                inline: true
+    async sendAlert(type, message, error = null) {
+        const alerts = {
+            'backup-failed': {
+                color: 0xFF0000, // Vermelho
+                title: '❌ Falha no Backup',
+                channel: '#ops-alerts'
             },
-            {
-                name: '📊 Memória',
-                value: \`\${metrics.system.memory_usage}%\`,
-                inline: true
+            'backup-warning': {
+                color: 0xFFA500, // Laranja
+                title: '⚠️ Alerta de Backup',
+                channel: '#ops-alerts'
             },
-            {
-                name: '⏰ Uptime',
-                value: \`\${Math.floor(metrics.system.uptime / 3600)}h\`,
-                inline: true
+            'backup-success': {
+                color: 0x00FF00, // Verde
+                title: '✅ Backup Concluído',
+                channel: '#ops-alerts'
+            },
+            'restore-failed': {
+                color: 0xFF0000,
+                title: '❌ Falha na Restauração',
+                channel: '#ops-alerts'
+            },
+            'restore-success': {
+                color: 0x00FF00,
+                title: '✅ Restauração Concluída',
+                channel: '#ops-alerts'
             }
-        ]
-    };
+        };
 
-    // Adicionar status dos endpoints
-    const endpointStatus = metrics.endpoints.map(endpoint => {
-        const status = endpoint.status === 'healthy' ? '✅' : '❌';
-        return \`\${status} \${endpoint.name}: \${endpoint.latency}ms\`;
-    }).join('\\n');
-
-    statusEmbed.fields.push({
-        name: '🌐 Endpoints',
-        value: endpointStatus,
-        inline: false
-    });
-
-    try {
-        await axios.post(DISCORD_WEBHOOKS.status, { embeds: [statusEmbed] });
-        console.log('✅ Status atualizado no Discord');
-    } catch (error) {
-        console.error('❌ Erro ao atualizar status:', error.message);
-        throw error;
-    }
-}
-
-// Exemplos de uso
-async function testAlerts() {
-    console.log('🚀 Testando alertas do Discord...\n');
-
-    try {
-        // Verificar webhooks
-        if (!DISCORD_WEBHOOKS.alerts || !DISCORD_WEBHOOKS.status || !DISCORD_WEBHOOKS.errors) {
-            throw new Error(\`
-Webhooks do Discord não configurados. Adicione ao .env:
-DISCORD_WEBHOOK_ALERTS=https://discord.com/api/webhooks/...
-DISCORD_WEBHOOK_STATUS=https://discord.com/api/webhooks/...
-DISCORD_WEBHOOK_ERRORS=https://discord.com/api/webhooks/...
-\`);
+        const alert = alerts[type];
+        if (!alert) {
+            throw new Error(`Tipo de alerta desconhecido: ${type}`);
         }
 
-        // Teste 1: Alerta de Sistema
-        console.log('1️⃣ Enviando alerta de sistema...');
-        await sendDiscordAlert('system', {
-            category: 'cpu',
-            severity: 'warning',
-            title: 'Alto uso de CPU',
-            description: 'O uso de CPU está acima do threshold de 80%',
-            metrics: {
-                cpu_usage: 85,
-                memory_usage: 60,
-                uptime: 3600 * 24 // 24 horas
+        const embed = {
+            color: alert.color,
+            title: alert.title,
+            description: message,
+            timestamp: new Date(),
+            fields: []
+        };
+
+        if (error) {
+            embed.fields.push({
+                name: 'Erro',
+                value: `\`\`\`\n${error.toString()}\n\`\`\``,
+                inline: false
+            });
+
+            if (error.stack) {
+                embed.fields.push({
+                    name: 'Stack Trace',
+                    value: `\`\`\`\n${error.stack.split('\n').slice(0, 3).join('\n')}\n\`\`\``,
+                    inline: false
+                });
             }
-        });
+        }
 
-        // Teste 2: Alerta de API
-        console.log('\n2️⃣ Enviando alerta de API...');
-        await sendDiscordAlert('api', {
-            category: 'api',
-            severity: 'error',
-            title: 'Endpoint Indisponível',
-            description: 'O endpoint /api/voice/health está inacessível',
-            endpoint: '/api/voice/health',
-            latency: 5000,
-            status: 'error'
-        });
+        // Se não houver webhook configurado, apenas logar
+        if (!this.webhookClient) {
+            console.log('\n📢 Alerta (Discord desativado):', alert.title);
+            console.log('📝 Mensagem:', message);
+            if (error) {
+                console.log('❌ Erro:', error.message);
+            }
+            return;
+        }
 
-        // Teste 3: Alerta de Backup
-        console.log('\n3️⃣ Enviando alerta de backup...');
-        await sendDiscordAlert('backup', {
-            category: 'backup',
-            severity: 'success',
-            title: 'Backup Concluído',
-            description: 'Backup diário realizado com sucesso',
-            collections: ['users', 'stats', 'voice'],
-            size: '150MB',
-            duration: '5m 30s'
-        });
+        try {
+            await this.webhookClient.send({
+                username: 'VocalCoach AI Ops',
+                avatarURL: 'https://vocalcoach.ai/logo.png',
+                embeds: [embed]
+            });
 
-        // Teste 4: Status Update
-        console.log('\n4️⃣ Enviando atualização de status...');
-        await sendStatusUpdate({
-            system: {
-                cpu_usage: 45,
-                memory_usage: 60,
-                uptime: 3600 * 72 // 72 horas
-            },
-            endpoints: [
-                { name: 'auth', status: 'healthy', latency: 150 },
-                { name: 'voice', status: 'healthy', latency: 200 },
-                { name: 'stats', status: 'error', latency: 5000 }
-            ]
-        });
+            console.log(`✅ Alerta enviado para ${alert.channel}: ${alert.title}`);
+        } catch (err) {
+            console.error('❌ Erro ao enviar alerta para o Discord:', err);
+            console.log('📝 Conteúdo do alerta:', message);
+        }
+    }
 
-        console.log('\n✅ Todos os testes concluídos com sucesso!');
+    async sendBackupSuccess(details) {
+        const message = [
+            '**Backup concluído com sucesso**',
+            '',
+            '**Detalhes:**',
+            `📂 Local: \`${details.localPath}\``,
+            `📦 Tamanho: ${details.size}`,
+            `⏱️ Duração: ${details.duration}`,
+            `🗃️ Coleções: ${details.collections.join(', ')}`,
+            '',
+            details.s3Path ? `☁️ S3: \`${details.s3Path}\`` : null
+        ].filter(Boolean).join('\n');
 
-    } catch (error) {
-        console.error('\n❌ Erro durante os testes:', error.message);
-        process.exit(1);
+        await this.sendAlert('backup-success', message);
+    }
+
+    async sendBackupFailed(error, details = {}) {
+        const message = [
+            '**Falha ao executar backup**',
+            '',
+            '**Detalhes:**',
+            `📂 Local: \`${details.localPath || 'N/A'}\``,
+            `⏱️ Timestamp: ${new Date().toISOString()}`,
+            '',
+            '**Ações Necessárias:**',
+            '1. Verificar logs detalhados',
+            '2. Executar backup manual',
+            '3. Verificar espaço em disco',
+            '4. Verificar conectividade com MongoDB'
+        ].join('\n');
+
+        await this.sendAlert('backup-failed', message, error);
+    }
+
+    async sendBackupWarning(message, details = {}) {
+        const formattedMessage = [
+            '**Alerta de Backup**',
+            '',
+            message,
+            '',
+            '**Detalhes:**',
+            Object.entries(details)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n')
+        ].join('\n');
+
+        await this.sendAlert('backup-warning', formattedMessage);
+    }
+
+    async sendRestoreSuccess(details) {
+        const message = [
+            '**Restauração concluída com sucesso**',
+            '',
+            '**Detalhes:**',
+            `📂 Origem: \`${details.sourcePath}\``,
+            `📦 Banco de Dados: \`${details.database}\``,
+            `⏱️ Duração: ${details.duration}`,
+            `🗃️ Coleções Restauradas: ${details.collections.join(', ')}`,
+            `📊 Total de Documentos: ${details.totalDocuments}`
+        ].join('\n');
+
+        await this.sendAlert('restore-success', message);
+    }
+
+    async sendRestoreFailed(error, details = {}) {
+        const message = [
+            '**Falha na restauração do backup**',
+            '',
+            '**Detalhes:**',
+            `📂 Origem: \`${details.sourcePath || 'N/A'}\``,
+            `📦 Banco de Dados: \`${details.database || 'N/A'}\``,
+            `⏱️ Timestamp: ${new Date().toISOString()}`,
+            '',
+            '**Ações Necessárias:**',
+            '1. Verificar integridade do backup',
+            '2. Verificar permissões do banco',
+            '3. Tentar backup anterior',
+            '4. Verificar espaço em disco'
+        ].join('\n');
+
+        await this.sendAlert('restore-failed', message, error);
     }
 }
 
-// Exportar funções
-module.exports = {
-    sendDiscordAlert,
-    sendStatusUpdate
-};
-
-// Se executado diretamente, rodar testes
-if (require.main === module) {
-    testAlerts().catch(console.error);
-} 
+// Exportar instância única
+module.exports = new DiscordAlerts(); 
