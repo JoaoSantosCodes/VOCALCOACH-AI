@@ -29,7 +29,9 @@
     "beta:schedule-reports:ci": "cross-env CI=true npm run beta:schedule-reports",
     "beta:backup": "node scripts/backup-beta.js",
     "beta:backup:ci": "cross-env CI=true npm run beta:backup",
-    "beta:backup:daily": "node scripts/backup-beta.js --daily"
+    "beta:backup:daily": "node scripts/backup-beta.js --daily",
+    "beta:verify-db": "node scripts/verify-mongodb.js",
+    "beta:verify-db:ci": "cross-env CI=true npm run beta:verify-db"
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
@@ -48,7 +50,6 @@
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "discord.js": "^14.14.1",
-    "hotjar-react": "^1.0.11",
     "mixpanel-browser": "^2.47.0",
     "mongodb": "^6.3.0",
     "node-cron": "^3.0.3",
