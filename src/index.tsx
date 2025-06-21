@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { ThemeProvider } from '@mui/material';
-import { theme } from './utils/theme';
 import reportWebVitals from './reportWebVitals';
+import { initMonitoring, metrics } from './config/monitoring.config';
+
+// Inicializa o monitoramento em produção e beta
+initMonitoring();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,11 +14,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
+    <App />
   </React.StrictMode>
 );
 
-// Reporta web vitals se necessário
-reportWebVitals(); 
+// Reporta Web Vitals para monitoramento
+reportWebVitals(metrics.trackWebVitals); 

@@ -90,7 +90,8 @@ export enum AchievementCategory {
   PERFORMANCE = 'performance',
   SOCIAL = 'social',
   CHALLENGE = 'challenge',
-  SPECIAL = 'special',
+  STREAK = 'streak',
+  MILESTONE = 'milestone',
 }
 
 export enum AchievementLevel {
@@ -103,7 +104,6 @@ export enum AchievementLevel {
 
 export enum BadgeRarity {
   COMMON = 'common',
-  UNCOMMON = 'uncommon',
   RARE = 'rare',
   EPIC = 'epic',
   LEGENDARY = 'legendary',
@@ -112,8 +112,8 @@ export enum BadgeRarity {
 export enum ChallengeType {
   DAILY = 'daily',
   WEEKLY = 'weekly',
+  SEASONAL = 'seasonal',
   SPECIAL = 'special',
-  COMMUNITY = 'community',
 }
 
 export enum ChallengeDifficulty {
@@ -126,7 +126,7 @@ export enum ChallengeDifficulty {
 export interface AchievementRequirement {
   type: string;
   value: number;
-  current: number;
+  current?: number;
 }
 
 export interface ChallengeRequirement {
@@ -159,4 +159,17 @@ export interface GamificationConfig {
     maxStreakBonus: number;
     streakBonusMultiplier: number;
   };
+}
+
+export interface GamificationEvent {
+  type: string;
+  userId: string;
+  data: any;
+  timestamp: Date;
+}
+
+export interface Reward {
+  type: 'points' | 'experience' | 'badge' | 'achievement';
+  value: number | Badge | Achievement;
+  message: string;
 } 

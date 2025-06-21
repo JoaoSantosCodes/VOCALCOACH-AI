@@ -4,12 +4,14 @@ import {
   UserProgress,
   PracticeSession,
   Challenge,
-  Leaderboard,
+  LeaderboardEntry,
   GamificationConfig,
   AchievementCategory,
   AchievementLevel,
   BadgeRarity,
   ChallengeType,
+  GamificationEvent,
+  Reward,
 } from '../types/gamification';
 
 class GamificationService {
@@ -27,11 +29,28 @@ class GamificationService {
       challengeCompletion: 100,
     },
     streaks: {
-      minDailyPractice: 10, // minutos
+      minDailyPractice: 10,
       maxStreakBonus: 50,
       streakBonusMultiplier: 1.1,
     },
   };
+
+  private eventListeners: ((event: GamificationEvent) => void)[] = [];
+
+  // Event handling
+  public addEventListener(listener: (event: GamificationEvent) => void): void {
+    this.eventListeners.push(listener);
+  }
+
+  private emitEvent(type: string, userId: string, data: any): void {
+    const event: GamificationEvent = {
+      type,
+      userId,
+      data,
+      timestamp: new Date(),
+    };
+    this.eventListeners.forEach(listener => listener(event));
+  }
 
   // Calcula experiência necessária para o próximo nível
   private calculateExperienceForLevel(level: number): number {
@@ -45,34 +64,12 @@ class GamificationService {
   public async updateProgress(userId: string, session: PracticeSession): Promise<UserProgress> {
     try {
       const userProgress = await this.getUserProgress(userId);
-      const earnedPoints = this.calculateSessionPoints(session);
-      const earnedExperience = this.calculateSessionExperience(session);
-
-      // Atualiza pontos e experiência
-      userProgress.totalPoints += earnedPoints;
-      userProgress.experience += earnedExperience;
-
-      // Verifica level up
-      while (userProgress.experience >= userProgress.experienceToNextLevel) {
-        userProgress.experience -= userProgress.experienceToNextLevel;
-        userProgress.level++;
-        userProgress.experienceToNextLevel = this.calculateExperienceForLevel(userProgress.level);
-        await this.handleLevelUp(userId, userProgress.level);
-      }
-
-      // Atualiza streak
-      if (this.isValidForStreak(session, userProgress.lastPracticeDate)) {
-        userProgress.streakDays++;
-      } else {
-        userProgress.streakDays = 1;
-      }
-
-      userProgress.lastPracticeDate = session.date;
-      userProgress.practiceHistory.push(session);
-
-      // Verifica conquistas
-      const newAchievements = await this.checkAchievements(userId, userProgress);
-      userProgress.achievements = [...userProgress.achievements, ...newAchievements];
+      const rewards = await this.processSession(userId, session, userProgress);
+      
+      // Notifica sobre as recompensas
+      rewards.forEach(reward => {
+        this.emitEvent('reward_earned', userId, reward);
+      });
 
       // Salva progresso atualizado
       await this.saveUserProgress(userId, userProgress);
@@ -84,7 +81,126 @@ class GamificationService {
     }
   }
 
-  // Verifica se a sessão é válida para manter/incrementar streak
+  private async processSession(
+    userId: string,
+    session: PracticeSession,
+    progress: UserProgress
+  ): Promise<Reward[]> {
+    const rewards: Reward[] = [];
+
+    // Calcula pontos e experiência
+    const earnedPoints = this.calculateSessionPoints(session);
+    const earnedExperience = this.calculateSessionExperience(session);
+
+    // Atualiza estatísticas
+    progress.stats.totalPracticeTime += session.duration;
+    progress.stats.exercisesCompleted += session.exercisesCompleted;
+    progress.stats.averageScore = (
+      (progress.stats.averageScore * (progress.practiceHistory.length) + session.metrics.overallScore) /
+      (progress.practiceHistory.length + 1)
+    );
+    if (session.metrics.overallScore >= 95) {
+      progress.stats.perfectSessions++;
+    }
+
+    // Atualiza pontos e experiência
+    progress.totalPoints += earnedPoints;
+    progress.experience += earnedExperience;
+
+    rewards.push({
+      type: 'points',
+      value: earnedPoints,
+      message: `Ganhou ${earnedPoints} pontos na sessão!`,
+    });
+
+    // Verifica level up
+    const levelUpRewards = await this.handleLevelProgress(userId, progress);
+    rewards.push(...levelUpRewards);
+
+    // Atualiza streak
+    const streakRewards = await this.handleStreak(userId, session, progress);
+    rewards.push(...streakRewards);
+
+    // Atualiza histórico
+    progress.practiceHistory.push(session);
+
+    // Verifica conquistas
+    const achievementRewards = await this.checkAchievements(userId, progress);
+    rewards.push(...achievementRewards);
+
+    // Verifica desafios
+    const challengeRewards = await this.checkChallenges(userId, session, progress);
+    rewards.push(...challengeRewards);
+
+    return rewards;
+  }
+
+  private async handleLevelProgress(
+    userId: string,
+    progress: UserProgress
+  ): Promise<Reward[]> {
+    const rewards: Reward[] = [];
+
+    while (progress.experience >= progress.experienceToNextLevel) {
+      progress.experience -= progress.experienceToNextLevel;
+      progress.level++;
+      progress.experienceToNextLevel = this.calculateExperienceForLevel(progress.level);
+
+      const levelRewards = await this.getLevelUpRewards(progress.level);
+      rewards.push(...levelRewards);
+
+      this.emitEvent('level_up', userId, {
+        newLevel: progress.level,
+        rewards: levelRewards,
+      });
+    }
+
+    return rewards;
+  }
+
+  private async handleStreak(
+    userId: string,
+    session: PracticeSession,
+    progress: UserProgress
+  ): Promise<Reward[]> {
+    const rewards: Reward[] = [];
+
+    if (this.isValidForStreak(session, progress.lastPracticeDate)) {
+      progress.streakDays++;
+      
+      if (progress.streakDays > progress.stats.longestStreak) {
+        progress.stats.longestStreak = progress.streakDays;
+      }
+
+      const streakBonus = Math.min(
+        this.config.streaks.maxStreakBonus,
+        Math.floor(this.config.points.dailyStreak * Math.pow(this.config.streaks.streakBonusMultiplier, progress.streakDays - 1))
+      );
+
+      progress.totalPoints += streakBonus;
+      rewards.push({
+        type: 'points',
+        value: streakBonus,
+        message: `Bônus de streak: +${streakBonus} pontos! (${progress.streakDays} dias)`,
+      });
+
+      this.emitEvent('streak_updated', userId, {
+        streakDays: progress.streakDays,
+        bonus: streakBonus,
+      });
+    } else {
+      if (progress.streakDays > 0) {
+        this.emitEvent('streak_broken', userId, {
+          previousStreak: progress.streakDays,
+        });
+      }
+      progress.streakDays = 1;
+    }
+
+    progress.lastPracticeDate = session.date;
+    return rewards;
+  }
+
   private isValidForStreak(session: PracticeSession, lastPracticeDate?: Date): boolean {
     if (!lastPracticeDate) return true;
 
@@ -95,7 +211,6 @@ class GamificationService {
     return diffDays === 1 && session.duration >= this.config.streaks.minDailyPractice;
   }
 
-  // Calcula pontos ganhos em uma sessão
   private calculateSessionPoints(session: PracticeSession): number {
     let points = 0;
 
@@ -113,21 +228,80 @@ class GamificationService {
     return points;
   }
 
-  // Calcula experiência ganha em uma sessão
   private calculateSessionExperience(session: PracticeSession): number {
     return Math.floor(this.calculateSessionPoints(session) * 0.5);
   }
 
-  // Lida com level up do usuário
-  private async handleLevelUp(userId: string, newLevel: number): Promise<void> {
-    // Implementar lógica de recompensas por level up
-    const rewards = this.getLevelUpRewards(newLevel);
-    await this.grantRewards(userId, rewards);
+  private async getLevelUpRewards(level: number): Promise<Reward[]> {
+    const rewards: Reward[] = [];
+
+    // Recompensas base por level up
+    rewards.push({
+      type: 'points',
+      value: level * 100,
+      message: `Bônus de level up: +${level * 100} pontos!`,
+    });
+
+    // Badges especiais por níveis importantes
+    if (level === 10) {
+      rewards.push({
+        type: 'badge',
+        value: {
+          id: 'novice_vocalist',
+          title: 'Vocalista Iniciante',
+          description: 'Alcançou o nível 10',
+          rarity: BadgeRarity.COMMON,
+          icon: 'badge_novice',
+          unlockedAt: new Date(),
+        },
+        message: 'Desbloqueou a insígnia de Vocalista Iniciante!',
+      });
+    } else if (level === 25) {
+      rewards.push({
+        type: 'badge',
+        value: {
+          id: 'intermediate_vocalist',
+          title: 'Vocalista Intermediário',
+          description: 'Alcançou o nível 25',
+          rarity: BadgeRarity.RARE,
+          icon: 'badge_intermediate',
+          unlockedAt: new Date(),
+        },
+        message: 'Desbloqueou a insígnia de Vocalista Intermediário!',
+      });
+    } else if (level === 50) {
+      rewards.push({
+        type: 'badge',
+        value: {
+          id: 'advanced_vocalist',
+          title: 'Vocalista Avançado',
+          description: 'Alcançou o nível 50',
+          rarity: BadgeRarity.EPIC,
+          icon: 'badge_advanced',
+          unlockedAt: new Date(),
+        },
+        message: 'Desbloqueou a insígnia de Vocalista Avançado!',
+      });
+    } else if (level === 100) {
+      rewards.push({
+        type: 'badge',
+        value: {
+          id: 'master_vocalist',
+          title: 'Mestre Vocal',
+          description: 'Alcançou o nível máximo!',
+          rarity: BadgeRarity.LEGENDARY,
+          icon: 'badge_master',
+          unlockedAt: new Date(),
+        },
+        message: 'Desbloqueou a insígnia de Mestre Vocal!',
+      });
+    }
+
+    return rewards;
   }
 
-  // Verifica e atualiza conquistas
-  private async checkAchievements(userId: string, progress: UserProgress): Promise<Achievement[]> {
-    const newAchievements: Achievement[] = [];
+  private async checkAchievements(userId: string, progress: UserProgress): Promise<Reward[]> {
+    const rewards: Reward[] = [];
     const allAchievements = await this.getAllAchievements();
 
     for (const achievement of allAchievements) {
@@ -136,15 +310,60 @@ class GamificationService {
         if (isCompleted) {
           achievement.isCompleted = true;
           achievement.completedAt = new Date();
-          newAchievements.push(achievement);
+          progress.achievements.push(achievement);
+
+          rewards.push({
+            type: 'achievement',
+            value: achievement,
+            message: `Conquista desbloqueada: ${achievement.title}!`,
+          });
+
+          // Pontos bônus por conquista
+          const bonusPoints = this.calculateAchievementBonus(achievement);
+          progress.totalPoints += bonusPoints;
+
+          rewards.push({
+            type: 'points',
+            value: bonusPoints,
+            message: `Bônus por conquista: +${bonusPoints} pontos!`,
+          });
+
+          this.emitEvent('achievement_unlocked', userId, {
+            achievement,
+            bonusPoints,
+          });
         }
       }
     }
 
-    return newAchievements;
+    return rewards;
   }
 
-  // Verifica se uma conquista foi completada
+  private calculateAchievementBonus(achievement: Achievement): number {
+    const basePoints = achievement.points;
+    let multiplier = 1;
+
+    switch (achievement.level) {
+      case AchievementLevel.BRONZE:
+        multiplier = 1;
+        break;
+      case AchievementLevel.SILVER:
+        multiplier = 2;
+        break;
+      case AchievementLevel.GOLD:
+        multiplier = 3;
+        break;
+      case AchievementLevel.PLATINUM:
+        multiplier = 4;
+        break;
+      case AchievementLevel.DIAMOND:
+        multiplier = 5;
+        break;
+    }
+
+    return basePoints * multiplier;
+  }
+
   private checkAchievementCompletion(achievement: Achievement, progress: UserProgress): boolean {
     switch (achievement.category) {
       case AchievementCategory.PRACTICE:
@@ -155,24 +374,25 @@ class GamificationService {
         return this.checkSocialAchievement(achievement, progress);
       case AchievementCategory.CHALLENGE:
         return this.checkChallengeAchievement(achievement, progress);
+      case AchievementCategory.STREAK:
+        return this.checkStreakAchievement(achievement, progress);
+      case AchievementCategory.MILESTONE:
+        return this.checkMilestoneAchievement(achievement, progress);
       default:
         return false;
     }
   }
 
-  // Métodos auxiliares para verificar diferentes tipos de conquistas
   private checkPracticeAchievement(achievement: Achievement, progress: UserProgress): boolean {
-    const totalPracticeTime = progress.practiceHistory.reduce((total, session) => total + session.duration, 0);
-    return totalPracticeTime >= achievement.requirements[0].value;
+    return progress.stats.totalPracticeTime >= achievement.requirements[0].value;
   }
 
   private checkPerformanceAchievement(achievement: Achievement, progress: UserProgress): boolean {
-    const perfectSessions = progress.practiceHistory.filter(session => session.metrics.overallScore >= 95);
-    return perfectSessions.length >= achievement.requirements[0].value;
+    return progress.stats.perfectSessions >= achievement.requirements[0].value;
   }
 
   private checkSocialAchievement(achievement: Achievement, progress: UserProgress): boolean {
-    // Implementar lógica de conquistas sociais
+    // TODO: Implementar quando tivermos recursos sociais
     return false;
   }
 
@@ -180,37 +400,80 @@ class GamificationService {
     return progress.challengesCompleted >= achievement.requirements[0].value;
   }
 
-  // Métodos de acesso a dados (a serem implementados com a camada de persistência)
-  private async getUserProgress(userId: string): Promise<UserProgress> {
-    // TODO: Implementar busca no banco de dados
-    return {} as UserProgress;
+  private checkStreakAchievement(achievement: Achievement, progress: UserProgress): boolean {
+    return progress.stats.longestStreak >= achievement.requirements[0].value;
   }
 
-  private async saveUserProgress(userId: string, progress: UserProgress): Promise<void> {
-    // TODO: Implementar salvamento no banco de dados
+  private checkMilestoneAchievement(achievement: Achievement, progress: UserProgress): boolean {
+    switch (achievement.requirements[0].type) {
+      case 'level':
+        return progress.level >= achievement.requirements[0].value;
+      case 'points':
+        return progress.totalPoints >= achievement.requirements[0].value;
+      case 'exercises':
+        return progress.stats.exercisesCompleted >= achievement.requirements[0].value;
+      default:
+        return false;
+    }
   }
 
-  private async getAllAchievements(): Promise<Achievement[]> {
-    // TODO: Implementar busca no banco de dados
-    return [];
+  private async checkChallenges(
+    userId: string,
+    session: PracticeSession,
+    progress: UserProgress
+  ): Promise<Reward[]> {
+    const rewards: Reward[] = [];
+    const activeChallenges = await this.getActiveChallenges();
+
+    for (const challenge of activeChallenges) {
+      if (challenge.participants.includes(userId)) {
+        const challengeProgress = this.calculateChallengeProgress(challenge, session);
+        
+        if (challengeProgress >= 100) {
+          progress.challengesCompleted++;
+          
+          // Adiciona recompensas do desafio
+          rewards.push({
+            type: 'points',
+            value: challenge.rewards.points,
+            message: `Desafio completado: ${challenge.title}! +${challenge.rewards.points} pontos`,
+          });
+
+          if (challenge.rewards.badge) {
+            rewards.push({
+              type: 'badge',
+              value: challenge.rewards.badge,
+              message: `Desbloqueou a insígnia ${challenge.rewards.badge.title}!`,
+            });
+          }
+
+          this.emitEvent('challenge_completed', userId, {
+            challenge,
+            rewards,
+          });
+        }
+      }
+    }
+
+    return rewards;
   }
 
-  private async grantRewards(userId: string, rewards: any): Promise<void> {
-    // TODO: Implementar lógica de recompensas
+  private calculateChallengeProgress(challenge: Challenge, session: PracticeSession): number {
+    // TODO: Implementar cálculo de progresso baseado no tipo de desafio
+    return 0;
   }
 
-  private getLevelUpRewards(level: number): any {
-    // TODO: Implementar lógica de recompensas por level
-    return {};
-  }
-
-  // API pública para outros serviços
   public async getLeaderboard(type: 'global' | 'weekly' | 'monthly'): Promise<LeaderboardEntry[]> {
     // TODO: Implementar busca no banco de dados
     return [];
   }
 
   public async getChallenges(type: ChallengeType): Promise<Challenge[]> {
+    // TODO: Implementar busca no banco de dados
+    return [];
+  }
+
+  private async getActiveChallenges(): Promise<Challenge[]> {
     // TODO: Implementar busca no banco de dados
     return [];
   }
@@ -228,6 +491,38 @@ class GamificationService {
     // TODO: Implementar busca no banco de dados
     return [];
   }
+
+  private async getUserProgress(userId: string): Promise<UserProgress> {
+    // TODO: Implementar busca no banco de dados
+    return {
+      userId,
+      level: 1,
+      experience: 0,
+      experienceToNextLevel: this.calculateExperienceForLevel(1),
+      totalPoints: 0,
+      streakDays: 0,
+      achievements: [],
+      badges: [],
+      challengesCompleted: 0,
+      practiceHistory: [],
+      stats: {
+        totalPracticeTime: 0,
+        exercisesCompleted: 0,
+        averageScore: 0,
+        perfectSessions: 0,
+        longestStreak: 0,
+      },
+    };
+  }
+
+  private async saveUserProgress(userId: string, progress: UserProgress): Promise<void> {
+    // TODO: Implementar salvamento no banco de dados
+  }
+
+  private async getAllAchievements(): Promise<Achievement[]> {
+    // TODO: Implementar busca no banco de dados
+    return [];
+  }
 }
 
-export const gamificationService = new GamificationService(); 
+export default new GamificationService(); 

@@ -1,41 +1,19 @@
 import React from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
-import { useSpring, animated, config } from '@react-spring/web';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-  ChartOptions,
-} from 'chart.js';
+  Box,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { Line } from 'react-chartjs-2';
-import { motion } from 'framer-motion';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import { useSpring, animated } from '@react-spring/web';
 
 interface ProgressChartProps {
   data: {
     labels: string[];
-    datasets: {
+    datasets: Array<{
       label: string;
       data: number[];
-      borderColor?: string;
-      backgroundColor?: string;
-    }[];
+    }>;
   };
   title: string;
   subtitle: string;
@@ -48,145 +26,109 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
 }) => {
   const theme = useTheme();
 
-  const fadeIn = useSpring({
-    from: { opacity: 0, y: 20 },
-    to: { opacity: 1, y: 0 },
-    config: config.gentle
+  const springProps = useSpring({
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    to: { opacity: 1, transform: 'translateY(0px)' },
+    config: { tension: 280, friction: 60 },
   });
 
-  const titleAnimation = useSpring({
-    from: { opacity: 0, x: -20 },
-    to: { opacity: 1, x: 0 },
-    delay: 200,
-    config: config.gentle
+  const hoverProps = useSpring({
+    scale: 1,
+    config: { tension: 300, friction: 10 },
   });
 
-  const subtitleAnimation = useSpring({
-    from: { opacity: 0, x: -20 },
-    to: { opacity: 1, x: 0 },
-    delay: 300,
-    config: config.gentle
-  });
+  const handleHover = (isHovered: boolean) => {
+    hoverProps.scale.start(isHovered ? 1.02 : 1);
+  };
 
-  const chartOptions: ChartOptions<'line'> = {
+  const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: true,
-        position: 'top',
+        position: 'bottom' as const,
         labels: {
-          color: theme.palette.text.primary,
+          color: 'rgba(255, 255, 255, 0.7)',
           font: {
             family: theme.typography.fontFamily,
-            size: 12
           },
-          usePointStyle: true,
-          pointStyle: 'circle'
-        }
+        },
       },
       tooltip: {
-        backgroundColor: theme.palette.background.paper,
-        titleColor: theme.palette.text.primary,
+        mode: 'index' as const,
+        intersect: false,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'rgba(255, 255, 255, 0.9)',
+        bodyColor: 'rgba(255, 255, 255, 0.7)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1,
+        padding: 12,
         titleFont: {
           family: theme.typography.fontFamily,
           size: 14,
-          weight: 600
+          weight: 'bold',
         },
-        bodyColor: theme.palette.text.secondary,
         bodyFont: {
           family: theme.typography.fontFamily,
-          size: 12,
-          weight: 400
+          size: 13,
         },
-        padding: 12,
-        borderColor: theme.palette.divider,
-        borderWidth: 1
-      }
+        displayColors: true,
+        boxPadding: 4,
+      },
     },
     scales: {
       x: {
         grid: {
-          color: theme.palette.divider,
-          display: false,
-          drawTicks: false
+          color: 'rgba(255, 255, 255, 0.1)',
+          drawBorder: false,
         },
         ticks: {
-          color: theme.palette.text.secondary,
+          color: 'rgba(255, 255, 255, 0.7)',
           font: {
             family: theme.typography.fontFamily,
-            size: 11
-          }
-        }
+          },
+        },
       },
       y: {
         grid: {
-          color: theme.palette.divider,
-          display: false,
-          drawTicks: false
+          color: 'rgba(255, 255, 255, 0.1)',
+          drawBorder: false,
         },
         ticks: {
-          color: theme.palette.text.secondary,
+          color: 'rgba(255, 255, 255, 0.7)',
           font: {
             family: theme.typography.fontFamily,
-            size: 11
-          }
-        }
-      }
+          },
+        },
+      },
     },
     interaction: {
+      mode: 'nearest' as const,
+      axis: 'x' as const,
       intersect: false,
-      mode: 'index'
     },
-    elements: {
-      line: {
-        tension: 0.3
-      },
-      point: {
-        radius: 4,
-        hitRadius: 8,
-        hoverRadius: 6
-      }
-    }
-  };
-
-  // Enhance the data with gradients and styling
-  const enhancedData = {
-    ...data,
-    datasets: data.datasets.map((dataset, index) => ({
-      ...dataset,
-      borderColor: index === 0 ? theme.palette.primary.main : theme.palette.secondary.main,
-      backgroundColor: (context: any) => {
-        const ctx = context.chart.ctx;
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        if (index === 0) {
-          gradient.addColorStop(0, 'rgba(124, 77, 255, 0.2)');
-          gradient.addColorStop(1, 'rgba(124, 77, 255, 0)');
-        } else {
-          gradient.addColorStop(0, 'rgba(255, 77, 148, 0.2)');
-          gradient.addColorStop(1, 'rgba(255, 77, 148, 0)');
-        }
-        return gradient;
-      },
-      fill: true,
-      pointBackgroundColor: index === 0 ? theme.palette.primary.main : theme.palette.secondary.main,
-      pointBorderColor: '#fff',
-    })),
   };
 
   return (
-    <animated.div style={fadeIn}>
+    <animated.div
+      style={{
+        ...springProps,
+        transform: hoverProps.scale.to(s => `scale(${s})`),
+      }}
+      onMouseEnter={() => handleHover(true)}
+      onMouseLeave={() => handleHover(false)}
+    >
       <Box
-        component={motion.div}
-        whileHover={{ scale: 1.01 }}
         sx={{
           p: 3,
+          height: '100%',
+          minHeight: 400,
           background: theme.gradients.glass,
           backdropFilter: 'blur(10px)',
           borderRadius: 4,
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          height: '100%',
-          minHeight: 400,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
           position: 'relative',
           overflow: 'hidden',
           '&::before': {
@@ -195,46 +137,23 @@ const ProgressChart: React.FC<ProgressChartProps> = ({
             top: 0,
             left: 0,
             right: 0,
-            height: '4px',
-            background: theme.gradients.primary,
-            opacity: 0,
-            transition: 'opacity 0.3s ease',
-          },
-          '&:hover::before': {
-            opacity: 1,
+            bottom: 0,
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: 'inherit',
           },
         }}
-        data-testid="progress-chart"
       >
-        <Box sx={{ mb: 3 }}>
-          <animated.div style={titleAnimation}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: 'white',
-                mb: 1,
-              }}
-            >
-              {title}
-            </Typography>
-          </animated.div>
-
-          <animated.div style={subtitleAnimation}>
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                fontSize: '0.875rem',
-              }}
-            >
-              {subtitle}
-            </Typography>
-          </animated.div>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6" color="text.primary" gutterBottom>
+            {title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {subtitle}
+          </Typography>
         </Box>
 
-        <Box sx={{ height: 300, position: 'relative' }}>
-          <Line options={chartOptions} data={enhancedData} />
+        <Box sx={{ flex: 1, position: 'relative' }}>
+          <Line data={data} options={chartOptions} />
         </Box>
       </Box>
     </animated.div>
