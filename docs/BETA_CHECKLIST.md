@@ -38,12 +38,36 @@
   - [x] Implementar verificação de integridade
   - [x] Criar ambiente de staging
   - [x] Configurar dados de teste
+  - [ ] Configurar variáveis de ambiente
   - [ ] Realizar teste em ambiente de staging
   - [ ] Validar dados restaurados
 - [ ] Documentação
   - [ ] Procedimentos de backup
   - [ ] Procedimentos de restore
   - [ ] Plano de disaster recovery
+
+### ⚠️ Pendências de Configuração
+1. **MongoDB**
+   - [ ] Configurar MONGODB_URI
+   - [ ] Configurar MONGODB_DB
+   - [ ] Verificar permissões de acesso
+
+2. **Email**
+   - [ ] Configurar SMTP_HOST
+   - [ ] Configurar SMTP_PORT
+   - [ ] Configurar SMTP_USER
+   - [ ] Configurar SMTP_PASS
+   - [ ] Verificar configurações de segurança
+
+3. **Discord**
+   - [ ] Configurar DISCORD_WEBHOOK_URL
+   - [ ] Configurar DISCORD_CHANNEL_ID
+   - [ ] Testar integração
+
+4. **Beta**
+   - [ ] Configurar BETA_DOMAIN
+   - [ ] Configurar DKIM_SELECTOR
+   - [ ] Verificar configurações DNS
 
 ## Prioridade 3: Monitoramento 24/7 📊 (70%)
 ### Sistema Base
@@ -94,7 +118,8 @@
 2. **Backup (Prioridade 2)**
    - ✅ Criar ambiente de staging
    - ✅ Configurar dados de teste
-   - 🔄 Executar teste de backup/restore
+   - 🔄 Configurar variáveis de ambiente
+   - ⏳ Executar teste de backup/restore
    - ⏳ Validar integridade dos dados
 
 3. **Monitoramento (Prioridade 3)**
