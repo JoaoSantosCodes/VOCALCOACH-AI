@@ -4,7 +4,7 @@ import { BrightnessHigh, BrightnessLow, Contrast, ContrastOutlined } from '@mui/
 import { createAppTheme } from './utils/theme';
 import { useThemePreference } from './hooks/useThemePreference';
 import Layout from './components/Layout';
-import Routes from './Routes';
+import { AppRoutes } from './Routes';
 
 const App: React.FC = () => {
   const { mode, contrastLevel, toggleMode, toggleContrast } = useThemePreference();
@@ -50,7 +50,7 @@ const App: React.FC = () => {
           </Tooltip>
         </Box>
         <Layout>
-          <Routes />
+          <AppRoutes />
         </Layout>
       </Box>
     </ThemeProvider>

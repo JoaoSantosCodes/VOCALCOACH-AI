@@ -1,4 +1,5 @@
-import { createTheme, PaletteOptions, Theme } from '@mui/material';
+import { createTheme, PaletteOptions } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 
 // Extend the Theme type to include our custom properties
 declare module '@mui/material/styles' {

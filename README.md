@@ -645,4 +645,165 @@ O sistema de backup foi implementado com as seguintes características:
 - **Documentação**
   - [Procedimentos de Backup](docs/BACKUP_PROCEDURES.md)
   - [Procedimentos de Restauração](docs/ROLLBACK_PROCEDURES.md)
-  - [Documentação Técnica](docs/TECHNICAL-DOCUMENTATION.md) 
+  - [Documentação Técnica](docs/TECHNICAL-DOCUMENTATION.md)
+
+## 📋 Status do Projeto
+
+**Progresso Geral: 65% Concluído**
+
+### ✅ Funcionalidades Implementadas
+- Sistema de backup automático
+- Dashboard de monitoramento em tempo real
+- Webhooks Discord configurados
+- Sistema de logs estruturado
+- Scripts de monitoramento e alertas
+- Documentação técnica completa
+
+### 🔄 Em Desenvolvimento
+- Configuração de DNS (pendente propagação)
+- Sistema de email (depende do DNS)
+- Relatórios automáticos
+
+### 📊 Progresso por Área
+- **Segurança e Backup**: 100% ✅
+- **Monitoramento**: 85% ✅
+- **Comunicação**: 40% 🔄
+- **Relatórios**: 30% 🔄
+- **Infraestrutura**: 70% 🔄
+
+## 🛠️ Dependências
+
+O projeto possui um checklist detalhado de dependências organizado por categoria:
+
+- **Frontend**: React, Material-UI, Chart.js, Workbox
+- **Backend**: Express, MongoDB, Passport, Winston
+- **Desenvolvimento**: TypeScript, ESLint, Jest, Cypress
+- **Monitoramento**: Axios, Discord Webhooks
+
+📋 [Ver Checklist Completo de Dependências](docs/dependencies-checklist.md)
+
+## 🚀 Instalação
+
+### Pré-requisitos
+- Node.js 18+
+- MongoDB
+- Git
+
+### Passos de Instalação
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/seu-usuario/vocalcoach-ai.git
+cd vocalcoach-ai
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+```
+
+3. **Configure as variáveis de ambiente**
+```bash
+cp config/env/staging.env .env
+# Edite o arquivo .env com suas configurações
+```
+
+4. **Inicie o servidor de desenvolvimento**
+```bash
+npm start
+```
+
+## 📊 Monitoramento
+
+### Dashboard em Tempo Real
+O projeto inclui um dashboard de monitoramento que pode ser acessado em:
+- **URL**: http://localhost:3001
+- **API**: http://localhost:3001/api/status
+
+### Comandos de Monitoramento
+```bash
+# Iniciar dashboard
+npm run beta:dashboard
+
+# Testar webhooks Discord
+npm run monitor:test
+
+# Verificar saúde do sistema
+npm run monitor:health
+```
+
+## 🔧 Scripts Disponíveis
+
+### Desenvolvimento
+```bash
+npm start          # Inicia o servidor de desenvolvimento
+npm run build      # Cria build de produção
+npm test           # Executa testes
+npm run test:e2e   # Executa testes end-to-end
+```
+
+### Monitoramento
+```bash
+npm run beta:dashboard    # Dashboard de monitoramento
+npm run monitor:test      # Testa webhooks Discord
+npm run monitor:health    # Verifica saúde do sistema
+npm run backup:create     # Cria backup do banco
+npm run backup:restore    # Restaura backup
+```
+
+### Deploy
+```bash
+npm run deploy:staging    # Deploy para staging
+npm run deploy:prod       # Deploy para produção
+```
+
+## 📁 Estrutura do Projeto
+
+```
+VocalCoach AI/
+├── backend/              # Servidor Node.js/Express
+├── src/                  # Frontend React
+├── scripts/              # Scripts de automação
+├── docs/                 # Documentação
+├── config/               # Configurações
+├── tests/                # Testes
+└── tools/                # Ferramentas auxiliares
+```
+
+## 🔒 Segurança
+
+- Autenticação JWT
+- Rate limiting
+- Validação de entrada
+- Headers de segurança
+- Criptografia de dados sensíveis
+
+## 📈 Monitoramento
+
+- Logs estruturados com Winston
+- Webhooks Discord para alertas
+- Dashboard em tempo real
+- Métricas de performance
+- Backup automático
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 📞 Suporte
+
+- **Documentação**: [docs/](docs/)
+- **FAQ**: [docs/FAQ.md](docs/FAQ.md)
+- **Guia de Suporte**: [docs/SUPPORT_GUIDE.md](docs/SUPPORT_GUIDE.md)
+
+---
+
+**Desenvolvido com ❤️ pela equipe VocalCoach AI** 

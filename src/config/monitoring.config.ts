@@ -13,6 +13,7 @@ interface MonitoringConfig {
             alerts: WebhookConfig;
             errors: WebhookConfig;
             info: WebhookConfig;
+            monitoring: WebhookConfig;
             beta: WebhookConfig;
         };
         retryAttempts: number;
@@ -45,8 +46,13 @@ const config: MonitoringConfig = {
                 level: LogLevel.ERROR
             },
             info: {
-                url: process.env.DISCORD_WEBHOOK_INFO || '',
+                url: process.env.DISCORD_WEBHOOK_MONITORING || '',
                 name: 'VocalCoach-Info',
+                level: LogLevel.INFO
+            },
+            monitoring: {
+                url: process.env.DISCORD_WEBHOOK_MONITORING || '',
+                name: 'VocalCoach-Monitoring',
                 level: LogLevel.INFO
             },
             beta: {

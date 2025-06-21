@@ -1,13 +1,13 @@
 import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { CircularProgress, Box } from '@mui/material';
-import { PrivateRoute } from '@components/Auth/PrivateRoute';
+import PrivateRoute from './components/Auth/PrivateRoute';
 
 // Lazy loaded components
-const Home = React.lazy(() => import('@/pages/Home'));
-const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
-const Practice = React.lazy(() => import('@/pages/Practice'));
-const Karaoke = React.lazy(() => import('@/pages/Karaoke'));
+const Home = React.lazy(() => import('./pages/Home'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Practice = React.lazy(() => import('./pages/Practice'));
+const Karaoke = React.lazy(() => import('./pages/Karaoke'));
 
 // Loading fallback component
 const LoadingFallback = () => (
