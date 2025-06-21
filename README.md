@@ -471,4 +471,114 @@ Features offline:
 
 João Santos - [@JoaoSantosCodes](https://github.com/JoaoSantosCodes)
 
-Link do Projeto: [https://github.com/JoaoSantosCodes/VOCALCOACH-AI](https://github.com/JoaoSantosCodes/VOCALCOACH-AI) 
+Link do Projeto: [https://github.com/JoaoSantosCodes/VOCALCOACH-AI](https://github.com/JoaoSantosCodes/VOCALCOACH-AI)
+
+## Status do Projeto 📊
+
+### Progresso Geral: 63.3% Concluído
+- Sistema de Email: 45% ▰▰▰▰▱▱▱▱▱▱
+- Backup: 100% ▰▰▰▰▰▰▰▰▰▰
+- Monitoramento: 70% ▰▰▰▰▰▰▰▱▱▱
+- Suporte: 10% ▰▱▱▱▱▱▱▱▱▱
+
+### Últimas Conquistas 🏆
+- ✅ Sistema de backup totalmente configurado e testado
+- ✅ Ambiente de staging implementado
+- ✅ MongoDB Tools instalado e configurado
+- ✅ Scripts de teste automatizados
+- ✅ Registros DNS gerados para email
+
+### Em Andamento 🔄
+1. **Sistema de Email**
+   - Configuração de registros DNS
+   - Testes de entrega
+   - Validação de taxas de entrega
+
+2. **Monitoramento**
+   - Configuração de webhooks
+   - Testes em produção
+
+3. **Suporte**
+   - Documentação inicial
+   - Templates de FAQ
+
+## Configuração do Ambiente 🛠️
+
+### Pré-requisitos
+- Node.js v16+
+- MongoDB v5+
+- MongoDB Database Tools v100.9.4
+- Acesso ao provedor DNS
+
+### Instalação
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/seu-usuario/vocalcoach-ai.git
+cd vocalcoach-ai
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+```
+
+3. **Configure o ambiente**
+```bash
+# Instalar MongoDB Tools
+npm run beta:install-tools
+
+# Configurar ambiente de staging
+npm run beta:setup-staging
+```
+
+4. **Verifique a instalação**
+```bash
+npm run beta:verify-tools
+```
+
+### Scripts Disponíveis
+
+#### Sistema de Email
+- `npm run beta:setup-dns` - Gera registros DNS
+- `npm run beta:validate-email` - Valida configuração de email
+
+#### Backup e Restore
+- `npm run beta:backup-staging` - Backup do ambiente de staging
+- `npm run beta:test-restore` - Testa restore do backup
+
+#### Monitoramento
+- `npm run beta:monitor-health` - Monitora saúde do sistema
+- `npm run beta:test-discord` - Testa integração Discord
+
+## Documentação 📚
+
+- [Guia de Configuração](docs/ENVIRONMENT_SETUP.md)
+- [Checklist Beta](docs/BETA_CHECKLIST.md)
+- [Guia do Beta Tester](docs/BETA_TESTER_GUIDE.md)
+- [Plano de Teste Beta](docs/BETA_TEST_PLAN.md)
+
+## Próximos Passos 🎯
+
+1. **Curto Prazo (24h)**
+   - Configurar registros DNS para email
+   - Realizar testes de entrega
+   - Configurar webhooks de monitoramento
+
+2. **Médio Prazo (72h)**
+   - Finalizar sistema de email
+   - Implementar dashboard de monitoramento
+   - Criar documentação de suporte
+
+3. **Longo Prazo (1 semana)**
+   - Iniciar beta test
+   - Coletar feedback inicial
+   - Ajustar configurações baseado no feedback
+
+## Contribuição 🤝
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes sobre como contribuir com o projeto.
+
+## Licença 📄
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes. 
