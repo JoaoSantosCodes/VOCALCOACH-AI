@@ -74,6 +74,7 @@
     "beta:progress": "node scripts/generate-beta-progress.js",
     "beta:checklist": "node scripts/checklist-progress.js",
     "beta:checklist:update": "node scripts/checklist-progress.js --update",
+    "beta:ai-diagnosis": "node scripts/ai-quick-diagnosis.js",
     "test:server": "node scripts/test-server.js",
     "dev:backend": "cd backend && npm run dev",
     "dev:backend:simple": "cd backend && npm run dev:simple",
