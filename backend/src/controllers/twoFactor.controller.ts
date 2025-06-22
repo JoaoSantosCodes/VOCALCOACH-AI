@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { TwoFactorService } from '../services/twoFactor.service';
 import { validateOrReject } from 'class-validator';
-import { TwoFactorSetupDto, TwoFactorVerifyDto } from '../validators/twoFactor.validator';
+import { TwoFactorTokenDto, TwoFactorVerifyDto } from '../validators/twoFactor.validator';
 
 export class TwoFactorController {
   // Iniciar configuração 2FA
@@ -32,7 +32,7 @@ export class TwoFactorController {
   // Ativar 2FA
   static async enable(req: Request, res: Response) {
     try {
-      const dto = new TwoFactorSetupDto();
+      const dto = new TwoFactorTokenDto();
       Object.assign(dto, req.body);
       await validateOrReject(dto);
 

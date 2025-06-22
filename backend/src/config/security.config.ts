@@ -1,92 +1,57 @@
-import helmet from 'helmet';
-import { Request, Response, NextFunction } from 'express';
-import xss from 'xss';
-
-// Configuração do Content Security Policy
-export const cspConfig = {
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-    imgSrc: ["'self'", 'data:', 'https:'],
-    connectSrc: ["'self'", 'https://api.example.com'],
-    mediaSrc: ["'self'"],
-    objectSrc: ["'none'"],
-    frameSrc: ["'none'"],
-  },
-  reportOnly: false,
-};
-
-// Middleware para sanitizar entrada de dados
-export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
-  if (req.body) {
-    const sanitized = sanitizeObject(req.body);
-    req.body = sanitized;
-  }
-
-  if (req.query) {
-    const sanitized = sanitizeObject(req.query);
-    req.query = sanitized;
-  }
-
-  if (req.params) {
-    const sanitized = sanitizeObject(req.params);
-    req.params = sanitized;
-  }
-
-  next();
-};
-
-// Função recursiva para sanitizar objetos
-const sanitizeObject = (obj: any): any => {
-  if (typeof obj !== 'object' || obj === null) {
-    return typeof obj === 'string' ? xss(obj) : obj;
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeObject(item));
-  }
-
-  const sanitized: any = {};
-  for (const [key, value] of Object.entries(obj)) {
-    sanitized[key] = sanitizeObject(value);
-  }
-  return sanitized;
-};
+import { HelmetOptions } from 'helmet';
+import { RequestHandler } from 'express';
+import xss from 'xss-clean';
 
 // Configuração do Helmet
-export const helmetConfig = {
-  // Habilitar X-XSS-Protection
-  xssFilter: true,
-
-  // Configurar X-Frame-Options
-  frameguard: {
-    action: 'deny',
+export const helmetConfig: HelmetOptions = {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
   },
-
-  // Configurar X-Content-Type-Options
-  noSniff: true,
-
-  // Configurar Referrer-Policy
-  referrerPolicy: {
-    policy: 'strict-origin-when-cross-origin',
-  },
-
-  // Configurar HSTS
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' as const },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
     preload: true,
   },
-
-  // Desabilitar X-Powered-By
   hidePoweredBy: true,
+};
 
-  // Configurar CSP
-  contentSecurityPolicy: {
-    useDefaults: true,
-    directives: cspConfig.directives,
+// Middleware de sanitização de entrada usando xss-clean
+export const sanitizeInput: RequestHandler = xss();
+
+// Configuração de CORS
+export const corsConfig = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+// Configuração de rate limiting
+export const rateLimitConfig = {
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // limite de 100 requisições por IP
+  message: 'Muitas requisições deste IP, tente novamente mais tarde.',
+  standardHeaders: true,
+  legacyHeaders: false,
+};
+
+// Configuração de sessão
+export const sessionConfig = {
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    sameSite: 'strict' as const,
   },
 };
 

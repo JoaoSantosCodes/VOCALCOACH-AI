@@ -10,6 +10,12 @@ export interface IBlogPost extends Document {
   author: Schema.Types.ObjectId;
   slug: string;
   tags: string[];
+  score: number;
+  criteria: {
+    type: string;
+    value: number;
+  };
+  progress: number;
   publishedAt: Date;
   status: 'draft' | 'published';
   views: number;
@@ -56,6 +62,28 @@ const BlogPostSchema: Schema = new Schema({
     type: String,
     trim: true,
   }],
+  views: {
+    type: Number,
+    default: 0,
+  },
+  score: {
+    type: Number,
+    default: 0,
+  },
+  criteria: {
+    type: {
+      type: String,
+      default: 'views',
+    },
+    value: {
+      type: Number,
+      default: 0,
+    },
+  },
+  progress: {
+    type: Number,
+    default: 0,
+  },
   publishedAt: {
     type: Date,
     default: Date.now,
@@ -64,10 +92,6 @@ const BlogPostSchema: Schema = new Schema({
     type: String,
     enum: ['draft', 'published'],
     default: 'draft',
-  },
-  views: {
-    type: Number,
-    default: 0,
   },
 }, {
   timestamps: true,

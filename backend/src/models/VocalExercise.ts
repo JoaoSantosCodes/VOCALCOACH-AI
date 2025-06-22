@@ -7,6 +7,12 @@ export interface IVocalExercise extends Document {
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   category: 'range' | 'control' | 'power' | 'agility' | 'articulation';
   duration: number; // in seconds
+  score: number;
+  criteria: {
+    type: string;
+    value: number;
+  };
+  progress: number;
   targetNotes: {
     note: string;
     octave: number;
@@ -74,6 +80,24 @@ const vocalExerciseSchema = new Schema<IVocalExercise>(
       type: Number,
       required: [true, 'Exercise duration is required'],
       min: [1, 'Duration must be at least 1 second'],
+    },
+    score: {
+      type: Number,
+      required: [true, 'Score is required'],
+    },
+    criteria: {
+      type: {
+        type: String,
+        required: [true, 'Criteria type is required'],
+      },
+      value: {
+        type: Number,
+        required: [true, 'Criteria value is required'],
+      },
+    },
+    progress: {
+      type: Number,
+      required: [true, 'Progress is required'],
     },
     targetNotes: [
       {

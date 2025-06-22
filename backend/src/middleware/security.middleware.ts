@@ -6,6 +6,13 @@ import hpp from 'hpp';
 import mongoSanitize from 'express-mongo-sanitize';
 import { rateLimit } from 'express-rate-limit';
 import { createHash, randomBytes } from 'crypto';
+import cors from 'cors';
+import logger from '../config/logger';
+
+// Extender o tipo Request para incluir files
+interface RequestWithFiles extends Request {
+  files?: any;
+}
 
 // Configuração do rate limiter global
 const limiter = rateLimit({
@@ -22,6 +29,136 @@ const csrfProtection = csrf({
     sameSite: 'strict',
   },
 });
+
+// Middleware de segurança básica
+export const securityMiddleware = [
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  }),
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+];
+
+// Rate limiting para autenticação
+export const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 5, // 5 tentativas
+  message: {
+    status: 'error',
+    message: 'Muitas tentativas de login. Tente novamente em 15 minutos.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiting para API geral
+export const apiRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // 100 requests
+  message: {
+    status: 'error',
+    message: 'Muitas requisições. Tente novamente em 15 minutos.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Middleware para verificar se o usuário está autenticado
+export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+  const user = (req as any).user;
+  if (!user) {
+    res.status(401).json({
+      status: 'error',
+      message: 'Authentication required',
+    });
+    return;
+  }
+  next();
+};
+
+// Middleware para verificar se o usuário é admin
+export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {
+  const user = (req as any).user;
+  if (!user) {
+    res.status(401).json({
+      status: 'error',
+      message: 'Authentication required',
+    });
+    return;
+  }
+
+  if (user.role !== 'admin') {
+    res.status(403).json({
+      status: 'error',
+      message: 'Admin access required',
+    });
+    return;
+  }
+
+  next();
+};
+
+// Middleware para logging de requisições
+export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const user = (req as any).user;
+    const userId = user ? user._id : 'anonymous';
+    
+    logger.info('HTTP Request', {
+      method: req.method,
+      url: req.url,
+      status: res.statusCode,
+      duration: `${duration}ms`,
+      userId,
+      userAgent: req.get('User-Agent'),
+      ip: req.ip,
+    });
+  });
+
+  next();
+};
+
+// Middleware para sanitização de dados
+export const sanitizeInput = (req: Request, res: Response, next: NextFunction): void => {
+  // Sanitizar body
+  if (req.body) {
+    Object.keys(req.body).forEach(key => {
+      if (typeof req.body[key] === 'string') {
+        req.body[key] = req.body[key].trim();
+      }
+    });
+  }
+
+  // Sanitizar query params
+  if (req.query) {
+    Object.keys(req.query).forEach(key => {
+      if (typeof req.query[key] === 'string') {
+        req.query[key] = (req.query[key] as string).trim();
+      }
+    });
+  }
+
+  next();
+};
 
 export class SecurityMiddleware {
   // Middleware principal de segurança
@@ -71,7 +208,7 @@ export class SecurityMiddleware {
     // CSRF Protection para rotas não-API
     app.use((req: Request, res: Response, next: NextFunction) => {
       if (!req.path.startsWith('/api/')) {
-        return csrfProtection(req, res, next);
+        return csrfProtection(req as any, res as any, next);
       }
       next();
     });
@@ -89,9 +226,9 @@ export class SecurityMiddleware {
     res: Response,
     next: NextFunction
   ) {
-    if (!req.files) return next();
-
-    const files = Array.isArray(req.files) ? req.files : [req.files];
+    const reqWithFiles = req as any;
+    if (!reqWithFiles.files) return next();
+    const files = Array.isArray(reqWithFiles.files) ? reqWithFiles.files : [reqWithFiles.files];
     const allowedTypes = [
       'image/jpeg',
       'image/png',

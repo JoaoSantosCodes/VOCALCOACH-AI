@@ -1,15 +1,14 @@
 import { Router } from 'express';
-import { startAnalysis, getAnalysisHistory, getAnalysisById } from '../controllers/voice.controller';
+import { VoiceController } from '../controllers/voice.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
-// All routes require authentication
-router.use(authMiddleware);
-
-// Voice analysis routes
-router.post('/analyze', startAnalysis);
-router.get('/history', getAnalysisHistory);
-router.get('/:id', getAnalysisById);
+// Rotas de análise de voz
+router.post('/analyze', authMiddleware, VoiceController.analyzeVoice);
+router.get('/history', authMiddleware, VoiceController.getAnalysisHistory);
+router.get('/:id', authMiddleware, VoiceController.getAnalysis);
+router.delete('/:id', authMiddleware, VoiceController.deleteAnalysis);
+router.get('/stats/voice', authMiddleware, VoiceController.getVoiceStats);
 
 export default router; 

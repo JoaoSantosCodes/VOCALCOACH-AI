@@ -1,127 +1,84 @@
 import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
+import path from 'path';
+import fs from 'fs';
 import { authConfig } from './auth.config';
 
-const { format, transports } = winston;
-const { combine, timestamp, printf, colorize, json } = format;
+// Criar diretório de logs se não existir
+const logsDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
 
-// Custom log format for development
-const devLogFormat = printf(({ level, message, timestamp, ...metadata }) => {
-  let msg = `${timestamp} [${level}]: ${message}`;
-  if (Object.keys(metadata).length > 0) {
-    msg += `\n${JSON.stringify(metadata, null, 2)}`;
-  }
-  return msg;
-});
-
-// Custom log format for production
-const prodLogFormat = combine(
-  timestamp(),
-  json()
+// Configuração de formatos
+const logFormat = winston.format.combine(
+  winston.format.timestamp({
+    format: 'YYYY-MM-DD HH:mm:ss'
+  }),
+  winston.format.errors({ stack: true }),
+  winston.format.json()
 );
 
-// Define log levels
-const logLevels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-};
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp({
+    format: 'YYYY-MM-DD HH:mm:ss'
+  }),
+  winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
+    let log = `${timestamp} [${level}]: ${message}`;
+    if (stack) {
+      log += `\n${stack}`;
+    }
+    if (Object.keys(meta).length > 0) {
+      log += `\n${JSON.stringify(meta, null, 2)}`;
+    }
+    return log;
+  })
+);
 
-// Create the logger
+// Configuração do logger
 const logger = winston.createLogger({
-  level: authConfig.logging.level || 'info',
-  levels: logLevels,
-  format: process.env.NODE_ENV === 'production' ? prodLogFormat : combine(
-    colorize(),
-    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    devLogFormat
-  ),
+  level: process.env.LOG_LEVEL || 'info',
+  format: logFormat,
+  defaultMeta: { service: 'vocalcoach-api' },
   transports: [
-    // Console transport for development
-    new transports.Console({
-      level: 'debug',
-      handleExceptions: true,
-      format: combine(
-        colorize(),
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        devLogFormat
-      ),
-    }),
-
-    // File transport for errors
-    new DailyRotateFile({
-      filename: 'logs/error-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
+    // Arquivo de logs de erro
+    new winston.transports.File({
+      filename: path.join(logsDir, 'error.log'),
       level: 'error',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: prodLogFormat,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
     }),
-
-    // File transport for all logs
-    new DailyRotateFile({
-      filename: 'logs/combined-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: prodLogFormat,
+    // Arquivo de logs combinados
+    new winston.transports.File({
+      filename: path.join(logsDir, 'combined.log'),
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
     }),
   ],
-  // Handle uncaught exceptions and unhandled rejections
-  exceptionHandlers: [
-    new transports.File({ filename: 'logs/exceptions.log' }),
-  ],
-  rejectionHandlers: [
-    new transports.File({ filename: 'logs/rejections.log' }),
-  ],
-  exitOnError: false,
 });
 
-// Create a stream object for Morgan middleware
-const stream = {
-  write: (message: string) => {
-    logger.http(message.trim());
-  },
+// Adicionar console em desenvolvimento
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: consoleFormat
+  }));
+}
+
+// Funções de conveniência
+export const logInfo = (message: string, meta?: any) => {
+  logger.info(message, meta);
 };
 
-// Helper functions for common logging patterns
-export const logError = (error: Error, context?: string) => {
-  logger.error({
-    message: error.message,
-    stack: error.stack,
-    context,
-    timestamp: new Date().toISOString(),
-  });
+export const logError = (message: string, error?: Error, meta?: any) => {
+  logger.error(message, { error: error?.stack, ...meta });
 };
 
-export const logAPIRequest = (req: any, context?: string) => {
-  logger.info({
-    method: req.method,
-    url: req.url,
-    params: req.params,
-    query: req.query,
-    body: req.body,
-    context,
-    timestamp: new Date().toISOString(),
-  });
+export const logWarn = (message: string, meta?: any) => {
+  logger.warn(message, meta);
 };
 
-export const logPerformance = (operation: string, duration: number) => {
-  logger.debug({
-    operation,
-    duration: `${duration}ms`,
-    timestamp: new Date().toISOString(),
-  });
+export const logDebug = (message: string, meta?: any) => {
+  logger.debug(message, meta);
 };
 
-export const logSecurity = (event: string, details: any) => {
-  logger.warn({
-    event,
-    details,
-    timestamp: new Date().toISOString(),
-  });
-};
-
-export { logger, stream }; 
+export default logger; 

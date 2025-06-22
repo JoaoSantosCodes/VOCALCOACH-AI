@@ -5,6 +5,9 @@ export interface IStats extends Document {
   activeUsers: number;
   totalExercises: number;
   averageScore: number;
+  level: number;
+  experience: number;
+  points: number;
   lastUpdated: Date;
 }
 
@@ -25,6 +28,21 @@ const StatsSchema: Schema = new Schema({
     default: 0
   },
   averageScore: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  level: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  experience: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  points: {
     type: Number,
     required: true,
     default: 0

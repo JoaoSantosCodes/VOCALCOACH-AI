@@ -11,6 +11,10 @@ export interface IUser extends Document {
   isActive: boolean;
   isEmailVerified: boolean;
   isProfileComplete: boolean;
+  progress: number;
+  level: number;
+  experience: number;
+  points: number;
   lastLogin: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -109,6 +113,22 @@ const userSchema = new Schema<IUser>(
     isProfileComplete: {
       type: Boolean,
       default: false,
+    },
+    progress: {
+      type: Number,
+      default: 0,
+    },
+    level: {
+      type: Number,
+      default: 1,
+    },
+    experience: {
+      type: Number,
+      default: 0,
+    },
+    points: {
+      type: Number,
+      default: 0,
     },
     lastLogin: {
       type: Date,

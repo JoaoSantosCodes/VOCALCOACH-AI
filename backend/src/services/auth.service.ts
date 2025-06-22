@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { User } from '../models/User';
-import { config } from '../config/auth.config';
+import { User, IUser } from '../models/User';
+import authConfig from '../config/auth.config';
 
 export class AuthService {
   private static readonly TOKEN_EXPIRATION = '24h';
@@ -10,20 +10,20 @@ export class AuthService {
   /**
    * Gera um token JWT para o usuário
    */
-  static generateToken(user: User): { accessToken: string; refreshToken: string } {
+  static generateToken(user: IUser): { accessToken: string; refreshToken: string } {
     const accessToken = jwt.sign(
       {
         id: user.id,
         email: user.email,
         role: user.role,
       },
-      config.jwtSecret,
+      authConfig.jwt.secret,
       { expiresIn: this.TOKEN_EXPIRATION }
     );
 
     const refreshToken = jwt.sign(
       { id: user.id },
-      config.refreshTokenSecret,
+      authConfig.jwt.secret,
       { expiresIn: this.REFRESH_TOKEN_EXPIRATION }
     );
 
@@ -50,7 +50,7 @@ export class AuthService {
    */
   static verifyToken(token: string): any {
     try {
-      return jwt.verify(token, config.jwtSecret);
+      return jwt.verify(token, authConfig.jwt.secret);
     } catch (error) {
       throw new Error('Token inválido');
     }
@@ -61,7 +61,7 @@ export class AuthService {
    */
   static verifyRefreshToken(token: string): any {
     try {
-      return jwt.verify(token, config.refreshTokenSecret);
+      return jwt.verify(token, authConfig.jwt.secret);
     } catch (error) {
       throw new Error('Refresh token inválido');
     }
@@ -84,7 +84,7 @@ export class AuthService {
         email: user.email,
         role: user.role,
       },
-      config.jwtSecret,
+      authConfig.jwt.secret,
       { expiresIn: this.TOKEN_EXPIRATION }
     );
   }

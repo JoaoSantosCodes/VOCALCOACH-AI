@@ -36,36 +36,26 @@ export class BotProtectionMiddleware {
   ];
 
   // Middleware principal de proteção
-  static async protect(req: Request, res: Response, next: NextFunction) {
+  static async protect(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // Verifica rate limit
-      await rateLimiter.consume(req.ip);
-
-      // Executa todas as verificações
-      const checks = await Promise.all([
-        this.checkUserAgent(req),
-        this.checkBehaviorPattern(req),
-        this.checkHoneypot(req),
-        this.validateClientFingerprint(req),
-      ]);
-
-      // Se alguma verificação falhar, bloqueia a requisição
-      if (checks.some(check => !check)) {
-        return res.status(403).json({
-          error: 'Acesso negado',
-          message: 'Comportamento suspeito detectado',
-        });
+      if (!req.ip) {
+        res.status(400).json({ error: 'IP address not available' });
+        return;
       }
 
+      await rateLimiter.consume(req.ip);
       next();
     } catch (error) {
-      if (error.name === 'RateLimiterRes') {
-        return res.status(429).json({
-          error: 'Too Many Requests',
-          message: 'Por favor, tente novamente mais tarde',
+      if (error && typeof error === 'object' && 'name' in error && error.name === 'RateLimiterRes') {
+        res.status(429).json({
+          error: 'Too many requests',
+          retryAfter: (error as any).msBeforeNext / 1000
         });
+        return;
       }
-      next(error);
+
+      console.error('Rate limiter error:', error);
+      next();
     }
   }
 

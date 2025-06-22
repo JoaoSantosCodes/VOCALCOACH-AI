@@ -1,19 +1,14 @@
 import { Router } from 'express';
-import { getUserAchievements, checkAndUpdateAchievements, initializeUserAchievements } from '../controllers/achievement.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { AchievementController } from '../controllers/achievement.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
-// All routes require authentication
-router.use(authenticateToken);
-
-// Get user's achievements
-router.get('/', getUserAchievements);
-
-// Check and update achievements
-router.post('/check', checkAndUpdateAchievements);
-
-// Initialize achievements for new user
-router.post('/initialize', initializeUserAchievements);
+// Rotas de conquistas
+router.get('/', authMiddleware, AchievementController.getUserAchievements);
+router.get('/all', AchievementController.getAllAchievements);
+router.post('/unlock', authMiddleware, AchievementController.unlockAchievement);
+router.post('/check', authMiddleware, AchievementController.checkAchievements);
+router.get('/stats', authMiddleware, AchievementController.getAchievementStats);
 
 export default router; 

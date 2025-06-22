@@ -1,14 +1,14 @@
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
-import { User } from '../models/User';
-import { prisma } from '../config/database';
+import { User, IUser } from '../models/User';
 import { createHash } from 'crypto';
+import bcrypt from 'bcryptjs';
 
 export class TwoFactorService {
   private static readonly APP_NAME = 'VocalCoach AI';
 
   // Gera segredo e QR code para 2FA
-  static async generateTwoFactorSecret(user: User) {
+  static async generateTwoFactorSecret(user: IUser) {
     const secret = authenticator.generateSecret();
     const otpauth = authenticator.keyuri(
       user.email,
@@ -23,12 +23,9 @@ export class TwoFactorService {
     const hashedSecret = createHash('sha256').update(secret).digest('hex');
 
     // Atualiza usuário com o segredo
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        twoFactorSecret: hashedSecret,
-        twoFactorEnabled: false,
-      },
+    await User.findByIdAndUpdate(user._id, {
+      twoFactorSecret: hashedSecret,
+      twoFactorEnabled: false,
     });
 
     return {
@@ -42,20 +39,12 @@ export class TwoFactorService {
     userId: string,
     token: string
   ): Promise<boolean> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        twoFactorSecret: true,
-        twoFactorEnabled: true,
-      },
-    });
-
-    if (!user || !user.twoFactorSecret) {
+    const user = await User.findById(userId).select('twoFactorSecret twoFactorEnabled');
+    const userObj = user as any;
+    if (!userObj || !userObj.twoFactorSecret) {
       return false;
     }
-
-    // Recupera o segredo original
-    const secret = user.twoFactorSecret;
+    const secret = userObj.twoFactorSecret;
 
     try {
       return authenticator.verify({
@@ -75,11 +64,8 @@ export class TwoFactorService {
       return false;
     }
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        twoFactorEnabled: true,
-      },
+    await User.findByIdAndUpdate(userId, {
+      twoFactorEnabled: true,
     });
 
     return true;
@@ -96,12 +82,9 @@ export class TwoFactorService {
       return false;
     }
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        twoFactorEnabled: false,
-        twoFactorSecret: null,
-      },
+    await User.findByIdAndUpdate(userId, {
+      twoFactorEnabled: false,
+      twoFactorSecret: null,
     });
 
     return true;
@@ -118,11 +101,8 @@ export class TwoFactorService {
       createHash('sha256').update(code).digest('hex')
     );
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        backupCodes: hashedCodes,
-      },
+    await User.findByIdAndUpdate(userId, {
+      backupCodes: hashedCodes,
     });
 
     return codes;
@@ -133,28 +113,20 @@ export class TwoFactorService {
     userId: string,
     code: string
   ): Promise<boolean> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        backupCodes: true,
-      },
-    });
-
-    if (!user || !user.backupCodes) {
+    const user = await User.findById(userId).select('backupCodes');
+    const userObj = user as any;
+    if (!userObj || !userObj.backupCodes) {
       return false;
     }
 
     const hashedCode = createHash('sha256').update(code).digest('hex');
-    const isValid = user.backupCodes.includes(hashedCode);
+    const isValid = userObj.backupCodes.includes(hashedCode);
 
     if (isValid) {
       // Remove o código usado
-      const remainingCodes = user.backupCodes.filter(c => c !== hashedCode);
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          backupCodes: remainingCodes,
-        },
+      const remainingCodes = userObj.backupCodes.filter((c: string) => c !== hashedCode);
+      await User.findByIdAndUpdate(userId, {
+        backupCodes: remainingCodes,
       });
     }
 

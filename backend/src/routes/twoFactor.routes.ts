@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { TwoFactorController } from '../controllers/twoFactor.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validator.middleware';
-import { TwoFactorSetupDto, TwoFactorVerifyDto, BackupCodeVerifyDto } from '../validators/twoFactor.validator';
+import { TwoFactorTokenDto, TwoFactorVerifyDto, BackupCodeDto } from '../validators/twoFactor.validator';
 import { securityAuditMiddleware } from '../middleware/audit.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 // Todas as rotas 2FA requerem autenticação
 router.use(authMiddleware);
@@ -17,7 +17,7 @@ router.post('/setup', TwoFactorController.setup);
 // Ativar 2FA
 router.post(
   '/enable',
-  validateRequest(TwoFactorSetupDto),
+  validateRequest(TwoFactorTokenDto),
   TwoFactorController.enable
 );
 
@@ -38,7 +38,7 @@ router.post(
 // Verificar código de backup
 router.post(
   '/verify-backup',
-  validateRequest(BackupCodeVerifyDto),
+  validateRequest(BackupCodeDto),
   TwoFactorController.verifyBackup
 );
 

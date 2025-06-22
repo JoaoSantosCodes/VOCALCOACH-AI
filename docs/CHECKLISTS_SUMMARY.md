@@ -178,6 +178,43 @@ npm run beta:dashboard
 
 ---
 
+## 🤖 Guia de Verificação para IA
+
+### **Novo Recurso: Guia Automatizado**
+Criamos um guia completo que permite que qualquer IA verifique automaticamente o status dos checklists e determine as próximas ações prioritárias.
+
+**📖 [Guia de Verificação para IA](./AI_CHECKLIST_GUIDE.md)**
+
+### **Benefícios do Guia:**
+- **Verificação Automática**: Processo estruturado para IAs
+- **Matriz de Decisão**: Priorização automática de ações
+- **Comandos Padronizados**: Verificações consistentes
+- **Template de Resposta**: Estrutura padronizada para relatórios
+
+### **Como Usar:**
+1. Execute `npm run beta:checklist` para verificação rápida
+2. Siga o processo de 4 passos do guia
+3. Use a matriz de decisão para priorizar ações
+4. Atualize progresso após cada tarefa
+
+### **Comandos Principais:**
+```bash
+# Verificação completa
+npm run beta:checklist
+
+# Verificação de dependências
+npm run deps:check
+
+# Teste de builds
+npm run build:backend
+npm run build
+
+# Atualizar progresso
+npm run beta:checklist:update
+```
+
+---
+
 ## 🎉 Conclusão
 
 Os checklists criados fornecem uma base sólida para o desenvolvimento organizado e eficiente do projeto VocalCoach AI. Com ferramentas automatizadas de acompanhamento e métricas claras, a equipe pode focar nas prioridades corretas e manter alta qualidade durante toda a fase de beta test.
@@ -187,4 +224,4 @@ Os checklists criados fornecem uma base sólida para o desenvolvimento organizad
 ---
 
 *Documento criado em: 21/12/2024*
-*Última atualização: 21/12/2024* 
+*Última atualização: 22/06/2025* 

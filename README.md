@@ -45,6 +45,29 @@ Este comando irá:
 - Configurar canais do Discord
 - Instalar dependências adicionais se necessário
 
+### 🤖 Guia de Verificação de Checklists para IA
+
+Para facilitar o desenvolvimento e manutenção do projeto, criamos um guia completo que permite que qualquer IA verifique automaticamente o status dos checklists e determine as próximas ações prioritárias.
+
+**📖 [Guia Completo](./docs/AI_CHECKLIST_GUIDE.md)**
+
+**Comando Rápido de Verificação:**
+```bash
+npm run beta:checklist
+```
+
+Este comando fornece:
+- Progresso geral do projeto
+- Status de cada checklist (Backend, Frontend, Prioridades)
+- Recomendações automáticas
+- Próximas ações prioritárias
+
+**Para IAs:**
+- Use o guia para verificar status automaticamente
+- Siga a matriz de decisão para priorizar ações
+- Atualize progresso após cada tarefa concluída
+- Mantenha consistência entre checklists
+
 ### 🎮 Comandos do Beta
 
 - `npm run beta:setup` - Configura o ambiente beta

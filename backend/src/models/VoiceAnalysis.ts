@@ -11,6 +11,7 @@ export interface IVoiceAnalysis extends Document {
   channels: number;
   bitDepth: number;
   fileSize: number;
+  score: number;
   pitch: {
     average: number;
     min: number;
@@ -187,6 +188,12 @@ const voiceAnalysisSchema = new Schema<IVoiceAnalysis>(
       type: Number,
       required: [true, 'File size is required'],
       min: [0, 'File size must be positive'],
+    },
+    score: {
+      type: Number,
+      required: [true, 'Score is required'],
+      min: [0, 'Score must be positive'],
+      max: [100, 'Score must be between 0 and 100'],
     },
     pitch: {
       average: {

@@ -6,6 +6,13 @@ export interface IAchievement extends Document {
   icon: string;
   category: 'practice' | 'performance' | 'social' | 'special';
   type: 'one-time' | 'progressive' | 'streak' | 'milestone';
+  criteria: {
+    type: string;
+    value: number;
+  };
+  progress: number;
+  completed: boolean;
+  completedAt?: Date;
   requirements: {
     type: string;
     value: number;
@@ -55,6 +62,27 @@ const achievementSchema = new Schema<IAchievement>(
       type: String,
       enum: ['one-time', 'progressive', 'streak', 'milestone'],
       required: [true, 'Achievement type is required'],
+    },
+    criteria: {
+      type: {
+        type: String,
+        required: [true, 'Criteria type is required'],
+      },
+      value: {
+        type: Number,
+        required: [true, 'Criteria value is required'],
+      },
+    },
+    progress: {
+      type: Number,
+      default: 0,
+    },
+    completed: {
+      type: Boolean,
+      default: false,
+    },
+    completedAt: {
+      type: Date,
     },
     requirements: {
       type: {

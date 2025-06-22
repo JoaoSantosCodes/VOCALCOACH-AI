@@ -2,165 +2,204 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as AppleStrategy } from 'passport-apple';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
-import { authConfig } from './auth.config';
 import { logError } from './logger';
 
-// Serialização do usuário para a sessão
+// Configuração da estratégia local (email/senha)
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password'
+}, async (email: string, password: string, done: any) => {
+  try {
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return done(null, false, { message: 'Email ou senha incorretos' });
+    }
+
+    // Verificar se a senha existe antes de comparar
+    if (!user.password) {
+      return done(null, false, { message: 'Email ou senha incorretos' });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    
+    if (!isValidPassword) {
+      return done(null, false, { message: 'Email ou senha incorretos' });
+    }
+
+    return done(null, user);
+  } catch (error) {
+    return done(error as Error, false);
+  }
+}));
+
+// Configuração da estratégia JWT
+passport.use(new JwtStrategy({
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET || 'your-secret-key'
+}, async (payload: any, done: any) => {
+  try {
+    const user = await User.findById(payload.userId);
+    
+    if (!user) {
+      return done(null, false);
+    }
+
+    return done(null, user);
+  } catch (error) {
+    return done(error as Error, false);
+  }
+}));
+
+// Serialize user
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
 
-// Deserialização do usuário da sessão
+// Deserialize user
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await User.findById(id);
     done(null, user);
   } catch (error) {
-    logError(error as Error, 'Passport Deserialization Error');
-    done(error, null);
+    done(error as Error, false);
   }
 });
 
-// Configuração do Google OAuth2.0
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: authConfig.google.clientID,
-      clientSecret: authConfig.google.clientSecret,
-      callbackURL: authConfig.google.callbackURL,
-      passReqToCallback: true,
-    },
-    async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
-      try {
-        // Verificar se o usuário já existe
-        let user = await User.findOne({ 'google.id': profile.id });
+// Google Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID || '',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback',
+  scope: ['profile', 'email']
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ 'google.id': profile.id });
 
-        if (user) {
-          // Atualizar informações do usuário
-          user.google.accessToken = accessToken;
-          user.google.refreshToken = refreshToken;
-          user.lastLogin = new Date();
-          await user.save();
-          return done(null, user);
+    if (!user) {
+      // Create new user
+      user = new User({
+        email: profile.emails?.[0]?.value,
+        name: profile.displayName,
+        google: {
+          id: profile.id,
+          accessToken,
+          refreshToken
         }
-
-        // Criar novo usuário
-        user = await User.create({
-          email: profile.emails[0].value,
-          name: profile.displayName,
-          avatar: profile.photos[0]?.value,
-          google: {
-            id: profile.id,
-            accessToken,
-            refreshToken,
-          },
-          isEmailVerified: true,
-          role: 'user',
-          lastLogin: new Date(),
-        });
-
-        done(null, user);
-      } catch (error) {
-        logError(error as Error, 'Google Auth Error');
-        done(error, null);
+      });
+    } else {
+      // Update existing user's Google info
+      if (!user.google) {
+        user.google = {
+          id: profile.id,
+          accessToken,
+          refreshToken
+        };
+      } else {
+        user.google.accessToken = accessToken;
+        user.google.refreshToken = refreshToken;
       }
     }
-  )
-);
 
-// Configuração do Facebook OAuth2.0
-if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
-  passport.use(
-    new FacebookStrategy(
-      {
-        clientID: process.env.FACEBOOK_APP_ID,
-        clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: process.env.FACEBOOK_CALLBACK_URL,
-        profileFields: ['id', 'emails', 'name', 'picture'],
-        passReqToCallback: true,
-      },
-      async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
-        try {
-          let user = await User.findOne({ 'facebook.id': profile.id });
+    await user.save();
+    return done(null, user);
+  } catch (error) {
+    logError('Google Auth Error', error as Error);
+    return done(error as Error, false);
+  }
+}));
 
-          if (user) {
-            user.facebook.accessToken = accessToken;
-            user.facebook.refreshToken = refreshToken;
-            user.lastLogin = new Date();
-            await user.save();
-            return done(null, user);
-          }
+// Facebook Strategy
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_APP_ID || '',
+  clientSecret: process.env.FACEBOOK_APP_SECRET || '',
+  callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:3000/auth/facebook/callback',
+  profileFields: ['id', 'displayName', 'photos', 'email']
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ 'facebook.id': profile.id });
 
-          user = await User.create({
-            email: profile.emails[0]?.value,
-            name: `${profile.name.givenName} ${profile.name.familyName}`,
-            avatar: profile.photos[0]?.value,
-            facebook: {
-              id: profile.id,
-              accessToken,
-              refreshToken,
-            },
-            isEmailVerified: true,
-            role: 'user',
-            lastLogin: new Date(),
-          });
-
-          done(null, user);
-        } catch (error) {
-          logError(error as Error, 'Facebook Auth Error');
-          done(error, null);
+    if (!user) {
+      // Create new user
+      user = new User({
+        email: profile.emails?.[0]?.value,
+        name: profile.displayName,
+        facebook: {
+          id: profile.id,
+          accessToken,
+          refreshToken
         }
+      });
+    } else {
+      // Update existing user's Facebook info
+      if (!user.facebook) {
+        user.facebook = {
+          id: profile.id,
+          accessToken,
+          refreshToken
+        };
+      } else {
+        user.facebook.accessToken = accessToken;
+        user.facebook.refreshToken = refreshToken;
       }
-    )
-  );
-}
+    }
 
-// Configuração do Apple OAuth2.0
-if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID) {
-  passport.use(
-    new AppleStrategy(
-      {
-        clientID: process.env.APPLE_CLIENT_ID,
-        teamID: process.env.APPLE_TEAM_ID,
-        keyID: process.env.APPLE_KEY_ID,
-        privateKeyLocation: process.env.APPLE_PRIVATE_KEY_PATH,
-        callbackURL: process.env.APPLE_CALLBACK_URL,
-        passReqToCallback: true,
-      },
-      async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
-        try {
-          let user = await User.findOne({ 'apple.id': profile.id });
+    await user.save();
+    return done(null, user);
+  } catch (error) {
+    logError('Facebook Auth Error', error as Error);
+    return done(error as Error, false);
+  }
+}));
 
-          if (user) {
-            user.apple.accessToken = accessToken;
-            user.apple.refreshToken = refreshToken;
-            user.lastLogin = new Date();
-            await user.save();
-            return done(null, user);
-          }
+// Apple Strategy
+passport.use(new AppleStrategy({
+  clientID: process.env.APPLE_CLIENT_ID || '',
+  teamID: process.env.APPLE_TEAM_ID || '',
+  keyID: process.env.APPLE_KEY_ID || '',
+  privateKeyLocation: process.env.APPLE_PRIVATE_KEY_PATH || '',
+  callbackURL: process.env.APPLE_CALLBACK_URL || 'http://localhost:3000/auth/apple/callback',
+  passReqToCallback: true
+}, async (req: any, accessToken: string, refreshToken: string, idToken: string, profile: any, done: any) => {
+  try {
+    let user = await User.findOne({ 'apple.id': profile.id });
 
-          user = await User.create({
-            email: profile.email,
-            name: profile.name?.firstName + ' ' + profile.name?.lastName,
-            apple: {
-              id: profile.id,
-              accessToken,
-              refreshToken,
-            },
-            isEmailVerified: true,
-            role: 'user',
-            lastLogin: new Date(),
-          });
-
-          done(null, user);
-        } catch (error) {
-          logError(error as Error, 'Apple Auth Error');
-          done(error, null);
+    if (!user) {
+      // Create new user
+      user = new User({
+        email: profile.email,
+        name: profile.name?.firstName + ' ' + profile.name?.lastName,
+        apple: {
+          id: profile.id,
+          accessToken,
+          refreshToken
         }
+      });
+    } else {
+      // Update existing user's Apple info
+      if (!user.apple) {
+        user.apple = {
+          id: profile.id,
+          accessToken,
+          refreshToken
+        };
+      } else {
+        user.apple.accessToken = accessToken;
+        user.apple.refreshToken = refreshToken;
       }
-    )
-  );
-}
+    }
+
+    await user.save();
+    return done(null, user);
+  } catch (error) {
+    logError('Apple Auth Error', error as Error);
+    return done(error as Error, false);
+  }
+}));
 
 export default passport; 

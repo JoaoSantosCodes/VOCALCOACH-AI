@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 
 export const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -25,4 +26,43 @@ export const updateProfileSchema = z.object({
     practiceReminders: z.boolean(),
     dailyGoalMinutes: z.number().min(5).max(240),
   }).optional(),
-}); 
+});
+
+export class LoginDto {
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  @MinLength(6)
+  password!: string;
+}
+
+export class RegisterDto {
+  @IsString()
+  @MinLength(2)
+  name!: string;
+
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  @MinLength(6)
+  password!: string;
+
+  @IsOptional()
+  @IsString()
+  confirmPassword?: string;
+}
+
+// Funções de validação para compatibilidade
+export const validateLogin = (data: any) => {
+  const loginDto = new LoginDto();
+  Object.assign(loginDto, data);
+  return loginDto;
+};
+
+export const validateRegister = (data: any) => {
+  const registerDto = new RegisterDto();
+  Object.assign(registerDto, data);
+  return registerDto;
+}; 

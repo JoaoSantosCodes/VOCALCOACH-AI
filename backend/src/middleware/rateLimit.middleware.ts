@@ -1,61 +1,142 @@
+import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
-import Redis from 'ioredis';
-import { logger } from '../config/logger';
+import logger from '../config/logger';
 
-// Criar cliente Redis
-const redis = new Redis({
+// Configuração do Redis para rate limiting
+const redis = require('redis').createClient({
   host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
+  port: process.env.REDIS_PORT || 6379,
 });
 
-redis.on('error', (error) => {
-  logger.error('Erro na conexão com Redis:', error);
-});
-
-// Configuração base do rate limit
-const baseConfig = {
+// Rate limiter global
+export const globalLimiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args: string[]) => redis.sendCommand(...args),
+  }),
   windowMs: 15 * 60 * 1000, // 15 minutos
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
+  max: 100, // limite de 100 requisições por IP
+  message: 'Muitas requisições deste IP, tente novamente mais tarde.',
+  handler: (req: any, res: any) => {
+    logger.error('Rate limit exceeded', new Error('Rate limit exceeded'), {
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
     res.status(429).json({
-      message: 'Muitas requisições. Por favor, tente novamente mais tarde.',
+      error: 'Too Many Requests',
+      message: 'Muitas requisições deste IP, tente novamente mais tarde.'
     });
   },
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => redis.call(...args),
-  }),
-};
+});
 
-// Rate limit para rotas de autenticação
-export const authLimiter = rateLimit({
-  ...baseConfig,
+// Rate limiter para autenticação
+export const authRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
   max: 5, // 5 tentativas
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  skipSuccessfulRequests: true, // Não conta requisições bem-sucedidas
+  message: {
+    status: 'error',
+    message: 'Muitas tentativas de login. Tente novamente em 15 minutos.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const userId = user ? user._id : 'anonymous';
+    
+    logger.warn('Rate limit exceeded for authentication', {
+      userId,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+
+    res.status(429).json({
+      status: 'error',
+      message: 'Muitas tentativas de login. Tente novamente em 15 minutos.',
+    });
+  },
 });
 
-// Rate limit para API geral
-export const apiLimiter = rateLimit({
-  ...baseConfig,
-  max: 100, // 100 requisições
+// Rate limiter para API geral
+export const apiRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // 100 requests
+  message: {
+    status: 'error',
+    message: 'Muitas requisições. Tente novamente em 15 minutos.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const userId = user ? user._id : 'anonymous';
+    
+    logger.warn('Rate limit exceeded for API', {
+      userId,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      url: req.url,
+    });
+
+    res.status(429).json({
+      status: 'error',
+      message: 'Muitas requisições. Tente novamente em 15 minutos.',
+    });
+  },
 });
 
-// Rate limit para uploads
-export const uploadLimiter = rateLimit({
-  ...baseConfig,
+// Rate limiter para uploads
+export const uploadRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hora
   max: 10, // 10 uploads
-  windowMs: 60 * 60 * 1000, // 1 hora
+  message: {
+    status: 'error',
+    message: 'Limite de uploads excedido. Tente novamente em 1 hora.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const userId = user ? user._id : 'anonymous';
+    
+    logger.warn('Rate limit exceeded for uploads', {
+      userId,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+
+    res.status(429).json({
+      status: 'error',
+      message: 'Limite de uploads excedido. Tente novamente em 1 hora.',
+    });
+  },
 });
 
-// Rate limit para análise de voz
-export const voiceAnalysisLimiter = rateLimit({
-  ...baseConfig,
-  max: 50, // 50 análises
+// Rate limiter para criação de conteúdo
+export const contentCreationRateLimit = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hora
+  max: 20, // 20 criações
+  message: {
+    status: 'error',
+    message: 'Limite de criação de conteúdo excedido. Tente novamente em 1 hora.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const userId = user ? user._id : 'anonymous';
+    
+    logger.warn('Rate limit exceeded for content creation', {
+      userId,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      url: req.url,
+    });
+
+    res.status(429).json({
+      status: 'error',
+      message: 'Limite de criação de conteúdo excedido. Tente novamente em 1 hora.',
+    });
+  },
 });
 
 // Rate limiter for user registration
@@ -103,21 +184,31 @@ export const skipRateLimitForTrustedIPs = (trustedIPs: string[]) => {
     if (trustedIPs.includes(req.ip)) {
       next();
     } else {
-      apiLimiter(req, res, next);
+      apiRateLimit(req, res, next);
     }
   };
 };
 
 // Dynamic rate limiter based on user role
-export const dynamicRateLimiter = (roleConfig: Record<string, { windowMs: number; max: number }>) => {
-  return (req: any, res: any, next: any) => {
-    const userRole = req.user?.role || 'anonymous';
-    const config = roleConfig[userRole] || roleConfig.anonymous;
-
-    rateLimit({
-      windowMs: config.windowMs,
-      max: config.max,
-      message: `Rate limit exceeded for ${userRole} role`,
+export const dynamicRateLimit = (req: Request, res: Response, next: NextFunction) => {
+  const user = (req as any).user;
+  
+  if (!user) {
+    // Usuário anônimo - limite mais restritivo
+    return rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 10,
+      message: { status: 'error', message: 'Limite excedido para usuários anônimos.' },
     })(req, res, next);
-  };
+  }
+
+  // Usuário autenticado - limite baseado no tipo de conta
+  const maxRequests = user.role === 'admin' ? 1000 : 
+                     user.role === 'premium' ? 500 : 100;
+
+  return rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: maxRequests,
+    message: { status: 'error', message: 'Limite de requisições excedido.' },
+  })(req, res, next);
 }; 

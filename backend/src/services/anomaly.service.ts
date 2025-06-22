@@ -1,4 +1,4 @@
-import { prisma } from '../config/database';
+import { User } from '../models/User';
 import { Redis } from 'ioredis';
 import { createHash } from 'crypto';
 
@@ -94,17 +94,8 @@ export class AnomalyDetectionService {
     source: string,
     type: string
   ): Promise<void> {
-    await prisma.securityAlert.create({
-      data: {
-        userId,
-        source,
-        type,
-        timestamp: new Date(),
-        metadata: {
-          detectedBy: 'anomaly_detection_service',
-        },
-      },
-    });
+    // Implementar com Mongoose quando necessário
+    console.warn(`Security Alert: ${type} detected for user ${userId} from ${source}`);
 
     // Notifica sistemas de monitoramento
     await this.notifySecurityTeam(userId, type, source);

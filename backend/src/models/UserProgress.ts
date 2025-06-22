@@ -3,6 +3,9 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUserProgress extends Document {
   userId: Schema.Types.ObjectId;
   exerciseId: Schema.Types.ObjectId;
+  level: number;
+  experience: number;
+  points: number;
   attempts: {
     startTime: Date;
     endTime: Date;
@@ -72,6 +75,18 @@ const userProgressSchema = new Schema<IUserProgress>(
       type: Schema.Types.ObjectId,
       ref: 'VocalExercise',
       required: [true, 'Exercise ID is required'],
+    },
+    level: {
+      type: Number,
+      required: [true, 'Level is required'],
+    },
+    experience: {
+      type: Number,
+      required: [true, 'Experience is required'],
+    },
+    points: {
+      type: Number,
+      required: [true, 'Points is required'],
     },
     attempts: [
       {
@@ -280,9 +295,9 @@ userProgressSchema.index({ userId: 1, streak: -1 });
 // Virtuals
 userProgressSchema.virtual('improvementRate').get(function () {
   if (this.attempts.length < 2) return 0;
-  const firstScore = this.attempts[0].score;
-  const lastScore = this.attempts[this.attempts.length - 1].score;
-  return ((lastScore - firstScore) / firstScore) * 100;
+  const firstScore = this.attempts[0]?.score || 0;
+  const lastScore = this.attempts[this.attempts.length - 1]?.score || 0;
+  return firstScore > 0 ? ((lastScore - firstScore) / firstScore) * 100 : 0;
 });
 
 userProgressSchema.virtual('averageAttemptDuration').get(function () {
@@ -292,6 +307,22 @@ userProgressSchema.virtual('averageAttemptDuration').get(function () {
     0
   );
   return totalDuration / this.attempts.length;
+});
+
+userProgressSchema.virtual('firstScore').get(function (): number {
+  if (!this.attempts || this.attempts.length === 0) {
+    return 0;
+  }
+  const firstScore = this.attempts[0]?.score;
+  return firstScore || 0;
+});
+
+userProgressSchema.virtual('lastScore').get(function (): number {
+  if (!this.attempts || this.attempts.length === 0) {
+    return 0;
+  }
+  const lastScore = this.attempts[this.attempts.length - 1]?.score;
+  return lastScore || 0;
 });
 
 // Métodos
@@ -314,7 +345,7 @@ userProgressSchema.methods.addAttempt = async function (
   }
 
   const totalScore = this.attempts.reduce(
-    (sum, attempt) => sum + attempt.score,
+    (sum: number, attempt: any) => sum + (attempt.score || 0),
     0
   );
   this.averageScore = totalScore / this.attempts.length;

@@ -7,6 +7,12 @@ export interface IFeedback extends Document {
   type: 'pitch' | 'rhythm' | 'breathing' | 'technique' | 'general';
   category: 'strength' | 'weakness' | 'suggestion';
   content: string;
+  score: number;
+  criteria: {
+    type: string;
+    value: number;
+  };
+  progress: number;
   metrics: {
     pitchAccuracy: number;
     rhythmAccuracy: number;
@@ -75,6 +81,24 @@ const feedbackSchema = new Schema<IFeedback>(
       required: [true, 'Feedback content is required'],
       trim: true,
       maxlength: [1000, 'Content cannot exceed 1000 characters'],
+    },
+    score: {
+      type: Number,
+      required: [true, 'Score is required'],
+    },
+    criteria: {
+      type: {
+        type: String,
+        required: [true, 'Criteria type is required'],
+      },
+      value: {
+        type: Number,
+        required: [true, 'Criteria value is required'],
+      },
+    },
+    progress: {
+      type: Number,
+      required: [true, 'Progress is required'],
     },
     metrics: {
       pitchAccuracy: {

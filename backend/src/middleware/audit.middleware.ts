@@ -50,7 +50,7 @@ export const auditMiddleware = (
       userId: (req as any).user?.id,
       action: req.method,
       resource: req.originalUrl,
-      ip: req.ip,
+      ip: req.ip || 'unknown',
       userAgent: req.get('user-agent') || 'unknown',
       status: res.statusCode,
       details: {
@@ -104,7 +104,7 @@ export const securityAuditMiddleware = (
       userId: (req as any).user?.id,
       action: 'SECURITY_EVENT',
       resource: req.originalUrl,
-      ip: req.ip,
+      ip: req.ip || 'unknown',
       userAgent: req.get('user-agent') || 'unknown',
       status: res.statusCode,
       details: {
