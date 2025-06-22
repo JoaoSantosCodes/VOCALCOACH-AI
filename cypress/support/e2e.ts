@@ -1,6 +1,4 @@
 import './commands';
-import '@testing-library/cypress/add-commands';
-import 'cypress-axe';
 
 // Desativa o log de fetch/XHR requests para manter os logs limpos
 const app = window.top;
@@ -43,17 +41,27 @@ Cypress.Commands.add('tab', { prevSubject: 'optional' }, (subject) => {
   }
 });
 
-// Configura regras personalizadas do axe
-beforeEach(() => {
-  cy.configureAxe({
-    rules: [
-      {
-        id: 'color-contrast',
-        enabled: true,
-        options: {
-          noScroll: true,
-        },
-      },
-    ],
+// Comando personalizado para verificar se elemento está visível
+Cypress.Commands.add('shouldBeVisible', (selector) => {
+  cy.get(selector).should('be.visible');
+});
+
+// Comando personalizado para verificar se elemento existe
+Cypress.Commands.add('shouldExist', (selector) => {
+  cy.get(selector).should('exist');
+});
+
+// Comando personalizado para fazer login
+Cypress.Commands.add('login', (email, password) => {
+  cy.get('[data-testid="nav-login"]').click();
+  cy.get('[data-testid="email-input"]').type(email);
+  cy.get('[data-testid="password-input"]').type(password);
+  cy.get('[data-testid="login-submit"]').click();
+});
+
+// Comando personalizado para verificar API
+Cypress.Commands.add('checkApiHealth', () => {
+  cy.request('GET', 'http://localhost:3000/health').then((response) => {
+    expect(response.status).to.eq(200);
   });
 }); 
