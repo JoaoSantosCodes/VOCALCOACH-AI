@@ -88,7 +88,20 @@
     "backup:create": "node scripts/backup-mongodb.js",
     "backup:restore": "node scripts/verify-backup.js",
     "deploy:staging": "npm run build && npm run test",
-    "deploy:prod": "npm run build && npm run test:e2e"
+    "deploy:prod": "npm run build && npm run test:e2e",
+    "🤖:diagnosis": "node scripts/ai-quick-diagnosis.js",
+    "🤖:diagnosis:ci": "cross-env CI=true npm run 🤖:diagnosis",
+    "🤖:diagnosis:auto": "npm run 🤖:diagnosis && npm run 🤖:notify:diagnosis",
+    "🤖:badges": "node scripts/generate-status-badges.js",
+    "🤖:badges:update": "npm run 🤖:badges && git add README.md public/status.json && git commit -m '🤖 Update status badges'",
+    "🤖:notify:diagnosis": "node scripts/discord-notifications.js diagnosis",
+    "🤖:notify:build": "node scripts/discord-notifications.js build",
+    "🤖:notify:deploy": "node scripts/discord-notifications.js deploy",
+    "🤖:notify:security": "node scripts/discord-notifications.js security",
+    "🤖:notify:daily": "node scripts/discord-notifications.js daily",
+    "🤖:notify:test": "node scripts/discord-notifications.js test",
+    "🤖:automation:full": "npm run 🤖:diagnosis && npm run 🤖:badges && npm run 🤖:notify:diagnosis",
+    "🤖:automation:ci": "cross-env CI=true npm run 🤖:automation:full"
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",

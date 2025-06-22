@@ -1,0 +1,143 @@
+name: 🤖 AI Diagnosis & Project Health Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  ai-diagnosis:
+    name: 🤖 AI Diagnosis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📦 Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        
+    - name: 🤖 Run AI Diagnosis
+      id: diagnosis
+      run: |
+        echo "🔍 Executando diagnóstico automático..."
+        npm run beta:ai-diagnosis > diagnosis-report.txt 2>&1 || true
+        
+        # Salvar resultado como output
+        echo "diagnosis_output<<EOF" >> $GITHUB_OUTPUT
+        cat diagnosis-report.txt >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        # Verificar se há problemas críticos
+        if grep -q "PROBLEMAS CRÍTICOS DETECTADOS" diagnosis-report.txt; then
+          echo "has_critical_issues=true" >> $GITHUB_OUTPUT
+          echo "status=critical" >> $GITHUB_OUTPUT
+        elif grep -q "Nenhum problema crítico detectado" diagnosis-report.txt; then
+          echo "has_critical_issues=false" >> $GITHUB_OUTPUT
+          echo "status=healthy" >> $GITHUB_OUTPUT
+        else
+          echo "has_critical_issues=false" >> $GITHUB_OUTPUT
+          echo "status=warning" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: 📋 Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const diagnosis = fs.readFileSync('diagnosis-report.txt', 'utf8');
+          
+          const comment = `## 🤖 AI Diagnosis Report
+          
+          **Status:** ${process.env.STATUS === 'critical' ? '🔴 Critical Issues' : process.env.STATUS === 'healthy' ? '✅ Healthy' : '⚠️ Warnings'}
+          
+          <details>
+          <summary>📊 Full Diagnosis Report</summary>
+          
+          \`\`\`
+          ${diagnosis}
+          \`\`\`
+          
+          </details>
+          
+          ---
+          *This report was generated automatically by the AI Diagnosis system.*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+    - name: 📁 Upload diagnosis report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ai-diagnosis-report
+        path: diagnosis-report.txt
+        retention-days: 30
+        
+    - name: 🚨 Create issue for critical problems
+      if: steps.diagnosis.outputs.has_critical_issues == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const diagnosis = fs.readFileSync('diagnosis-report.txt', 'utf8');
+          
+          // Extrair problemas críticos
+          const criticalIssues = diagnosis.match(/🚨 PROBLEMAS CRÍTICOS DETECTADOS:([\s\S]*?)(?=🎯 RECOMENDAÇÕES|$)/);
+          
+          const issueBody = `## 🚨 Critical Issues Detected
+          
+          **Branch:** ${context.ref}
+          **Commit:** ${context.sha}
+          **Triggered by:** ${context.eventName}
+          
+          ### 🔍 Critical Problems Found:
+          ${criticalIssues ? criticalIssues[1] : 'See full report below'}
+          
+          ### 📋 Full Diagnosis Report:
+          \`\`\`
+          ${diagnosis}
+          \`\`\`
+          
+          ### 🎯 Recommended Actions:
+          1. Review the critical issues above
+          2. Fix the problems identified
+          3. Re-run the diagnosis to verify fixes
+          
+          ---
+          *This issue was created automatically by the AI Diagnosis system.*`;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🚨 Critical Issues Detected - AI Diagnosis',
+            body: issueBody,
+            labels: ['critical', 'ai-diagnosis', 'automated']
+          });
+          
+    - name: ✅ Summary
+      run: |
+        echo "🤖 AI Diagnosis completed!"
+        echo "Status: ${{ steps.diagnosis.outputs.status }}"
+        echo "Critical Issues: ${{ steps.diagnosis.outputs.has_critical_issues }}"
+        
+        if [ "${{ steps.diagnosis.outputs.has_critical_issues }}" = "true" ]; then
+          echo "🚨 Critical issues detected - check the created issue for details"
+          exit 1
+        else
+          echo "✅ No critical issues detected"
+        fi 

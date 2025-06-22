@@ -1,5 +1,8 @@
 # VocalCoach AI 🎵
 
+![Health](https://img.shields.io/badge/health-warning-yellow) ![Build](https://img.shields.io/badge/build-passing-brightgreen) ![Coverage](https://img.shields.io/badge/coverage-70%25+-yellow) ![Dependencies](undefined)
+
+
 [![Tests](https://github.com/JoaoSantosCodes/VOCALCOACH-AI/actions/workflows/tests.yml/badge.svg)](https://github.com/JoaoSantosCodes/VOCALCOACH-AI/actions/workflows/tests.yml)
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](https://github.com/JoaoSantosCodes/VOCALCOACH-AI)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
